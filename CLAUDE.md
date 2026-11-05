@@ -15,8 +15,14 @@ here inherits these rules. Change them only when drew says so.
 - No birds or bats on screen, ever (the world lost them). Insects fill the air.
 - No alpha blending and no anti-aliasing. Tones mix only by Bayer dithering (`engine/dither.py`).
   Fades, glows, captions and transitions all dither.
-- Captions: the 3x5 pixel font in `engine/font.py`, uppercase, bone with an ink drop shadow.
-  Sparse narration; one line on screen at a time where possible.
+- Text: all story text is on-screen subtitles, no voice. Use `cards` (`engine/subtitles.py`):
+  narration centred with no box, dialogue in a box with the speaker's name tag
+  (`assets/speakers.yaml`). Font: `engine/textfont.py`, mixed case. Text types on at
+  40 chars/s and holds for chars / 15 + 1 s. Episodes set `band: 40`, a black strip
+  under the picture that holds all text, so it never covers the figures. Long cards
+  split into pages by themselves. `captions` and the old 3x5 font are for titles only.
+- Scripts come from drew in the scene format in `docs/script-sample.md`;
+  `python tools/script2timeline.py <script> episodes/<ep>` writes the draft timeline.
 
 ## Layout
 - `engine/` the reusable engine. Most review effort goes here.
@@ -28,7 +34,10 @@ here inherits these rules. Change them only when drew says so.
 - `out/` renders (gitignored).
 
 ## Loop
+0. Draft the timeline from the script with `tools/script2timeline.py`, then hand-pass camera,
+   paths, props and lights (the draft's `notes` say what each scene needs).
 1. `python render.py episodes/<ep> --keys` for key frames + `out/<ep>/contact.png` (seconds).
+   With cards, a key frame is also taken as each card finishes typing.
 2. Review the contact sheet, adjust the timeline or sprites.
 3. `python render.py episodes/<ep> --scene <id>` for one clip, then the full episode.
 4. Tag each approved cut in git (`ep01-cut1`, ...).

@@ -1,0 +1,14 @@
+# Who can speak, how their name shows, and the color of the name tag.
+# Keys are what the script uses after the colon-less name (lowercased).
+# Colors come from engine/palette.py. Dialogue text is always bone.
+narration: {name: null}
+shaman:     {name: "The shaman",   color: ember2}
+apprentice: {name: "The apprentice", color: bone_hi}
+host:       {name: "Host",         color: fern4}
+the fold:   {name: "The Fold",     color: fern4}
+fold:       {name: "The Fold",     color: fern4}
+surveyor:   {name: "Surveyor",     color: ash5}
+chainman:   {name: "Chainman",     color: ash5}
+clerk:      {name: "Clerk",        color: ash5}
+guard:      {name: "Guard",        color: ash4}
+# Anyone not listed shows their script name in ash4.
