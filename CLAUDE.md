@@ -12,7 +12,9 @@ here inherits these rules. Change them only when drew says so.
   reserved for rig lights, fire, and the capture.
 - Every scene sets `backdrop.region` and `time` (`engine/regions.py`) so places
   look different as the journey moves. See `docs/style.md` for the full brief.
-- No birds or bats on screen, ever (the world lost them). Insects fill the air.
+- No ordinary birds or bats (the Quiet took them); insects fill the air. Fantastical
+  birds exist and are carnivorous predators, gryphon-like threats, never background
+  life. Creatures of the Americas' folklore and myth share the world (see docs/style.md).
 - No alpha blending and no anti-aliasing. Tones mix only by Bayer dithering (`engine/dither.py`).
   Fades, glows, captions and transitions all dither.
 - Text: all story text is on-screen subtitles, no voice. Use `cards` (`engine/subtitles.py`):

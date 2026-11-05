@@ -30,8 +30,16 @@ world doc (`descriptive references/`). This is what the engine aims at.
 Night is blue everywhere, tinted by the region's darkest ramp.
 
 ## World rules that touch the picture
-- **No birds or bats.** Never draw them. Insects fill the air instead:
-  `motes` (glowing insects) and `swarm` (locusts) are weather types.
+- **No ordinary birds or bats.** The Quiet took them; never draw them as
+  background life. Insects fill the air instead: `motes` (glowing insects) and
+  `swarm` (locusts) are weather types.
+- **Fantastical birds are predators.** drew's call (2026-11-05): the Quiet hit
+  ordinary birds only. Any fantastical bird is carnivorous and a threat, closer
+  to a gryphon than a songbird. Stage them as danger: big, rare, lit from below
+  or against the sky.
+- **Creatures.** Everyday animals of the Americas plus beings from the
+  Americas' folklore and myth share the world (wendigo-type, Appalachian
+  horrors, and others). The world bible avoids closed or sacred beings.
 - **The rig** is salvage that reads a dying nervous system, heavy and finite.
   It is a machine on a handcart, not a tower. Ember is reserved for it, fire, and
   the capture.
