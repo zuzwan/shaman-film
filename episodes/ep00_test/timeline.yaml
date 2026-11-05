@@ -1,69 +1,105 @@
-# Engine test reel. Not story content: three scenes that exercise every
-# feature (parallax, actors, walk cycle, lights, weather, captions, fades).
+# Engine test reel. Not story content: one scene per region of the world,
+# exercising the new sprites, props, carried lights and region palettes.
+# Caption text here is placeholder.
 episode: ep00_test
 resolution: [320, 180]   # x6 = 1920x1080
 scale: 6
 fps: 12
 
 scenes:
-  - id: s01_ridge
-    duration: 7
-    transition_in: {duration: 1.5}
+  - id: s01_river_survey
+    duration: 6
+    transition_in: {duration: 1.0}
     backdrop:
+      region: river
+      time: day
       seed: 3
-      sky: [sky2, sky1, sky0]
-      horizon: 130
-      layers:
-        - {color: ash3, y: 112, amp: 16, rough: 0.55, parallax: 0.15}
-        - {color: ash2, y: 126, amp: 12, rough: 0.6,  parallax: 0.35}
-        - {color: ash1, y: 140, amp: 8,  rough: 0.5,  parallax: 0.6}
-      ground: {color: ash0, y: 152, speckle: ash1}
-    camera: {pan: [0, 60]}
-    weather: {type: ash, density: 0.5, wind: 0.25}
-    actors:
-      - {sprite: rig, state: hum, path: [[230, 120]], parallax: 0.35}
-    lights:
-      - {pos: [230, 77], radius: 9, color: ember0, intensity: 0.7, pulse: 1.0, parallax: 0.35}
+      props:
+        - {type: tree, pos: [40, 152], height: 46, seed: 2, color: ink2, depth: 5}
+    camera: {pan: [0, 30]}
+    actors:   # a Survey column walking the route
+      - {sprite: guard,    state: walk, path: [[-20, 160], [190, 160]]}
+      - {sprite: chainman, state: walk, path: [[-36, 161], [174, 161]], phase: 0.2}
+      - {sprite: clerk,    state: walk, path: [[-52, 160], [158, 160]], phase: 0.4}
+      - {sprite: guard,    state: walk, path: [[-68, 161], [142, 161]], phase: 0.1}
     captions:
-      - {t: [2.0, 6.0], text: "The towers still hum. Nobody remembers who left them on."}
+      - {t: [2.0, 5.5], text: "The column counted everything it passed."}
 
-  - id: s02_crossing
-    duration: 8
+  - id: s02_uplands_road
+    duration: 6
     backdrop:
-      seed: 3
-      sky: [sky2, sky1, sky0]
-      horizon: 130
-      layers:
-        - {color: ash3, y: 112, amp: 16, rough: 0.55, parallax: 0.15}
-        - {color: ash2, y: 126, amp: 12, rough: 0.6,  parallax: 0.35}
-        - {color: ash1, y: 140, amp: 8,  rough: 0.5,  parallax: 0.6}
-      ground: {color: ash0, y: 152, speckle: ash1}
-    camera: {pan: [60, 120], ease: linear}
-    weather: {type: ash, density: 0.6, wind: 0.25}
+      region: uplands
+      time: dusk
+      seed: 5
+      props:
+        - {type: tree, pos: [250, 152], height: 70, seed: 7, color: ink0, thick: 3}
+    camera: {pan: [0, 50], ease: linear}
     actors:
-      - {sprite: rig, state: hum, path: [[230, 120]], parallax: 0.35}
-      - {sprite: wanderer, state: walk, path: [[50, 162], [330, 162]]}
-    lights:
-      - {pos: [230, 77], radius: 9, color: ember0, intensity: 0.7, pulse: 1.0, parallax: 0.35}
+      - {sprite: shaman,     state: walk, path: [[70, 162], [200, 162]]}
+      - {sprite: apprentice, state: walk, path: [[50, 163], [180, 163]], phase: 0.3,
+         light: {offset: [5, -9], radius: 10, color: ember0, intensity: 0.6, flicker: true}}
 
-  - id: s03_night
+  - id: s03_uplands_camp
+    duration: 5
+    backdrop:
+      region: uplands
+      time: night
+      seed: 5
+      weather: false
+      props:
+        - {type: moon, pos: [240, 36], r: 9, halo: 26, layer: -1, parallax: 0}
+        - {type: fire, pos: [160, 160]}
+    weather: none
+    lights:
+      - {pos: [160, 156], radius: 34, color: ember0, intensity: 0.5, flicker: true}
+      - {pos: [160, 156], radius: 14, color: ember1, intensity: 0.6, flicker: true}
+    actors:
+      - {sprite: shaman,     state: idle, path: [[136, 163]]}
+      - {sprite: apprentice, state: idle, path: [[184, 163]], flip: true}
+      - {sprite: rig,        state: hum,  path: [[205, 165]], flip: true}
+    captions:
+      - {t: [1.0, 4.5], text: "He had twelve animals in him and no name he answered to."}
+
+  - id: s04_glass_town
+    duration: 6
+    backdrop:
+      region: glass
+      time: dusk
+      seed: 2
+      props:
+        - {type: ruin, pos: [30, 132],  width: 80, height: 60, arches: 4, seed: 3, color: blood0, layer: 0, parallax: 0.2}
+        - {type: ruin, pos: [190, 150], width: 110, height: 70, arches: 3, seed: 8, color: ink0, rim: blood2, layer: 2, parallax: 0.6}
+    camera: {pan: [0, 40]}
+    actors:
+      - {sprite: shaman, state: walk, path: [[20, 162], [150, 162]]}
+
+  - id: s05_coast
+    duration: 5
+    backdrop:
+      region: coast
+      time: dusk
+      seed: 4
+    weather: {type: rain, density: 0.25, wind: 0.5}
+    actors:
+      - {sprite: apprentice, state: walk, path: [[60, 162], [150, 162]]}
+      - {sprite: rig, state: hum, path: [[40, 164], [130, 164]]}
+
+  - id: s06_interior_fold
     duration: 7
     transition_out: {duration: 2.0}
     backdrop:
-      seed: 9
-      sky: [ink1, cold0, cold1]
-      horizon: 140
-      layers:
-        - {color: cold0, y: 118, amp: 14, rough: 0.55, parallax: 0.2}
-        - {color: ink2,  y: 134, amp: 8,  rough: 0.5,  parallax: 0.5}
-      ground: {color: ink1, y: 150, speckle: ink2}
-    camera: {zoom: [1.0, 1.15]}
-    weather: {type: snow, density: 0.35, wind: 0.4}
-    actors:
-      - {sprite: rig, state: hum, path: [[205, 124]], parallax: 0.2}
-      - {sprite: wanderer, state: idle, path: [[120, 160]]}
-    lights:
-      - {pos: [205, 81], radius: 22, color: ember0, intensity: 0.55, pulse: 1.0, parallax: 0.2}
-      - {pos: [205, 81], radius: 5,  color: ember1, intensity: 0.9,  pulse: 1.0, parallax: 0.2}
+      region: interior
+      time: night
+      seed: 6
+      props:
+        - {type: moon, pos: [70, 30], r: 7, halo: 22, layer: -1, parallax: 0}
+        - {type: tree, pos: [20, 152],  height: 90, seed: 11, color: ink0, thick: 4, depth: 7}
+        - {type: tree, pos: [300, 152], height: 80, seed: 12, color: ink0, thick: 4, depth: 7}
+    actors:   # Fold hosts: one sprite, one gait, no phase offsets
+      - {sprite: fold_host, state: walk, path: [[340, 160], [140, 160]], flip: true}
+      - {sprite: fold_host, state: walk, path: [[356, 161], [156, 161]], flip: true}
+      - {sprite: fold_host, state: walk, path: [[372, 160], [172, 160]], flip: true}
+      - {sprite: fold_host, state: walk, path: [[388, 161], [188, 161]], flip: true}
+      - {sprite: fold_host, state: walk, path: [[404, 160], [204, 160]], flip: true}
     captions:
-      - {t: [1.5, 5.5], text: "He watched it until the cold made the decision for him."}
+      - {t: [2.5, 6.0], text: "We saw them coming. We see most things."}

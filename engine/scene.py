@@ -6,11 +6,20 @@ upscaling happens only in FFmpeg, with nearest-neighbour.
 """
 import numpy as np
 
-from . import sprites
+from . import regions, sprites
 from .backdrops import Backdrop
 from .dither import mask, threshold
 from .font import CH, text_mask, wrap
-from .palette import RGB
+from .palette import RGB, nearest
+
+# Colors a light may paint with, by its key color. Warm light stays warm.
+LIGHT_RAMPS = {
+    "ember0": ["blood0", "rust0", "blood1", "rust1", "ember0", "blood2", "ember1"],
+    "ember1": ["rust1", "ember0", "blood3", "ember1", "ember2"],
+    "ember2": ["ember1", "ember2", "blood4", "flame"],
+    "moon": ["night1", "night2", "night3", "cold1", "cold2", "ash4", "moon"],
+    "night3": ["night1", "night2", "night3", "cold1", "cold2"],
+}
 from .weather import Weather
 
 
@@ -47,9 +56,9 @@ class Scene:
         self.zoom = cam.get("zoom", [1, 1])
         self.cam_ease = cam.get("ease", "smooth")
         extent = abs(self.pan[1] - self.pan[0]) + 16
-        self.backdrop = Backdrop(spec.get("backdrop", {}), self.W, self.H, extent)
-        w = spec.get("weather")
-        self.weather = Weather(w, self.W, self.H) if w else None
+        bd, w = regions.expand(spec.get("backdrop", {}), spec.get("weather"))
+        self.backdrop = Backdrop(bd, self.W, self.H, extent)
+        self.weather = Weather(w, self.W, self.H) if w and w != "none" else None
         self.actors = spec.get("actors", [])
         self.lights = spec.get("lights", [])
         self.captions = spec.get("captions", [])
@@ -70,6 +79,9 @@ class Scene:
         inten = L.get("intensity", 0.6)
         if "pulse" in L:  # seconds per cycle
             inten *= 0.55 + 0.45 * (0.5 + 0.5 * np.cos(2 * np.pi * t / L["pulse"]))
+        if L.get("flicker"):  # firelight: irregular, changes a few times a second
+            k = int(t * 8)
+            inten *= 0.8 + 0.2 * np.sin(k * 12.9898 + L["pos"][0]) * np.sin(k * 4.1414)
         x0, x1 = int(cx - r), int(cx + r) + 1
         y0, y1 = int(cy - r), int(cy + r) + 1
         xa, ya = max(0, x0), max(0, y0)
@@ -78,17 +90,37 @@ class Scene:
             return
         yy, xx = np.mgrid[ya:yb, xa:xb]
         d = np.sqrt((xx - cx) ** 2 + (yy - cy) ** 2) / r
-        amount = np.clip(1 - d, 0, 1) ** 2 * inten
-        on = threshold(yb - ya, xb - xa, xa, ya) < amount
-        c[ya:yb, xa:xb][on] = RGB[L.get("color", "ember0")]
+        amount = np.clip(1 - d, 0, 1) ** 1.5 * inten
+        # Light washes each pixel toward its color, snaps the result to the light's
+        # ramp (warm colors only, so no grey halos), and dithers between the lit
+        # and unlit pixel by strength.
+        region = c[ya:yb, xa:xb]
+        col = RGB[L.get("color", "ember0")].astype(np.float32)
+        ramp = L.get("ramp", LIGHT_RAMPS.get(L.get("color", "ember0"), [L.get("color", "ember0")]))
+        sel = amount > 0.03
+        lit_target = region[sel].astype(np.float32)
+        lit_target = lit_target + (col - lit_target) * (0.25 + 0.5 * amount[sel, None])
+        lit = nearest(np.clip(lit_target, 0, 255), ramp)
+        on = threshold(yb - ya, xb - xa, xa, ya)[sel] < amount[sel] * 1.6
+        px = region[sel]
+        px[on] = lit[on]
+        region[sel] = px
+
+    def actor_pos(self, a, t):
+        """World position of an actor at time t, or None when it is off stage."""
+        t0, t1 = a.get("t", [0, self.duration])
+        if not (t0 <= t <= t1):
+            return None
+        f = ease((t - t0) / max(1e-6, t1 - t0), a.get("ease", "linear"))
+        return lerp_path(a.get("path", [[0, 0]]), f)
 
     def _draw_actor(self, c, a, t, cam_x):
         spr = sprites.load(a["sprite"])
-        t0, t1 = a.get("t", [0, self.duration])
-        if not (t0 <= t <= t1):
+        pos = self.actor_pos(a, t)
+        if pos is None:
             return
-        f = ease((t - t0) / max(1e-6, t1 - t0), a.get("ease", "linear"))
-        x, y = lerp_path(a.get("path", [[0, 0]]), f)
+        x, y = pos
+        t0 = a.get("t", [0])[0] + a.get("phase", 0.0)
         px = a.get("parallax", 1.0)
         rgb, alpha = spr.frame(a.get("state", "idle"), t - t0, a.get("flip", False))
         ax, ay = spr.anchor
@@ -133,11 +165,20 @@ class Scene:
     def render(self, t):
         cam_x, z = self.camera(t)
         c = np.zeros((self.H, self.W, 3), dtype=np.uint8)
-        self.backdrop.draw(c, cam_x)
-        for L in self.lights:
-            self._draw_light(c, L, t, cam_x)
+        self.backdrop.draw(c, cam_x, t)
+        self.backdrop.draw_props(c, cam_x, t)
         for a in sorted(self.actors, key=lambda a: a.get("parallax", 1.0)):
             self._draw_actor(c, a, t, cam_x)
+        for L in self.lights:  # after actors, so firelight falls on the figures too
+            self._draw_light(c, L, t, cam_x)
+        for a in self.actors:  # lights carried by actors, e.g. a lantern
+            if "light" in a and (pos := self.actor_pos(a, t)) is not None:
+                dx, dy = a["light"].get("offset", [0, 0])
+                if a.get("flip"):
+                    dx = -dx
+                L = dict(a["light"], pos=[pos[0] + dx, pos[1] + dy], parallax=a.get("parallax", 1.0))
+                self._draw_light(c, L, t, cam_x)
+        self.backdrop.draw_props(c, cam_x, t, emissive=True)  # flames sit on top of their own light
         if self.weather:
             self.weather.draw(c, t, cam_x)
         if z != 1:
