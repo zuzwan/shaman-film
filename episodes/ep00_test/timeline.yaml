@@ -1,0 +1,69 @@
+# Engine test reel. Not story content: three scenes that exercise every
+# feature (parallax, actors, walk cycle, lights, weather, captions, fades).
+episode: ep00_test
+resolution: [320, 180]   # x6 = 1920x1080
+scale: 6
+fps: 12
+
+scenes:
+  - id: s01_ridge
+    duration: 7
+    transition_in: {duration: 1.5}
+    backdrop:
+      seed: 3
+      sky: [sky2, sky1, sky0]
+      horizon: 130
+      layers:
+        - {color: ash3, y: 112, amp: 16, rough: 0.55, parallax: 0.15}
+        - {color: ash2, y: 126, amp: 12, rough: 0.6,  parallax: 0.35}
+        - {color: ash1, y: 140, amp: 8,  rough: 0.5,  parallax: 0.6}
+      ground: {color: ash0, y: 152, speckle: ash1}
+    camera: {pan: [0, 60]}
+    weather: {type: ash, density: 0.5, wind: 0.25}
+    actors:
+      - {sprite: rig, state: hum, path: [[230, 120]], parallax: 0.35}
+    lights:
+      - {pos: [230, 77], radius: 9, color: ember0, intensity: 0.7, pulse: 1.0, parallax: 0.35}
+    captions:
+      - {t: [2.0, 6.0], text: "The towers still hum. Nobody remembers who left them on."}
+
+  - id: s02_crossing
+    duration: 8
+    backdrop:
+      seed: 3
+      sky: [sky2, sky1, sky0]
+      horizon: 130
+      layers:
+        - {color: ash3, y: 112, amp: 16, rough: 0.55, parallax: 0.15}
+        - {color: ash2, y: 126, amp: 12, rough: 0.6,  parallax: 0.35}
+        - {color: ash1, y: 140, amp: 8,  rough: 0.5,  parallax: 0.6}
+      ground: {color: ash0, y: 152, speckle: ash1}
+    camera: {pan: [60, 120], ease: linear}
+    weather: {type: ash, density: 0.6, wind: 0.25}
+    actors:
+      - {sprite: rig, state: hum, path: [[230, 120]], parallax: 0.35}
+      - {sprite: wanderer, state: walk, path: [[50, 162], [330, 162]]}
+    lights:
+      - {pos: [230, 77], radius: 9, color: ember0, intensity: 0.7, pulse: 1.0, parallax: 0.35}
+
+  - id: s03_night
+    duration: 7
+    transition_out: {duration: 2.0}
+    backdrop:
+      seed: 9
+      sky: [ink1, cold0, cold1]
+      horizon: 140
+      layers:
+        - {color: cold0, y: 118, amp: 14, rough: 0.55, parallax: 0.2}
+        - {color: ink2,  y: 134, amp: 8,  rough: 0.5,  parallax: 0.5}
+      ground: {color: ink1, y: 150, speckle: ink2}
+    camera: {zoom: [1.0, 1.15]}
+    weather: {type: snow, density: 0.35, wind: 0.4}
+    actors:
+      - {sprite: rig, state: hum, path: [[205, 124]], parallax: 0.2}
+      - {sprite: wanderer, state: idle, path: [[120, 160]]}
+    lights:
+      - {pos: [205, 81], radius: 22, color: ember0, intensity: 0.55, pulse: 1.0, parallax: 0.2}
+      - {pos: [205, 81], radius: 5,  color: ember1, intensity: 0.9,  pulse: 1.0, parallax: 0.2}
+    captions:
+      - {t: [1.5, 5.5], text: "He watched it until the cold made the decision for him."}
