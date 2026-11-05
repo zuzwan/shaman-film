@@ -26,6 +26,12 @@ here inherits these rules. Change them only when drew says so.
 - Scripts come from drew in the scene format in `docs/script-sample.md`;
   `python tools/script2timeline.py <script> episodes/<ep>` writes the draft timeline.
 
+- Action: fights are rare, short and brutal, and are cut, not animated long. Split a
+  scene into `shots` (punch-ins with whole-number `zoom` + `focus`, a few frames each),
+  then `fx` from `engine/fx.py`: speed lines, impact frames (flat colour, figures in
+  silhouette), flashes, letterbox bars, plus camera `shake` and actor `tint`/`freeze`.
+  `episodes/ep00_fight` is the reference cut.
+
 ## Layout
 - `engine/` the reusable engine. Most review effort goes here.
 - `assets/sprites/*.yaml` ASCII sprites (format documented in `engine/sprites.py`).
@@ -45,5 +51,5 @@ here inherits these rules. Change them only when drew says so.
 4. Tag each approved cut in git (`ep01-cut1`, ...).
 
 ## Not built yet
-Audio (score, effects, narration mux), scene-to-scene
-cross transitions, close-shot (larger) sprites, a capture animation for the rig.
+Audio (score, effects, narration mux), scene-to-scene cross transitions,
+medium and close (larger) sprites, creatures, Teal carrying the rig.
