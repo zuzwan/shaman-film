@@ -1,0 +1,116 @@
+# Survey hired guard, spear upright. Pale coats and brimmed caps mark the Survey.
+name: guard
+anchor: [5, 17]
+fps: 6
+legend:
+  b: ink1
+  B: ash2
+  h: ash0
+  f: ash2
+  c: ash3
+  C: ash5
+  d: ash0
+  D: ash1
+  k: ink0
+  r: rust0
+  t: ash4
+  n: ash2
+  L: bone
+states:
+  idle:
+    - |
+      ...BBBB...t.
+      ..BbbbbBB.r.
+      ...hhhf...r.
+      ...hhhf...r.
+      ....hh....r.
+      ..CCccCC..r.
+      .CccccccC.r.
+      .Ccccccccnr.
+      .Ccccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Dd..Dd..r.
+      ..Dd..Dd..r.
+      ..Dd..Dd..r.
+      ..Dd..Dd..r.
+      .kkk..kkk.r.
+  walk:
+    - |
+      ...BBBB...t.
+      ..BbbbbBB.r.
+      ...hhhf...r.
+      ...hhhf...r.
+      ....hh....r.
+      ..CCccCC..r.
+      .CccccccC.r.
+      .Ccccccccnr.
+      .Ccccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      .Dd....DD.r.
+      .Dd....Dd.r.
+      Dd......DDr.
+      Dd......Ddr.
+      kkk.....kkr.
+    - |
+      ..BBBBBBB.r.
+      ...hhhf...r.
+      ...hhhf...r.
+      ....hh....r.
+      ..CCccCC..r.
+      .CccccccC.r.
+      .Ccccccccnr.
+      .Ccccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ...Dddd...r.
+      ...Dd.D...r.
+      ...Dd.DD..r.
+      ...D...D..r.
+      ..kk...kk.r.
+      ............
+    - |
+      ...BBBB...t.
+      ..BbbbbBB.r.
+      ...hhhf...r.
+      ...hhhf...r.
+      ....hh....r.
+      ..CCccCC..r.
+      .CccccccC.r.
+      .Ccccccccnr.
+      .Ccccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Dd..Dd..r.
+      .Dd....DD.r.
+      .Dd.....DDr.
+      Dd......Ddr.
+      kk.......krk
+    - |
+      ..BBBBBBB.r.
+      ...hhhf...r.
+      ...hhhf...r.
+      ....hh....r.
+      ..CCccCC..r.
+      .CccccccC.r.
+      .Ccccccccnr.
+      .Ccccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ..Cccccc..r.
+      ...Dddd...r.
+      ...D.Dd...r.
+      ...D.DdD..r.
+      ..Dd...D..r.
+      ..kk...kk.r.
+      ............

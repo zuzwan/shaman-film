@@ -9,12 +9,15 @@ A backdrop spec in a timeline:
         - {color: ash3, y: 112, amp: 14, rough: 0.55, parallax: 0.2}
         - {color: ash1, y: 128, amp: 10, rough: 0.6,  parallax: 0.45}
       ground: {color: ash0, y: 150, speckle: ash1}
+      props: [...]                 # see engine/props.py; `layer: N` slots a prop
+                                   # after ridge N (-1 = behind all ridges)
 
 `y` is the ridge baseline, `amp` the height variation in pixels, `parallax`
 how fast the layer scrolls relative to the camera (0 = fixed, 1 = world).
 """
 import numpy as np
 
+from . import props
 from .dither import mask
 from .palette import RGB
 
@@ -63,15 +66,24 @@ class Backdrop:
             out[y] = np.where(row[:, None], b, a)
         return out
 
-    def draw(self, canvas, cam_x):
+    def draw(self, canvas, cam_x, t=0.0):
+        """Sky, then ridge layers and ground, with each prop slotted in by its `layer`.
+
+        A prop's `layer: N` draws it just after ridge layer N (-1 = right after the
+        sky, behind every ridge). Props without a layer are drawn later by
+        `draw_props`, in front of the ground and behind actors.
+        """
         W, H = self.W, self.H
+        all_props = self.spec.get("props", [])
         canvas[:] = self.sky
+        props.draw(canvas, [p for p in all_props if p.get("layer") == -1], cam_x, t)
         ys = np.arange(H)[:, None]
-        for L, heights in self.layers:
+        for i, (L, heights) in enumerate(self.layers):
             off = int(round(cam_x * L.get("parallax", 0.5)))
             off = max(0, min(off, len(heights) - W))
             h = heights[off:off + W][None, :]
             canvas[ys >= h] = RGB[L["color"]]
+            props.draw(canvas, [p for p in all_props if p.get("layer") == i], cam_x, t)
         g = self.ground
         if g:
             region = canvas[g["y"]:]
@@ -85,3 +97,8 @@ class Backdrop:
                 # sparser toward the horizon, denser at the bottom
                 density = np.linspace(0.04, 0.22, gh)[:, None]
                 region[sl < density] = RGB[g["speckle"]]
+
+    def draw_props(self, canvas, cam_x, t, emissive=False):
+        """Front props. Emissive ones (fire) are drawn in a second pass, after lights."""
+        props.draw(canvas, [p for p in self.spec.get("props", []) if "layer" not in p
+                            and (p["type"] in props.EMISSIVE) == emissive], cam_x, t)
