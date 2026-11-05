@@ -1,0 +1,34 @@
+# Ambient supernatural scenery test. Not story content. Eyes in the treeline,
+# wanderlights over the low ground, a tall presence at the edge of the trees.
+episode: ep00_ambient
+resolution: [320, 180]
+scale: 6
+fps: 12
+band: 40
+
+scenes:
+  - id: a01_treeline
+    duration: 10
+    transition_in: {duration: 1.0}
+    transition_out: {duration: 1.5}
+    backdrop:
+      region: interior
+      time: night
+      seed: 6
+      props:
+        - {type: moon, pos: [270, 50], r: 6, halo: 18, layer: -1, parallax: 0}
+        - {type: presence, pos: [262, 141], height: 52, color: ink0, amount: 0.6, seed: 3, layer: 1}
+        - {type: tree, pos: [30, 152],  height: 95, seed: 11, color: ink0, thick: 4, depth: 7}
+        - {type: tree, pos: [215, 152], height: 85, seed: 12, color: ink0, thick: 4, depth: 7}
+        - {type: eyes, pos: [90, 142], pairs: 4, spread: [90, 10], color: ember2, seed: 1}
+        - {type: wanderlight, pos: [170, 132], count: 3, spread: [70, 18], color: fern4, seed: 2}
+        - {type: fire, pos: [140, 162], size: 0.8}
+    weather: none   # keep the air clear so the eyes read as eyes, not fireflies
+    lights:
+      - {pos: [140, 158], radius: 26, color: ember0, intensity: 0.5, flicker: true}
+    actors:
+      - {sprite: shaman, state: idle, path: [[124, 165]]}
+      - {sprite: apprentice, state: idle, path: [[158, 165]], flip: true}
+      - {sprite: rig, state: idle, path: [[104, 166]]}
+    cards:
+      - {narration: "Teal counted the eyes, lost count, and stopped counting.", at: 3.0}

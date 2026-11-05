@@ -32,6 +32,11 @@ here inherits these rules. Change them only when drew says so.
   silhouette), flashes, letterbox bars, plus camera `shake` and actor `tint`/`freeze`.
   `episodes/ep00_fight` is the reference cut.
 
+- Ambient supernatural scenery (drew, 2026-11-05): eyes in the dark, wanderlights,
+  tall half-there presences, as background only, never explained. They are props
+  (`eyes`, `wanderlight`, `presence` in `engine/props.py`); `episodes/ep00_ambient` shows them.
+  Don't stack eyes with firefly `motes` weather: they read the same.
+
 ## Layout
 - `engine/` the reusable engine. Most review effort goes here.
 - `assets/sprites/*.yaml` ASCII sprites (format documented in `engine/sprites.py`).

@@ -5,6 +5,10 @@
       - {type: tree, pos: [60, 150], height: 60, seed: 4, color: ink1, parallax: 0.8}
       - {type: ruin, pos: [180, 150], width: 70, height: 55, arches: 3, seed: 2, color: ink2, parallax: 0.4}
       - {type: fire, pos: [120, 158]}            # flickering flame; pair with a light
+      # ambient supernatural scenery (never explained, never the subject of a shot)
+      - {type: eyes, pos: [60, 140], pairs: 4, spread: [70, 14], color: ember2, seed: 1}
+      - {type: wanderlight, pos: [240, 130], count: 3, spread: [60, 24], color: fern4, seed: 2}
+      - {type: presence, pos: [200, 152], height: 46, color: ink0, amount: 0.55, seed: 3}
 
 `pos` is the base (feet) in world pixels; `parallax` as for layers.
 Props draw in list order, after the ridge layers and ground.
@@ -114,8 +118,70 @@ def fire(c, p, ox, t):
             _put(c, x + int(rng.integers(-3, 4)), y - int(rng.integers(8, 16) * s), RGB["ember2"])
 
 
-EMISSIVE = {"fire"}
-DRAW = {"moon": moon, "tree": tree, "ruin": ruin, "fire": fire}
+def eyes(c, p, ox, t):
+    """Pairs of eyes in the dark: each pair opens, holds, blinks and goes, on its own slow cycle."""
+    rng = np.random.default_rng(p.get("seed", 0))
+    sx, sy = p.get("spread", [60, 12])
+    col = RGB[p.get("color", "ember2")]
+    for i in range(p.get("pairs", 3)):
+        x = p["pos"][0] - ox + rng.uniform(-sx / 2, sx / 2)
+        y = p["pos"][1] + rng.uniform(-sy / 2, sy / 2)
+        period, phase = rng.uniform(5, 11), rng.uniform(0, 11)
+        u = ((t + phase) % period) / period
+        if u > 0.55:                       # gone for the rest of the cycle
+            continue
+        if int((t + phase) * 12) % 37 == 0:  # an occasional blink
+            continue
+        gap = 2 if rng.random() < 0.6 else 3
+        _put(c, int(x), int(y), col)
+        _put(c, int(x) + gap, int(y), col)
+
+
+def wanderlight(c, p, ox, t):
+    """Drifting lights over marsh or forest: a bright core and a dithered halo, wandering slowly."""
+    rng = np.random.default_rng(p.get("seed", 0))
+    sx, sy = p.get("spread", [60, 20])
+    col = p.get("color", "fern4")
+    H, W = c.shape[:2]
+    for i in range(p.get("count", 3)):
+        a, b, ph = rng.uniform(0.15, 0.4), rng.uniform(0.2, 0.5), rng.uniform(0, 6.28)
+        x = p["pos"][0] - ox + np.sin(t * a + ph) * sx / 2 + np.sin(t * a * 2.7 + ph) * 3
+        y = p["pos"][1] + np.cos(t * b + ph * 1.3) * sy / 2
+        pulse = 0.6 + 0.4 * np.sin(t * 1.7 + ph * 4)
+        r = p.get("radius", 6)
+        x0, y0 = int(x) - r, int(y) - r
+        for yy in range(max(0, y0), min(H, y0 + 2 * r + 1)):
+            for xx in range(max(0, x0), min(W, x0 + 2 * r + 1)):
+                d = np.hypot(xx - x, yy - y) / r
+                if d < 1 and threshold(1, 1, xx, yy)[0, 0] < (1 - d) ** 2 * pulse * 0.8:
+                    c[yy, xx] = RGB[p.get("halo", "fern3")]
+        _put(c, int(x), int(y), RGB[col])
+        if pulse > 0.8:
+            _put(c, int(x), int(y) - 1, RGB[col])
+
+
+def presence(c, p, ox, t):
+    """Something tall at the edge of things: a dithered dark shape, half there, swaying."""
+    rng = np.random.default_rng(p.get("seed", 0))
+    H, W = c.shape[:2]
+    h = p.get("height", 40)
+    w = p.get("width", h * 0.28)
+    cx = p["pos"][0] - ox + np.sin(t * 0.3 + rng.uniform(0, 6)) * 2
+    base = p["pos"][1]
+    amount = p.get("amount", 0.5) * (0.75 + 0.25 * np.sin(t * 0.5 + rng.uniform(0, 6)))
+    col = RGB[p.get("color", "ink0")]
+    for yy in range(max(0, int(base - h)), min(H, int(base))):
+        f = (base - yy) / h                     # 0 at the feet, 1 at the top
+        half = w / 2 * (0.55 + 0.45 * np.sin(np.pi * min(1, f * 1.15))) * (1 - f ** 6)
+        for xx in range(max(0, int(cx - half)), min(W, int(cx + half) + 1)):
+            edge = 1 - abs(xx - cx) / max(half, 1)
+            if threshold(1, 1, xx, yy)[0, 0] < amount * min(1, edge * 2.2):
+                c[yy, xx] = col
+
+
+EMISSIVE = {"fire", "eyes", "wanderlight"}
+DRAW = {"moon": moon, "tree": tree, "ruin": ruin, "fire": fire,
+        "eyes": eyes, "wanderlight": wanderlight, "presence": presence}
 
 
 def draw(c, props, cam_x, t):
