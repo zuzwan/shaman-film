@@ -5,7 +5,7 @@ title: The Shaman
 
 # The title card: swarm (gnats gather into the letters), ember (burned into
 # planks) or plate (an almanac plate stamped in ink). See engine/intro.py.
-style: swarm
+style: plate
 
 # Night behind the intro takes the colour of the act's region, so the same
 # card sits in a different country as the journey moves.
