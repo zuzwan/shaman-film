@@ -61,8 +61,8 @@ here inherits these rules. Change them only when drew says so.
 - Intro (drew, 2026-11-06): the show is "The Shaman". Every episode opens on its title card,
   then a small "Episode X" card. Set `intro: {episode: N}` in the timeline and render.py puts
   `s00_intro` first (`engine/intro.py`, 12 s, full frame). The title lettering is drawn in
-  `engine/titlefont.py`; title, card style (swarm / ember / plate) and act colours live in
-  `assets/show.yaml`. The sting window goes to `out/<ep>/cues.yaml`; `episodes/ep00_intro`
+  `engine/titlefont.py`; title, card style (swarm, final: drew 2026-11-06), scenery (towers) and act
+  colours live in `assets/show.yaml`; the card's time (dusk/day/night) follows the first scene. The sting window goes to `out/<ep>/cues.yaml`; `episodes/ep00_intro`
   shows it. `rig_big` (`tools/art/rig_big.py`) is the rig at zoom-3 size, faces per continuity.
 
 ## Layout

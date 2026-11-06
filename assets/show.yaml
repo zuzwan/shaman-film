@@ -8,7 +8,8 @@ title: The Shaman
 style: swarm
 
 # What stands behind the swarm card: plain, mills, orchard, towers or camp (engine/intro.py SCENERY).
-scenery: mills
+scenery: towers
+# The card is drawn at dusk, day or night to match the time the first scene opens on.
 
 # Night behind the intro takes the colour of the act's region, so the same
 # card sits in a different country as the journey moves.

@@ -174,6 +174,18 @@ def _at_time(sc, time):
     return sc
 
 
+def card_time(scene_time):
+    """The card's time (dusk, day, night) for the time the first scene opens on."""
+    if not scene_time:
+        return None
+    t = str(scene_time).lower()
+    if "night" in t:
+        return "night"
+    if any(k in t for k in ("dusk", "dawn", "evening", "sunset", "sunrise")):
+        return "dusk"
+    return "day"
+
+
 class Layout:
     """Where the lettering sits: THE over SHAMAN, centred, with rules and a device."""
 
@@ -229,7 +241,8 @@ class Intro(Scene):
         self.style = intro.get("style", s.get("style", "swarm"))
         self.ep = ep
         self.scenery = intro.get("scenery", s.get("scenery", "plain"))
-        self.time = intro.get("time", s.get("time", "dusk"))
+        # the card's time of day follows the episode's first scene unless set
+        self.time = intro.get("time") or card_time(intro.get("opens_on")) or s.get("time", "dusk")
         sc = _at_time(SCENERY[self.scenery], self.time)
         self.gnat = "ash3" if self.time == "night" else "ink1"
         sp = {"id": "s00_intro", "duration": INTRO_LENGTH, "band": 0,

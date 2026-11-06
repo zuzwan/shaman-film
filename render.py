@@ -97,7 +97,10 @@ def main():
         (out / sub).mkdir(parents=True, exist_ok=True)
 
     # the intro card (engine/intro.py) goes in front of the first scene as s00_intro
-    intro = Intro(tl["intro"], cfg) if tl.get("intro") else None
+    intro = None
+    if tl.get("intro"):  # the title card's time of day matches the first scene
+        first = (tl["scenes"][0].get("backdrop", {}) if tl["scenes"] else {}).get("time")
+        intro = Intro({"opens_on": first, **tl["intro"]}, cfg)
     order = ([intro.spec] if intro else []) + tl["scenes"]
     scenes = [s for s in order if not args.scene or s["id"].startswith(args.scene)]
     rows = []
