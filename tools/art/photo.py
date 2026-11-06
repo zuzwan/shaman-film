@@ -63,12 +63,14 @@ def to_canvas(names, mask):
 class Face:
     """A quantised portrait plus the regions needed to cut expressions."""
 
-    def __init__(self, base, eyes, mouth, brow_y, skin):
+    def __init__(self, base, eyes, mouth, brow_y, skin, teeth="ash3", tongue="rust0"):
         self.base = base          # Canvas
         self.eyes = eyes          # list of (x0, y0, x1, y1) boxes, the open eye incl. lids
-        self.mouth = mouth        # (x0, y0, x1, y1)
+        self.mouth = mouth        # (xl, yl, xr, yr): the line between the lips, corner to corner
         self.brow_y = brow_y
         self.skin = skin          # palette name for painted lids
+        self.teeth = teeth
+        self.tongue = tongue
 
     def copy(self):
         c = Canvas(self.base.w, self.base.h)
@@ -110,24 +112,59 @@ class Face:
                     c.px[y][x] = src[min(max(k, 0), len(src) - 1)]
         return c
 
+    def lip_y(self, x):
+        xl, yl, xr, yr = self.mouth
+        u = min(max((x - xl) / max(1, xr - xl), 0.0), 1.0)
+        return yl + (yr - yl) * u
+
     def mouth_open(self, c, h):
-        x0, y0, x1, y1 = self.mouth
-        # the chin drops: rows below the mouth slide down by h, the gap is dark
-        for x in range(x0, x1):
+        """Open the mouth by h px. The jaw drops: every row under the lip line slides
+        down (by h across the mouth, tapering to nothing at the jaw's edges). The gap
+        becomes a lens-shaped cavity, widest at the centre, with stretched lip at the
+        corners, a row of teeth under the upper lip once it is open enough, and a
+        tongue in the widest shapes."""
+        if h <= 0:
+            return c
+        xl, yl, xr, yr = self.mouth
+        cx, rx = (xl + xr) / 2, (xr - xl) / 2
+        taper = int(rx * 0.9)
+        teeth, tongue = self.teeth, self.tongue
+        for x in range(max(0, xl - taper), min(c.w, xr + taper + 1)):
+            u = (x - cx) / rx
+            # jaw drop for this column: full across the mouth, tapering outside it
+            if abs(u) <= 1:
+                s = h
+            else:
+                s = int(round(h * max(0.0, 1 - (abs(u) - 1) * rx / taper)))
+            if s <= 0:
+                continue
+            yc = int(round(self.lip_y(x)))
             col = [c.px[y][x] for y in range(c.h)]
-            for y in range(c.h - 1, y1 - 1, -1):
-                src = y - h
-                c.px[y][x] = col[src] if src >= y1 else None
-            for y in range(y1 - 1, y1 - 1 + h):
-                if y < c.h and not ((x < x0 + 2 or x >= x1 - 2) and (y == y1 - 1 or y == y1 - 2 + h)):
-                    c.px[y][x] = "ink0"
-            if h >= 4 and x0 + 3 <= x < x1 - 3:
-                c.px[y1][x] = "ash3"  # teeth
-        # fill the hole left under the chin shift with the lowest row of the face
-        for x in range(x0, x1):
-            for y in range(c.h - h, c.h):
-                if c.px[y][x] is None and c.px[y - h][x] is not None:
-                    c.px[y][x] = c.px[y - h][x]
+            for y in range(c.h - 1, yc - 1, -1):
+                src = y - s
+                c.px[y][x] = col[src] if src >= yc else None
+            # the gap rows yc .. yc+s-1
+            hx = int(round(h * (1 - u * u) ** 0.5)) if abs(u) < 1 else 0
+            top = yc + (s - hx) // 2
+            above = col[yc - 1] or self.skin
+            below = col[yc] or self.skin
+            for y in range(yc, yc + s):
+                if y >= c.h:
+                    break
+                if hx > 0 and top <= y < top + hx:
+                    edge = y == top or y == top + hx - 1 or abs(u) > 0.8
+                    v = "ink1" if edge else "ink0"
+                    if h >= 3 and hx >= 3 and y == top + 1 and abs(u) < 0.62 and (x % 3 != 1):
+                        v = teeth
+                    if h >= 5 and hx >= 5 and y == top + hx - 2 and abs(u) < 0.4:
+                        v = tongue
+                    c.px[y][x] = v
+                else:
+                    c.px[y][x] = above if y < yc + s // 2 else below
+            # fill the hole left under the chin shift with the lowest face row
+            for y in range(c.h - s, c.h):
+                if c.px[y][x] is None and c.px[y - s][x] is not None:
+                    c.px[y][x] = c.px[y - s][x]
         return c
 
     def brow(self, c, amount):
@@ -147,7 +184,9 @@ class Face:
     def states(self):
         F = self
         idle = [F.copy(), F.shift(F.copy(), -1), F.copy(), F.close_eyes(F.copy(), 1.0)]
-        speak = [F.mouth_open(F.copy(), 2), F.mouth_open(F.shift(F.copy(), -1), 4), F.mouth_open(F.copy(), 5), F.mouth_open(F.copy(), 2)]
+        # talking is uneven: a few shapes, a closed beat, never a metronome
+        speak = [F.mouth_open(F.copy(), 2), F.mouth_open(F.shift(F.copy(), -1), 5), F.mouth_open(F.copy(), 3),
+                 F.copy(), F.mouth_open(F.copy(), 4), F.mouth_open(F.shift(F.copy(), -1), 2)]
         return {
             "idle": idle,
             "speak": speak,
@@ -189,7 +228,7 @@ def build_auk():
             if c.px[y][x] is not None:
                 c.px[y][x] = "ink1"
     c.outline("ink0")
-    return Face(c, eyes=[(27, 45, 44, 52), (54, 43, 73, 50)], mouth=(34, 84, 62, 88), brow_y=38, skin="ash1")
+    return Face(c, eyes=[(27, 45, 44, 52), (54, 43, 73, 50)], mouth=(39, 84, 63, 84), brow_y=38, skin="ash1", teeth="ash2", tongue="ink2")
 
 
 def build_teal():
@@ -219,7 +258,7 @@ def build_teal():
     c.poly([(8, 78), (30, 82), (46, 84), (62, 82), (80, 78), (84, 90), (74, 100), (44, 104), (12, 100), (4, 90)], "rust1", shade=("rust0", "rust1", (1, -0.5), 2))
     c.stroke(12, 90, 74, 92, "rust0", 1); c.stroke(10, 96, 70, 98, "rust0", 1)
     c.outline("ink0")
-    return Face(c, eyes=[(27, 43, 42, 49), (52, 42, 67, 48)], mouth=(37, 69, 59, 73), brow_y=35, skin="ash2")
+    return Face(c, eyes=[(27, 43, 42, 49), (52, 42, 67, 48)], mouth=(35, 66, 53, 64), brow_y=35, skin="ash2", teeth="ash4", tongue="rust0")
 
 
 if __name__ == "__main__":
