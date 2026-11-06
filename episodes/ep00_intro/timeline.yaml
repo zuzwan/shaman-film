@@ -7,7 +7,7 @@ scale: 6
 fps: 12
 band: 40
 
-intro: {episode: 1, title: "Here"}
+intro: {episode: 1}   # add style: swarm | ember | plate to try another card
 
 scenes:
   - id: s01_sleeping_standing

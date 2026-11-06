@@ -1,7 +1,11 @@
 # The show: one place for the title and the shape of the season.
 # The intro card (engine/intro.py) reads this, so changing the title here
 # changes it on every episode at the next render.
-title: Fourteen Faces
+title: The Shaman
+
+# The title card: swarm (gnats gather into the letters), ember (burned into
+# planks) or plate (an almanac plate stamped in ink). See engine/intro.py.
+style: swarm
 
 # Night behind the intro takes the colour of the act's region, so the same
 # card sits in a different country as the journey moves.

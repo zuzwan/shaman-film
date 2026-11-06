@@ -58,11 +58,12 @@ here inherits these rules. Change them only when drew says so.
   (`eyes`, `wanderlight`, `presence` in `engine/props.py`); `episodes/ep00_ambient` shows them.
   Don't stack eyes with firefly `motes` weather: they read the same.
 
-- Intro (drew, 2026-11-06): every episode opens on the same intro card. Set
-  `intro: {episode: N, title: "..."}` in the timeline and render.py puts `s00_intro` first
-  (`engine/intro.py`, 12 s, full frame). Show title, act colours and faces-per-episode live in
-  `assets/show.yaml`. The rig there is `rig_big` (`tools/art/rig_big.py`, faces per continuity).
-  The intro sting window goes to `out/<ep>/cues.yaml`; `episodes/ep00_intro` shows it.
+- Intro (drew, 2026-11-06): the show is "The Shaman". Every episode opens on its title card,
+  then a small "Episode X" card. Set `intro: {episode: N}` in the timeline and render.py puts
+  `s00_intro` first (`engine/intro.py`, 12 s, full frame). The title lettering is drawn in
+  `engine/titlefont.py`; title, card style (swarm / ember / plate) and act colours live in
+  `assets/show.yaml`. The sting window goes to `out/<ep>/cues.yaml`; `episodes/ep00_intro`
+  shows it. `rig_big` (`tools/art/rig_big.py`) is the rig at zoom-3 size, faces per continuity.
 
 ## Layout
 - `engine/` the reusable engine. Most review effort goes here.
