@@ -1,0 +1,21 @@
+# The show: one place for the title and the shape of the season.
+# The intro card (engine/intro.py) reads this, so changing the title here
+# changes it on every episode at the next render.
+title: Fourteen Faces
+
+# Night behind the intro takes the colour of the act's region, so the same
+# card sits in a different country as the journey moves.
+acts:
+  - {episodes: [1, 6],   region: river}
+  - {episodes: [7, 12],  region: uplands}
+  - {episodes: [13, 18], region: glass}
+  - {episodes: [19, 24], region: interior}
+
+# Faces carved on the rig in the intro, by episode (continuity.md): twelve
+# animals until the otter is taken in ep 3, thirteen from then, and in the
+# finale the fourteenth, Auk. They light one by one, oldest capture first.
+faces:
+  default: 13
+  1: 12
+  2: 12
+  24: 14

@@ -10,6 +10,10 @@ Outputs go to out/<episode>/:
     keys/<id>_<n>.png      key frames for review
     contact.png            every scene's key frames on one sheet
     <episode>.mp4          the scenes concatenated
+    cues.yaml              sound cues (the intro sting), for the audio pass
+
+A timeline with `intro: {episode: 1, title: "Here"}` opens on the show's
+intro card (engine/intro.py, title from assets/show.yaml).
 """
 import argparse
 import subprocess
@@ -19,6 +23,7 @@ import numpy as np
 import yaml
 from PIL import Image
 
+from engine.intro import STING, Intro
 from engine.scene import Scene
 
 KEYS_PER_SCENE = 4
@@ -33,10 +38,12 @@ def ffmpeg_writer(path, W, H, fps, scale):
         "-pix_fmt", "yuv420p", str(path)], stdin=subprocess.PIPE)
 
 
-def render_scene(spec, cfg, out, keys_only=False):
-    scene = Scene(spec, cfg)
+def render_scene(spec, cfg, out, keys_only=False, scene=None):
+    scene = scene or Scene(spec, cfg)
     W, H = cfg["resolution"]
     key_idx = set(np.linspace(0, scene.n_frames - 1, KEYS_PER_SCENE).astype(int))
+    if getattr(scene, "key_times", None):  # a scene can name its own review moments
+        key_idx = {min(scene.n_frames - 1, int(t * cfg["fps"])) for t in scene.key_times}
     # with subtitles, also key the moment each card is fully typed: that's what gets reviewed
     for card in scene.cards:
         key_idx.add(min(scene.n_frames - 1, int((card["t_typed"] + 0.3) * cfg["fps"])))
@@ -89,17 +96,22 @@ def main():
     for sub in ("scenes", "keys"):
         (out / sub).mkdir(parents=True, exist_ok=True)
 
-    scenes = [s for s in tl["scenes"] if not args.scene or s["id"].startswith(args.scene)]
+    # the intro card (engine/intro.py) goes in front of the first scene as s00_intro
+    intro = Intro(tl["intro"], cfg) if tl.get("intro") else None
+    order = ([intro.spec] if intro else []) + tl["scenes"]
+    scenes = [s for s in order if not args.scene or s["id"].startswith(args.scene)]
     rows = []
     for spec in scenes:
         print(f"rendering {spec['id']}")
-        rows.append((spec["id"], render_scene(spec, cfg, out, args.keys)))
+        rows.append((spec["id"], render_scene(spec, cfg, out, args.keys, intro if intro and spec is intro.spec else None)))
+    if intro:  # where the sound pass puts the intro sting (no audio system yet)
+        (out / "cues.yaml").write_text(yaml.safe_dump({"intro_sting": STING}, sort_keys=False))
     contact_sheet(rows, cfg, out / "contact.png")
     print(f"contact sheet: {out / 'contact.png'}")
 
     if not args.keys and not args.scene:
         lst = out / "concat.txt"
-        lst.write_text("".join(f"file 'scenes/{s['id']}.mp4'\n" for s in tl["scenes"]))
+        lst.write_text("".join(f"file 'scenes/{s['id']}.mp4'\n" for s in order))
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0",
                         "-i", str(lst), "-c", "copy", str(out / f"{ep.name}.mp4")], check=True)
         print(f"episode cut: {out / (ep.name + '.mp4')}")

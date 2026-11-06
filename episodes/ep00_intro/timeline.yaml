@@ -1,0 +1,32 @@
+# The intro card in front of an episode's first scene. Not story content
+# beyond ep 1's opening beat, which is here only to show the cut from the
+# full-frame intro into the banded episode picture.
+episode: ep00_intro
+resolution: [320, 180]
+scale: 6
+fps: 12
+band: 40
+
+intro: {episode: 1, title: "Here"}
+
+scenes:
+  - id: s01_sleeping_standing
+    duration: 6
+    transition_in: {duration: 1.0}
+    backdrop:
+      region: river
+      time: night
+      seed: 3
+      props:
+        - {type: moon, pos: [262, 58], r: 5, halo: 14, layer: -1, parallax: 0}
+        - {type: tree, pos: [36, 156], height: 70, seed: 4, color: ink0, thick: 3, depth: 6}
+        - {type: grass, pos: [160, 160], width: 320, height: 6, color: ink1, seed: 2, layer: front}
+    weather: none
+    lights:
+      - {pos: [150, 110], radius: 18, color: ember0, intensity: 0.45, pulse: 3}
+    actors:
+      - {id: rig, sprite: rig, state: hum, path: [[150, 160]]}
+      - {id: auk, sprite: auk, med: auk_med, state: idle, path: [[172, 160]], flip: true, breathe: 4}
+      - {id: teal, sprite: teal, med: teal_med, state: sit, path: [[140, 162]], breathe: 3, phase: 1.2}
+    cards:
+      - {narration: "The hundred-and-thirty-first year after the Quiet.", at: 1.2}
