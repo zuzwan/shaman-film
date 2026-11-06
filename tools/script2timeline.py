@@ -59,7 +59,7 @@ WEATHER = [("locust", {"type": "swarm", "density": 0.8, "wind": 0.6}),
            ("light ash", {"type": "ash", "density": 0.25, "wind": 0.2}),
            ("ash", {"type": "ash", "density": 0.5, "wind": 0.3}),
            ("none", "none"), ("clear", "none")]
-SPRITES = {"shaman": "shaman", "apprentice": "apprentice", "rig": "rig", "chainman": "chainman",
+SPRITES = {"shaman": "auk", "auk": "auk", "apprentice": "teal", "teal": "teal", "rig": "rig", "chainman": "chainman",
            "clerk": "clerk", "guard": "guard", "surveyor": "chainman", "host": "fold_host",
            "fold host": "fold_host", "fold": "fold_host"}
 NAMES = {"auk": "shaman", "shaman": "shaman", "teal": "apprentice", "apprentice": "apprentice", "rig": "rig"}
@@ -115,10 +115,12 @@ def place(actors):
     """Stand the cast in a loose row centre stage, facing the middle."""
     n = len(actors)
     out, seen = [], {}
-    ids = {"shaman": "auk", "apprentice": "teal", "rig": "rig"}
+    ids = {"auk": "auk", "teal": "teal", "rig": "rig"}
     for i, spr in enumerate(actors):
         x = 160 + (i - (n - 1) / 2) * 22
-        a = {"sprite": spr, "state": "hum" if spr == "rig" else "idle", "path": [[round(x), 162]]}
+        a = {"sprite": spr, "state": "hum" if spr == "rig" else "idle", "path": [[round(x), 162]], "breathe": 3}
+        if spr != "rig":
+            a["med"] = spr + "_med"
         base = ids.get(spr, spr)
         seen[base] = seen.get(base, 0) + 1
         a["id"] = base if seen[base] == 1 else f"{base}{seen[base]}"

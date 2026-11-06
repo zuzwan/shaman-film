@@ -1,0 +1,116 @@
+# Cast reel. Not story content: every character at wide, medium and close
+# size, through their moves, so the animation set can be judged in a scene.
+episode: ep00_cast
+resolution: [320, 180]
+scale: 6
+fps: 12
+band: 40
+
+scenes:
+  # 1. wide: the whole cast walks and runs past, each at their own pace
+  - id: c01_wide_walk
+    duration: 9
+    transition_in: {duration: 0.8}
+    backdrop: {region: river, time: day, seed: 4,
+               props: [{type: grass, y: 180, height: 10, layer: front, parallax: 1.4, seed: 3}]}
+    actors:
+      - {id: auk,   sprite: auk,       med: auk_med,       state: walk, path: [[-20, 160], [200, 160]], bob: 1, fps: 7}
+      - {id: teal,  sprite: teal,      med: teal_med,      state: walk, path: [[-50, 160], [170, 160]], bob: 1, fps: 8, phase: 0.3}
+      - {id: cm,    sprite: chainman,  med: chainman_med,  state: walk, path: [[-90, 160], [130, 160]], bob: 1, phase: 0.6}
+      - {id: clerk, sprite: clerk,     med: clerk_med,     state: walk, path: [[-120, 160], [100, 160]], bob: 1, phase: 0.9}
+      - {id: guard, sprite: guard,     med: guard_med,     state: walk, path: [[-150, 160], [70, 160]], bob: 1, phase: 0.2}
+      - {id: host,  sprite: fold_host, med: fold_host_med, state: walk, path: [[-180, 160], [40, 160]], bob: 1, phase: 0.5}
+      - {id: raider, sprite: raider,   med: raider_med,    state: run,  path: [[-60, 160], [380, 160]], t: [4.5, 9], fps: 10}
+    captions: [{text: "THE CAST, WIDE", t: [0.3, 3.0], y: 30}]
+
+  # 2. medium: a conversation at zoom 2, both figures drawn sharp
+  - id: c02_medium_talk
+    backdrop: {region: uplands, time: dusk, seed: 7}
+    weather: {type: snow, density: 0.25, wind: 0.4}
+    actors:
+      - {id: auk,  sprite: auk,  med: auk_med,  state: talk, path: [[136, 162]], breathe: 3}
+      - {id: teal, sprite: teal, med: teal_med, state: idle, path: [[184, 162]], flip: true, breathe: 2.6, phase: 1.0}
+    cards:
+      - {speaker: shaman, text: "You count the fires on the ridge. Then you count them again when the wind drops."}
+      - {speaker: apprentice, text: "And if the number changes?"}
+      - {speaker: shaman, text: "Then one of them is not a fire."}
+    shots:
+      - {duration: 5.5, shot: "medium · eye · auk · static"}
+      - {duration: 3.0, shot: "medium · over-shoulder · teal · static", set: {teal: {state: talk}, auk: {state: idle}}}
+      - {duration: 4.0, shot: "medium · eye · auk · push-in", set: {auk: {state: talk}}}
+
+  # 3. medium action: crouch, point, look back, a clash cut with the medium sprites
+  - id: c03_medium_action
+    backdrop: {region: glass, time: dusk, seed: 3,
+               props: [{type: ruin, pos: [220, 152], width: 120, height: 70, arches: 3, seed: 4, color: ink1, layer: 1, parallax: 0.5}]}
+    weather: {type: ash, density: 0.4, wind: 0.3}
+    actors:
+      - {id: auk,    sprite: auk,    med: auk_med,    state: crouch, path: [[140, 162]]}
+      - {id: teal,   sprite: teal,   med: teal_med,   state: crouch, path: [[112, 162]], phase: 0.5}
+      - {id: raider, sprite: raider, med: raider_med, state: idle,   path: [[300, 162]], flip: true, hidden: true}
+    cards:
+      - {narration: "He pointed, and she looked, and neither of them saw the third one.", at: 0.4}
+    shots:
+      - {duration: 2.4, shot: "medium · low · auk · static"}
+      - {duration: 2.0, shot: "medium · eye · auk · static", set: {auk: {state: point}, teal: {state: look_back}}}
+      - {duration: 2.0, shot: "medium · eye · teal · static", set: {auk: {state: point}, teal: {state: look_back, flip: true}}}
+      - {duration: 1.6, shot: "wide · eye · static", set: {raider: {hidden: false, state: run, path: [[330, 162], [200, 162]]}, auk: {state: windup}, teal: {state: stagger}}}
+      - {duration: 0.42, shot: "medium · eye · raider · static", set: {raider: {hidden: false, state: lunge, path: [[190, 162]]}, auk: {state: windup}},
+         fx: [{type: speedlines, kind: radial, center: [170, 120], inner: 24, color: bone, density: 50}]}
+      - {duration: 0.17, fx: [{type: impact, bg: bone, fg: ink0}], set: {raider: {hidden: false, state: hit, path: [[186, 162]]}, auk: {state: strike, path: [[150, 162]]}}}
+      - {duration: 0.6, camera: {shake: {amp: 5, decay: 1}}, shot: "medium · eye · auk · static", set: {raider: {hidden: false, state: hit, path: [[186, 162], [230, 162]]}, auk: {state: strike, path: [[150, 162]]}}}
+      - {duration: 3.0, shot: "medium · eye · raider · static", set: {raider: {hidden: false, state: down, path: [[230, 162]]}, auk: {state: idle, path: [[150, 162]]}, teal: {state: kneel}}}
+
+  # 4. close: the portraits, speaking and not
+  - id: c04_close
+    backdrop: {plain: true, sky: [ink0, ink1, ink0], horizon: 180}
+    weather: none
+    actors:
+      - {id: auk_c,  sprite: auk_close,  state: idle, path: [[140, 190]]}
+      - {id: teal_c, sprite: teal_close, state: idle, path: [[150, 190]], hidden: true}
+    cards:
+      - {speaker: shaman, text: "There is no one coming. Say it until it is boring."}
+      - {speaker: apprentice, text: "There is no one coming."}
+      - {speaker: shaman, text: "Again."}
+    shots:
+      - {duration: 4.0, set: {auk_c: {state: speak}}}
+      - {duration: 1.6, set: {auk_c: {state: glare}}}
+      - {duration: 3.4, set: {auk_c: {hidden: true}, teal_c: {hidden: false, state: speak, flip: true}}}
+      - {duration: 1.8, set: {auk_c: {hidden: true}, teal_c: {hidden: false, state: look_away, flip: true}}}
+      - {duration: 1.4, set: {auk_c: {hidden: true}, teal_c: {hidden: false, state: flinch, flip: true}}}
+      - {duration: 2.4, set: {auk_c: {state: speak}}}
+      - {duration: 2.0, set: {auk_c: {state: look_down}}}
+
+  # 5. the gaunt at wide and at medium: stalk, rear, lunge
+  - id: c05_gaunt
+    backdrop: {region: interior, time: night, seed: 5,
+               props: [{type: tree, pos: [60, 152], height: 90, seed: 21, color: ink0, thick: 4, depth: 7},
+                       {type: eyes, pos: [240, 134], pairs: 2, spread: [40, 6], color: ember2, seed: 4}]}
+    weather: none
+    actors:
+      - {id: gaunt, sprite: gaunt, med: gaunt_med, state: stalk, path: [[330, 162], [200, 162]], flip: true, fps: 4}
+      - {id: teal,  sprite: teal,  med: teal_med,  state: idle,  path: [[90, 162]], breathe: 2.5}
+    cards:
+      - {narration: "It walked the way a man walks who has been told how, once, a long time ago.", at: 0.5}
+    shots:
+      - {duration: 5.0}
+      - {duration: 2.5, shot: "medium · low · gaunt · static", set: {gaunt: {state: rear, path: [[200, 162]]}}}
+      - {duration: 2.0, shot: "medium · eye · gaunt · track", set: {gaunt: {state: stalk, path: [[200, 162], [150, 162]]}}}
+      - {duration: 0.6, shot: "medium · eye · gaunt · shake", set: {gaunt: {state: lunge, path: [[150, 162], [110, 162]]}},
+         fx: [{type: speedlines, kind: radial, center: [140, 110], inner: 24, color: fern4, density: 50}]}
+
+  # 6. Teal carrying the rig; Auk at the crank; the sit and the kneel
+  - id: c06_carry_crank
+    transition_out: {duration: 1.5}
+    backdrop: {region: coast, time: dusk, seed: 8}
+    weather: {type: rain, density: 0.25, wind: 0.5}
+    actors:
+      - {id: teal, sprite: teal_rig, med: teal_rig_med, state: walk, path: [[-20, 162], [150, 162]], bob: 1, fps: 7, t: [0, 4.5]}
+      - {id: rig,  sprite: rig,  state: idle, path: [[200, 164]], hidden: true}
+      - {id: auk,  sprite: auk,  med: auk_med, state: sit, path: [[240, 162]], flip: true, breathe: 3}
+    cards:
+      - {narration: "She carried it the way he had: badly, and all the way.", at: 0.5}
+    shots:
+      - {duration: 4.5}
+      - {duration: 3.0, shot: "medium · eye · auk · static", set: {teal: {state: kneel, path: [[150, 162]], t: [0, 3]}, rig: {hidden: false}, auk: {state: crank, path: [[182, 162]], flip: false}}}
+      - {duration: 3.0, shot: "medium · eye · teal · static", set: {teal: {state: sit, path: [[150, 162]], t: [0, 3], flip: true}, rig: {hidden: false}, auk: {state: crank, path: [[182, 162]], flip: false}}}

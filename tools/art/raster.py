@@ -60,6 +60,47 @@ class Canvas:
                 if ((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 <= 1:
                     self.put(x, y, self._shade(col, shade, x, y, cx - rx, cx + rx, cy - ry, cy + ry))
 
+    def disc(self, cx, cy, r, col, shade=None):
+        self.ellipse(cx, cy, r, r, col, shade)
+
+    def stroke(self, x0, y0, x1, y1, col, thick=1.0, shade=None):
+        """A thick line with round ends (limbs, staffs, branches)."""
+        n = int(max(abs(x1 - x0), abs(y1 - y0)) * 2) + 2
+        r = thick / 2
+        for i in range(n):
+            f = i / (n - 1)
+            cx, cy = x0 + (x1 - x0) * f, y0 + (y1 - y0) * f
+            if r <= 0.6:
+                self.put(cx, cy, col)
+            else:
+                for y in range(int(cy - r) - 1, int(cy + r) + 2):
+                    for x in range(int(cx - r) - 1, int(cx + r) + 2):
+                        if (x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2 <= r * r:
+                            c = col if not shade else self._shade(col, shade, x, y, cx - r, cx + r, y0, y1)
+                            self.put(x, y, c)
+
+    def rim(self, light, of=None, direction=(1, -1)):
+        """Light catching the edge: pixels whose neighbour in `direction` is empty
+        (or an outline) take `light`. Call before `outline`."""
+        dx, dy = direction
+        add = []
+        for y in range(self.h):
+            for x in range(self.w):
+                v = self.px[y][x]
+                if v is None or (of is not None and v not in of):
+                    continue
+                if self.get(x + dx, y + dy) is None or (dx and self.get(x + dx, y) is None and dy and self.get(x, y + dy) is None):
+                    add.append((x, y))
+        for x, y in add:
+            self.px[y][x] = light
+
+    def paste(self, other, dx, dy):
+        for y in range(other.h):
+            for x in range(other.w):
+                v = other.px[y][x]
+                if v is not None:
+                    self.put(x + dx, y + dy, v)
+
     def ring(self, cx, cy, r, col, thick=1):
         for y in range(int(cy - r) - 1, int(cy + r) + 2):
             for x in range(int(cx - r) - 1, int(cx + r) + 2):
@@ -71,11 +112,13 @@ class Canvas:
     def _shade(col, shade, x, y, x0, x1, y0, y1):
         if not shade:
             return col
-        dark, light, (dx, dy) = shade
+        dark, light, (dx, dy) = shade[:3]
+        k = shade[3] if len(shade) > 3 else 1.0  # steepness: 1 = full gradient, 4 = two tones with a narrow dither seam
         fx = (x - x0) / max(1, x1 - x0 - 1)
         fy = (y - y0) / max(1, y1 - y0 - 1)
         f = fx * dx + fy * dy
         f = (f - min(0, dx) - min(0, dy)) / max(1e-6, abs(dx) + abs(dy))
+        f = min(1.0, max(0.0, (f - 0.5) * k + 0.5))
         return light if BAYER[y % 4, x % 4] < f else dark
 
     def outline(self, col, of=None):

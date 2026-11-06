@@ -26,9 +26,10 @@ Test reels: `episodes/ep00_shots` (one scene per entry here) and
 | `close` | the face, the hands, the thing on the ground | zoom 3, or a close sprite (`auk_close`, `teal_close`) on a `plain` backdrop |
 | `insert` | one object filling the frame: a rig face, a hand on a crank, a map | zoom 4, or an insert sprite (`rig_face`, `hands_crank`) |
 
-Close and insert sprites are drawn at close scale and used at zoom 1 over a
-plain backdrop, so they are sharper than a zoomed wide sprite. A `scale: 2`
-on a wide actor gives a medium shot without a new sprite.
+Every character exists at three sizes (`auk`, `auk_med`, `auk_big`). Give the
+actor `med: auk_med` and a medium or close shot draws the sharp figure over
+the zoomed set. Close and insert sprites (`auk_close`, `teal_close`, `rig_face`,
+`hands_crank`) are drawn at close scale and used at zoom 1 over a plain backdrop.
 
 ## Angle
 
@@ -98,5 +99,7 @@ Reference cuts: `episodes/ep00_fight` (the first clash), `episodes/ep00_fights`
 Figures should never be statues. On any actor: `breathe: 3` lifts the torso a
 pixel for half of every three seconds; `bob: 1` bounces a walk; `fps` runs a
 cycle faster or slower than drawn; `phase` offsets it so two figures are not
-in step. Sprites with more life (longer walks, cloak and scarf motion, head
-turns) are the next asset pass.
+in step. Every character has the full move set (`tools/art/figure.py`): idle,
+walk, run, turn, talk, crouch, kneel, sit, point, look_back, windup, strike,
+hit, stagger, down; the faces have idle, speak, glare, flinch, look_down,
+look_away, closed and grim. `episodes/ep00_cast` is the reel.

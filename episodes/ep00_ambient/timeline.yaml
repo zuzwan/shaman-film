@@ -27,8 +27,8 @@ scenes:
     lights:
       - {pos: [140, 158], radius: 26, color: ember0, intensity: 0.5, flicker: true}
     actors:
-      - {sprite: shaman, state: idle, path: [[124, 165]]}
-      - {sprite: apprentice, state: idle, path: [[158, 165]], flip: true}
+      - {sprite: auk, med: auk_med, state: idle, path: [[124, 165]]}
+      - {sprite: teal, med: teal_med, state: idle, path: [[158, 165]], flip: true}
       - {sprite: rig, state: idle, path: [[104, 166]]}
     cards:
       - {narration: "Teal counted the eyes, lost count, and stopped counting.", at: 3.0}

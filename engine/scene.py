@@ -28,7 +28,12 @@ panel fills camera, backdrop angle and fx defaults (engine/shotlist.py).
 Panels: `panels: [{rect: [x, y, w, h], at: 0.5, shot: ..., window: [x, y]}]`
 lays several sub-shots on one page, each appearing at its `at`.
 
-Actors: `scale: 2` blows a wide sprite up for a medium shot; `fps` overrides
+Actors: `med: auk_med` names the actor's medium sprite; in any shot zoomed 2x
+or more it is drawn sharp after the zoom while the set behind it is blown up,
+so punch-ins get a real figure instead of fat pixels: zoom 2 uses `<name>_med`,
+zoom 3 `<name>_big` (when it exists), zoom 4 the medium sprite at 2x.
+`sharp: true` does the same with the actor's own sprite.
+`scale: 2` blows a wide sprite up for a medium shot; `fps` overrides
 the sprite's cycle rate; `bob: 1` bounces a walking figure a pixel on each
 step; `breathe: 3` lifts the upper body a pixel for half of every 3 s, so a
 figure standing still is never a statue.
@@ -146,13 +151,17 @@ class Scene:
     def _actor(self, aid):
         return next((a for a in self.actors if a.get("id") == aid), None)
 
-    def _focus(self, t, cam_x):
+    def _focus(self, t, cam_x, z=1):
         """Screen point the zoom centres on: `focus`, or the named actor's chest."""
         if self.focus_on and (a := self._actor(self.focus_on)) is not None:
             pos = self.actor_pos(a, t)
             if pos is not None:
-                s = a.get("scale", 1)
-                return (pos[0] - cam_x * a.get("parallax", 1.0), pos[1] - self.focus_lift * s)
+                lift = self.focus_lift * a.get("scale", 1)
+                if a.get("med") and z >= 2:  # the sharp sprite is what shows: aim at its chest, not the wide one's
+                    name, ms = self._lod(a["med"], z)
+                    h = next(iter(sprites.load(name).states.values()))[0][1].shape[0]
+                    lift = h * 0.7 * ms / z
+                return (pos[0] - cam_x * a.get("parallax", 1.0), pos[1] - lift)
         return self.focus
 
     # -- layers ---------------------------------------------------------
@@ -199,10 +208,39 @@ class Scene:
         f = ease((t - t0) / max(1e-6, t1 - t0), a.get("ease", "linear"))
         return lerp_path(a.get("path", [[0, 0]]), f)
 
-    def _draw_actor(self, c, a, t, cam_x, amask=None):
+    @staticmethod
+    def _lod(med, z):
+        """Which sharp sprite a zoom gets: med at 2, big at 3 (if drawn), med x2 at 4+."""
+        if 2.5 <= z < 3.5 and med.endswith("_med"):
+            big = med[:-4] + "_big"
+            try:
+                sprites.load(big)
+                return big, 1
+            except FileNotFoundError:
+                pass
+        return med, max(1, int(z // 2))
+
+    @staticmethod
+    def _is_sharp(a, z):
+        return bool(a.get("sharp")) or (bool(a.get("med")) and z >= 2)
+
+    def _zoom_point(self, x, y, z, focus):
+        """Where a picture point lands after `_zoom` (same clamping)."""
+        H, W = self.H, self.W
+        fx_, fy_ = focus if focus is not None else (W / 2, H / 2)
+        hw, hh = W / (2 * z), H / (2 * z)
+        cx = min(max(fx_, hw), W - hw)
+        cy = min(max(fy_, hh), H - hh)
+        return (x - (cx - hw)) * z, (y - (cy - hh)) * z
+
+    def _draw_actor(self, c, a, t, cam_x, amask=None, zoom=None):
         if a.get("hidden"):
             return
-        spr = sprites.load(a["sprite"])
+        name = a["sprite"]
+        med_scale = 1
+        if zoom and a.get("med") and zoom[0] >= 2:
+            name, med_scale = self._lod(a["med"], zoom[0])
+        spr = sprites.load(name)
         pos = self.actor_pos(a, t)
         if pos is None:
             return
@@ -212,18 +250,25 @@ class Scene:
         at = a["freeze"] if "freeze" in a else t - t0   # freeze: hold one moment of the cycle
         if "fps" in a:                                   # run the cycle faster or slower than drawn
             at = at * a["fps"] / spr.fps
-        rgb, alpha = spr.frame(a.get("state", "idle"), at, a.get("flip", False))
+        state = a.get("state", "idle")
+        if state not in spr.states:
+            state = next(iter(spr.states))
+        rgb, alpha = spr.frame(state, at, a.get("flip", False))
         rgb, alpha = self._secondary(a, spr, rgb, alpha, at)
         if a.get("tint"):  # solid silhouette, e.g. the white hit-flash
             rgb = np.broadcast_to(RGB[a["tint"]], rgb.shape)
         ax, ay = spr.anchor
-        if (s := int(a.get("scale", 1))) > 1:  # whole-number blow-up: a medium shot from a wide sprite
+        s = int(a.get("scale", 1)) if not med_scale > 1 else med_scale
+        if s > 1:  # whole-number blow-up: a medium shot from a wide sprite, or a medium sprite at zoom 4
             rgb = rgb.repeat(s, 0).repeat(s, 1)
             alpha = alpha.repeat(s, 0).repeat(s, 1)
             ax, ay = ax * s, ay * s
         if a.get("flip"):
             ax = alpha.shape[1] - 1 - ax
-        bx, by = int(round(x - cam_x * px)) - ax, int(round(y)) - ay
+        sx, sy = x - cam_x * px, y
+        if zoom and zoom[0] != 1:
+            sx, sy = self._zoom_point(sx, sy, zoom[0], zoom[1])
+        bx, by = int(round(sx)) - ax, int(round(sy)) - ay
         sprites.blit(c, rgb, alpha, bx, by)
         if amask is not None:
             sprites.blit_mask(amask, alpha, bx, by)
@@ -231,7 +276,7 @@ class Scene:
     @staticmethod
     def _secondary(a, spr, rgb, alpha, at):
         """Secondary motion on top of the drawn cycle: a step bob and a breath."""
-        n = len(spr.states[a.get("state", "idle")])
+        n = len(spr.states.get(a.get("state", "idle"), [None]))
         shift = 0
         if a.get("bob") and n > 1:  # up on the passing frames, down on the contact frames
             k = int(at * (a.get("fps", spr.fps))) % n
@@ -301,7 +346,8 @@ class Scene:
         self.backdrop.draw(c, cam_x, clock)
         self.backdrop.draw_props(c, cam_x, clock)
         for a in sorted(self.actors, key=lambda a: a.get("parallax", 1.0)):
-            self._draw_actor(c, a, t, cam_x, amask)
+            if not self._is_sharp(a, z):
+                self._draw_actor(c, a, t, cam_x, amask)
         for L in self.lights:  # after actors, so firelight falls on the figures too
             self._draw_light(c, L, clock, cam_x)
         for a in self.actors:  # lights carried by actors, e.g. a lantern
@@ -315,10 +361,13 @@ class Scene:
         self.backdrop.draw_front(c, cam_x, clock)  # foreground framing, over the figures
         if self.weather:
             self.weather.draw(c, clock, cam_x)
+        focus = self._focus(t, cam_x, z)
         if z != 1:
-            focus = self._focus(t, cam_x)
             c = self._zoom(c, z, focus)
             amask = self._zoom(amask, z, focus)
+        for a in sorted(self.actors, key=lambda a: a.get("parallax", 1.0)):
+            if self._is_sharp(a, z):  # crisp over the zoomed set, at the zoomed position
+                self._draw_actor(c, a, t, cam_x, amask, zoom=(z, focus))
         self.backdrop.draw_screen(c, clock)
         fx.apply(c, self.fx, frame, amask, top=self.cfg.get("band", 0))
         dx, dy = fx.shake_offset(self.shake, t, self.duration, frame)
