@@ -83,7 +83,7 @@ def main():
 
     ep = Path(args.episode)
     tl = yaml.safe_load(open(ep / "timeline.yaml"))
-    cfg = {"resolution": tl.get("resolution", [320, 180]), "fps": tl.get("fps", 12), "scale": tl.get("scale", 6),
+    cfg = {"resolution": tl.get("resolution", [320, 180]), "fps": tl.get("fps", 12), "scale": tl.get("scale", 6), "texture": tl.get("texture", False),
            "band": tl.get("band", 0)}
     out = Path("out") / ep.name
     for sub in ("scenes", "keys"):

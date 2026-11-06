@@ -22,7 +22,44 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from raster import Canvas, write_sprite  # noqa: E402
+
+HD = True  # the hyper-detailed style: every fill is textured by its material (engine/texture.py)
+
+
+def texturize(c, k, H, seed=0):
+    """Retone the figure's fills by material: cloth, wool, skin, hair, leather, wood."""
+    import numpy as np
+    from engine import texture
+    from engine.palette import RGB
+    kinds = {}
+    hide = k.get("skull")
+    for key, kind in (("coat", "hair" if hide else "cloth"), ("cloak", "wool"), ("hood", "wool"), ("trousers", "cloth"),
+                      ("skin", "skin"), ("hair", "hair"), ("beard", "hair"), ("boots", "leather"), ("pack", "leather"),
+                      ("scarf", "wool"), ("staff", "wood"), ("mask", "cloth"), ("cap", "cloth"), ("helmet", "leather"),
+                      ("plate", "leather"), ("satchel", "leather")):
+        col = k.get(key)
+        if isinstance(col, str) and col not in kinds:
+            kinds[col] = kind
+    rgb = np.zeros((c.h, c.w, 3), np.uint8)
+    names = np.empty((c.h, c.w), object)
+    for y in range(c.h):
+        for x in range(c.w):
+            v = c.px[y][x]
+            if v is not None:
+                rgb[y, x] = RGB[v]
+                names[y, x] = v
+    amp = 0.55 if H < 40 else 0.95
+    for col, kind in kinds.items():
+        m = names == col
+        if m.any():
+            texture.texture(rgb, m, kind, 0, 0, seed=seed + hash(kind) % 97, amp=amp)
+    back = {tuple(int(v) for v in RGB[n]): n for n in RGB}
+    for y in range(c.h):
+        for x in range(c.w):
+            if names[y, x] is not None:
+                c.px[y][x] = back.get(tuple(int(v) for v in rgb[y, x]), names[y, x])
 
 OUT = Path(__file__).resolve().parents[2] / "assets/sprites"
 
@@ -187,6 +224,8 @@ class Figure:
         self.props(c, J, p)
         if k.get("rim"):
             c.rim(k["rim"], of=k.get("rim_of"))
+        if HD:
+            texturize(c, k, H, seed=self.H)
         c.outline("ink0")
         return c
 

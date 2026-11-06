@@ -120,7 +120,7 @@ class Scene:
         self.cam_ease = cam.get("ease", "smooth")
         extent = abs(self.pan[1] - self.pan[0]) + 16
         bd, w = regions.expand(spec.get("backdrop", {}), spec.get("weather"))
-        self.backdrop = Backdrop(bd, self.W, self.H, extent)
+        self.backdrop = Backdrop(bd, self.W, self.H, extent, textured=bool(cfg.get("texture")))
         self.weather = Weather(w, self.W, self.H) if w and w != "none" else None
         self.actors = spec.get("actors", [])
         self.fx = spec.get("fx", [])
