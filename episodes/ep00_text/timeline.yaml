@@ -11,8 +11,8 @@ scenes:
   duration: auto
   backdrop: {region: river, time: dusk}
   actors:
-  - {sprite: shaman, state: idle, path: [[138, 162]], id: auk}
-  - {sprite: apprentice, state: idle, path: [[160, 162]], id: teal}
+  - {sprite: auk, med: auk_med, state: idle, path: [[138, 162]], id: auk}
+  - {sprite: teal, med: teal_med, state: idle, path: [[160, 162]], id: teal}
   - {sprite: rig, state: hum, path: [[182, 162]], id: rig, flip: true}
   cards:
   - narration: The mill town had been listed for forty years. This season the Survey had struck it from the route.
@@ -38,10 +38,10 @@ scenes:
   duration: auto
   backdrop: {region: river, time: night}
   actors:
-  - {sprite: apprentice, state: idle, path: [[127, 162]], id: teal}
-  - {sprite: fold_host, state: idle, path: [[149, 162]], id: fold_host}
-  - {sprite: fold_host, state: idle, path: [[171, 162]], id: fold_host2, flip: true}
-  - {sprite: fold_host, state: idle, path: [[193, 162]], id: fold_host3, flip: true}
+  - {sprite: teal, med: teal_med, state: idle, path: [[127, 162]], id: teal}
+  - {sprite: fold_host, med: fold_host_med, state: idle, path: [[149, 162]], id: fold_host}
+  - {sprite: fold_host, med: fold_host_med, state: idle, path: [[171, 162]], id: fold_host2, flip: true}
+  - {sprite: fold_host, med: fold_host_med, state: idle, path: [[193, 162]], id: fold_host3, flip: true}
   cards:
   - speaker: apprentice
     text: Where is everyone?
@@ -64,8 +64,8 @@ scenes:
   duration: auto
   backdrop: {region: glass, time: dusk}
   actors:
-  - {sprite: shaman, state: idle, path: [[138, 162]], id: auk}
-  - {sprite: apprentice, state: idle, path: [[160, 162]], id: teal}
+  - {sprite: auk, med: auk_med, state: idle, path: [[138, 162]], id: auk}
+  - {sprite: teal, med: teal_med, state: idle, path: [[160, 162]], id: teal}
   - {sprite: rig, state: hum, path: [[182, 162]], id: rig, flip: true}
   cards:
   - narration: He did not see the second one until it was too late to matter.

@@ -15,9 +15,9 @@ scenes:
     backdrop: {region: uplands, time: dusk, seed: 11}
     weather: {type: snow, density: 0.35, wind: 0.5}
     actors:
-      - {id: auk,   sprite: shaman,    state: idle, path: [[110, 160]]}
-      - {id: teal,  sprite: apprentice, state: idle, path: [[80, 160]]}
-      - {id: gaunt, sprite: gaunt,     state: idle, path: [[230, 160]], flip: true}
+      - {id: auk,   sprite: auk, med: auk_med,    state: idle, path: [[110, 160]]}
+      - {id: teal,  sprite: teal, med: teal_med, state: idle, path: [[80, 160]]}
+      - {id: gaunt, sprite: gaunt, med: gaunt_med,     state: idle, path: [[230, 160]], flip: true}
       - {id: auk_c, sprite: auk_close,  state: glare, path: [[150, 180]], hidden: true}
       - {id: teal_c, sprite: teal_close, state: idle, path: [[150, 180]], hidden: true}
     cards:
@@ -28,9 +28,9 @@ scenes:
       # the page: his eye, its skull, her held breath
       - duration: 3.6
         panels:
-          - {rect: [8, 6, 150, 62], at: 0.0, backdrop: {plain: true, sky: [ink0, ink1]}, weather: none, set: {auk_c: {hidden: false}, auk: {hidden: true}, teal: {hidden: true}, gaunt: {hidden: true}}, window: [85, 112]}
+          - {rect: [8, 6, 150, 62], at: 0.0, backdrop: {plain: true, sky: [ink0, ink1]}, weather: none, set: {auk_c: {hidden: false}, auk: {hidden: true}, teal: {hidden: true}, gaunt: {hidden: true}}, window: [90, 70]}
           - {rect: [166, 6, 146, 62], at: 0.5, shot: "close · eye · gaunt · static"}
-          - {rect: [8, 74, 304, 60], at: 1.1, backdrop: {plain: true, sky: [ink1, ink0]}, weather: none, set: {teal_c: {hidden: false, state: idle}, auk: {hidden: true}, teal: {hidden: true}, gaunt: {hidden: true}}, window: [8, 112]}
+          - {rect: [8, 74, 304, 60], at: 1.1, backdrop: {plain: true, sky: [ink1, ink0]}, weather: none, set: {teal_c: {hidden: false, state: idle}, auk: {hidden: true}, teal: {hidden: true}, gaunt: {hidden: true}}, window: [8, 72]}
       - {duration: 1.2, shot: "medium · eye · auk · static"}
       - {duration: 0.34, shot: "medium · eye · gaunt · static", set: {gaunt: {state: rear}}, fx: [{type: speedlines, kind: radial, center: [230, 120], inner: 30, color: bone, density: 50}]}
       - {duration: 0.17, fx: [{type: impact, bg: bone, fg: ink0}], set: {auk: {state: strike, path: [[150, 160]]}, gaunt: {state: lunge, path: [[196, 160]]}}}
@@ -51,10 +51,10 @@ scenes:
         - {type: trunk, pos: [34, 0], width: 36, color: ink0, rim: ink1, layer: front, parallax: 1.0, seed: 4}
     weather: none
     actors:
-      - {id: auk,    sprite: shaman,     state: walk, path: [[250, 162], [190, 162]], flip: true,
+      - {id: auk,    sprite: auk, med: auk_med,     state: walk, path: [[250, 162], [190, 162]], flip: true,
          light: {radius: 20, color: ember0, intensity: 0.45, flicker: true, offset: [-6, -14]}}
-      - {id: teal,   sprite: apprentice, state: walk, path: [[280, 162], [222, 162]], flip: true}
-      - {id: raider, sprite: raider,     state: idle, path: [[50, 162]]}
+      - {id: teal,   sprite: teal, med: teal_med, state: walk, path: [[280, 162], [222, 162]], flip: true}
+      - {id: raider, sprite: raider, med: raider_med,     state: idle, path: [[50, 162]]}
       - {id: teal_c, sprite: teal_close, state: flinch, path: [[150, 180]], hidden: true}
     cards:
       - {narration: "The dark had a shape in it, and the shape had been waiting.", at: 0.4}
@@ -86,10 +86,10 @@ scenes:
     lights:
       - {pos: [120, 158], radius: 24, color: ember0, intensity: 0.5, flicker: true}
     actors:
-      - {id: auk,    sprite: shaman,     state: idle, path: [[100, 164]], flip: true}
-      - {id: teal,   sprite: apprentice, state: idle, path: [[140, 164]]}
+      - {id: auk,    sprite: auk, med: auk_med,     state: idle, path: [[100, 164]], flip: true}
+      - {id: teal,   sprite: teal, med: teal_med, state: idle, path: [[140, 164]]}
       - {id: rig,    sprite: rig,        state: idle, path: [[84, 166]]}
-      - {id: gaunt,  sprite: gaunt,      state: stalk, path: [[330, 162], [210, 162]], flip: true, t: [0, 9]}
+      - {id: gaunt,  sprite: gaunt, med: gaunt_med,      state: stalk, path: [[330, 162], [210, 162]], flip: true, t: [0, 9]}
       - {id: auk_c,  sprite: auk_close,  state: idle, path: [[150, 180]], hidden: true}
       - {id: face,   sprite: rig_face,   state: lit,  path: [[160, 176]], hidden: true}
     cards:
@@ -100,8 +100,8 @@ scenes:
       - duration: 3.0
         panels:
           - {rect: [8, 6, 100, 128], at: 0.0, shot: "close · eye · gaunt · static", set: {gaunt: {state: rear, path: [[210, 162]]}}, window: [110, 26]}
-          - {rect: [116, 6, 196, 60], at: 0.6, backdrop: {plain: true, sky: [ink0, ink1], props: []}, set: {auk_c: {hidden: false, state: glare}, auk: {hidden: true}, teal: {hidden: true}, rig: {hidden: true}, gaunt: {hidden: true}}, window: [62, 110]}
-          - {rect: [116, 74, 196, 60], at: 1.2, backdrop: {plain: true, sky: [ink0, ink0], props: []}, set: {face: {hidden: false}, auk: {hidden: true}, teal: {hidden: true}, rig: {hidden: true}, gaunt: {hidden: true}}, window: [62, 110]}
+          - {rect: [116, 6, 196, 60], at: 0.6, backdrop: {plain: true, sky: [ink0, ink1], props: []}, set: {auk_c: {hidden: false, state: glare}, auk: {hidden: true}, teal: {hidden: true}, rig: {hidden: true}, gaunt: {hidden: true}}, window: [62, 70]}
+          - {rect: [116, 74, 196, 60], at: 1.2, backdrop: {plain: true, sky: [ink0, ink0], props: []}, set: {face: {hidden: false}, auk: {hidden: true}, teal: {hidden: true}, rig: {hidden: true}, gaunt: {hidden: true}}, window: [62, 70]}
       - {duration: 0.34, shot: "medium · eye · gaunt · static", set: {gaunt: {state: lunge, path: [[210, 162], [150, 162]], ease: linear}},
          fx: [{type: speedlines, kind: radial, center: [180, 120], inner: 24, color: fern4, density: 60}]}
       - {duration: 0.17, fx: [{type: impact, bg: ink0, fg: fern4}], set: {gaunt: {state: lunge, path: [[150, 162]]}, teal: {state: idle, tint: bone}}}
@@ -124,9 +124,9 @@ scenes:
         - {type: trunk, pos: [760, 0], width: 12, color: ink1, layer: front, parallax: 1.8, seed: 9}
     weather: {type: rain, density: 0.4, wind: 0.7}
     actors:
-      - {id: teal,   sprite: apprentice, state: walk, path: [[120, 162], [520, 162]], phase: 0}
-      - {id: raider, sprite: raider,     state: run,  path: [[40, 162], [470, 162]]}
-      - {id: auk,    sprite: shaman,     state: idle, path: [[560, 162]], flip: true, hidden: true}
+      - {id: teal,   sprite: teal, med: teal_med, state: walk, path: [[120, 162], [520, 162]], phase: 0}
+      - {id: raider, sprite: raider, med: raider_med,     state: run,  path: [[40, 162], [470, 162]]}
+      - {id: auk,    sprite: auk, med: auk_med,     state: idle, path: [[560, 162]], flip: true, hidden: true}
       - {id: teal_c, sprite: teal_close, state: idle, path: [[150, 180]], hidden: true}
     cards:
       - {narration: "She ran the way the Survey had taught her: in a straight line, which is how the Survey loses people.", at: 0.5}
@@ -136,7 +136,7 @@ scenes:
       - duration: 2.4
         panels:
           - {rect: [8, 6, 150, 56], at: 0.0, weather: none, backdrop: {ground: {y: 152, color: ash1}}, camera: {zoom: 3, follow: teal, focus_on: teal, focus_lift: -6}, fx: [{type: speedlines, kind: horizontal, color: ash5, density: 30}]}
-          - {rect: [166, 6, 146, 56], at: 0.4, backdrop: {plain: true, sky: [tide1, ink1], props: []}, set: {teal_c: {hidden: false, flip: true, state: flinch}, teal: {hidden: true}, raider: {hidden: true}}, window: [85, 108]}
+          - {rect: [166, 6, 146, 56], at: 0.4, backdrop: {plain: true, sky: [tide1, ink1], props: []}, set: {teal_c: {hidden: false, flip: true, state: flinch}, teal: {hidden: true}, raider: {hidden: true}}, window: [85, 72]}
           - {rect: [8, 68, 304, 66], at: 0.9, shot: "medium · low · raider · track", fx: [{type: speedlines, kind: horizontal, color: ash5, density: 30}]}
       - {duration: 2.0, shot: "wide · eye · teal · track", fx: [{type: speedlines, kind: horizontal, color: ash5, density: 18}]}
       # Auk steps out of the rain from the far side of frame
@@ -160,9 +160,9 @@ scenes:
     weather: none
     actors:
       - {id: rig,   sprite: rig,         state: idle,  path: [[150, 166]]}
-      - {id: auk,   sprite: shaman,      state: idle,  path: [[126, 164]]}
-      - {id: teal,  sprite: apprentice,  state: idle,  path: [[90, 164]]}
-      - {id: gaunt, sprite: gaunt,       state: rear,  path: [[226, 162]], flip: true}
+      - {id: auk,   sprite: auk, med: auk_med,      state: idle,  path: [[126, 164]]}
+      - {id: teal,  sprite: teal, med: teal_med,  state: idle,  path: [[90, 164]]}
+      - {id: gaunt, sprite: gaunt, med: gaunt_med,       state: rear,  path: [[226, 162]], flip: true}
       - {id: hands, sprite: hands_crank, state: crank, path: [[160, 170]], hidden: true}
       - {id: face,  sprite: rig_face,    state: dark,  path: [[160, 176]], hidden: true}
     lights:

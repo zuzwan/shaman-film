@@ -18,10 +18,10 @@ scenes:
         - {type: tree, pos: [40, 152], height: 46, seed: 2, color: ink2, depth: 5}
     camera: {pan: [0, 30]}
     actors:   # a Survey column walking the route
-      - {sprite: guard,    state: walk, path: [[-20, 160], [190, 160]]}
-      - {sprite: chainman, state: walk, path: [[-36, 161], [174, 161]], phase: 0.2}
-      - {sprite: clerk,    state: walk, path: [[-52, 160], [158, 160]], phase: 0.4}
-      - {sprite: guard,    state: walk, path: [[-68, 161], [142, 161]], phase: 0.1}
+      - {sprite: guard, med: guard_med,    state: walk, path: [[-20, 160], [190, 160]]}
+      - {sprite: chainman, med: chainman_med, state: walk, path: [[-36, 161], [174, 161]], phase: 0.2}
+      - {sprite: clerk, med: clerk_med,    state: walk, path: [[-52, 160], [158, 160]], phase: 0.4}
+      - {sprite: guard, med: guard_med,    state: walk, path: [[-68, 161], [142, 161]], phase: 0.1}
     captions:
       - {t: [2.0, 5.5], text: "The column counted everything it passed."}
 
@@ -35,8 +35,8 @@ scenes:
         - {type: tree, pos: [250, 152], height: 70, seed: 7, color: ink0, thick: 3}
     camera: {pan: [0, 50], ease: linear}
     actors:
-      - {sprite: shaman,     state: walk, path: [[70, 162], [200, 162]]}
-      - {sprite: apprentice, state: walk, path: [[50, 163], [180, 163]], phase: 0.3,
+      - {sprite: auk, med: auk_med,     state: walk, path: [[70, 162], [200, 162]]}
+      - {sprite: teal, med: teal_med, state: walk, path: [[50, 163], [180, 163]], phase: 0.3,
          light: {offset: [5, -9], radius: 10, color: ember0, intensity: 0.6, flicker: true}}
 
   - id: s03_uplands_camp
@@ -54,8 +54,8 @@ scenes:
       - {pos: [160, 156], radius: 34, color: ember0, intensity: 0.5, flicker: true}
       - {pos: [160, 156], radius: 14, color: ember1, intensity: 0.6, flicker: true}
     actors:
-      - {sprite: shaman,     state: idle, path: [[136, 163]]}
-      - {sprite: apprentice, state: idle, path: [[184, 163]], flip: true}
+      - {sprite: auk, med: auk_med,     state: idle, path: [[136, 163]]}
+      - {sprite: teal, med: teal_med, state: idle, path: [[184, 163]], flip: true}
       - {sprite: rig,        state: hum,  path: [[205, 165]], flip: true}
     captions:
       - {t: [1.0, 4.5], text: "He had twelve animals in him and no name he answered to."}
@@ -71,7 +71,7 @@ scenes:
         - {type: ruin, pos: [190, 150], width: 110, height: 70, arches: 3, seed: 8, color: ink0, rim: blood2, layer: 2, parallax: 0.6}
     camera: {pan: [0, 40]}
     actors:
-      - {sprite: shaman, state: walk, path: [[20, 162], [150, 162]]}
+      - {sprite: auk, med: auk_med, state: walk, path: [[20, 162], [150, 162]]}
 
   - id: s05_coast
     duration: 5
@@ -81,7 +81,7 @@ scenes:
       seed: 4
     weather: {type: rain, density: 0.25, wind: 0.5}
     actors:
-      - {sprite: apprentice, state: walk, path: [[60, 162], [150, 162]]}
+      - {sprite: teal, med: teal_med, state: walk, path: [[60, 162], [150, 162]]}
       - {sprite: rig, state: hum, path: [[40, 164], [130, 164]]}
 
   - id: s06_interior_fold
@@ -96,10 +96,10 @@ scenes:
         - {type: tree, pos: [20, 152],  height: 90, seed: 11, color: ink0, thick: 4, depth: 7}
         - {type: tree, pos: [300, 152], height: 80, seed: 12, color: ink0, thick: 4, depth: 7}
     actors:   # Fold hosts: one sprite, one gait, no phase offsets
-      - {sprite: fold_host, state: walk, path: [[340, 160], [140, 160]], flip: true}
-      - {sprite: fold_host, state: walk, path: [[356, 161], [156, 161]], flip: true}
-      - {sprite: fold_host, state: walk, path: [[372, 160], [172, 160]], flip: true}
-      - {sprite: fold_host, state: walk, path: [[388, 161], [188, 161]], flip: true}
-      - {sprite: fold_host, state: walk, path: [[404, 160], [204, 160]], flip: true}
+      - {sprite: fold_host, med: fold_host_med, state: walk, path: [[340, 160], [140, 160]], flip: true}
+      - {sprite: fold_host, med: fold_host_med, state: walk, path: [[356, 161], [156, 161]], flip: true}
+      - {sprite: fold_host, med: fold_host_med, state: walk, path: [[372, 160], [172, 160]], flip: true}
+      - {sprite: fold_host, med: fold_host_med, state: walk, path: [[388, 161], [188, 161]], flip: true}
+      - {sprite: fold_host, med: fold_host_med, state: walk, path: [[404, 160], [204, 160]], flip: true}
     captions:
       - {t: [2.5, 6.0], text: "We saw them coming. We see most things."}

@@ -14,8 +14,8 @@ scenes:
     transition_in: {duration: 0.8}
     backdrop: {region: uplands, time: day, seed: 3}
     actors:
-      - {id: auk,  sprite: shaman,     state: walk, path: [[60, 154], [120, 154]]}
-      - {id: teal, sprite: apprentice, state: walk, path: [[44, 154], [104, 154]]}
+      - {id: auk,  sprite: auk, med: auk_med,     state: walk, path: [[60, 154], [120, 154]]}
+      - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[44, 154], [104, 154]]}
     captions: [{text: "EXTREME WIDE", t: [0.3, 3.5], y: 30}]
 
   # 2. low angle: the horizon drops, the figures tower (feet at 152 + 22)
@@ -25,8 +25,8 @@ scenes:
     backdrop: {region: river, time: dusk, seed: 5,
                props: [{type: grass, y: 180, height: 14, layer: front, parallax: 1.4, seed: 2}]}
     actors:
-      - {id: auk,  sprite: shaman,     state: idle, path: [[150, 174]], scale: 2, breathe: 3}
-      - {id: teal, sprite: apprentice, state: idle, path: [[200, 174]], scale: 2, flip: true, breathe: 2.6, phase: 1.1}
+      - {id: auk,  sprite: auk, med: auk_med,     state: idle, path: [[150, 174]], scale: 2, breathe: 3}
+      - {id: teal, sprite: teal, med: teal_med, state: idle, path: [[200, 174]], scale: 2, flip: true, breathe: 2.6, phase: 1.1}
     captions: [{text: "LOW ANGLE", t: [0.3, 3.5], y: 30}]
 
   # 3. high angle: looking down the slope, more ground than sky (feet at 152 - 34)
@@ -36,8 +36,8 @@ scenes:
     backdrop: {region: coast, time: day, seed: 2}
     weather: {type: rain, density: 0.3, wind: 0.6}
     actors:
-      - {id: auk,  sprite: shaman,     state: walk, path: [[90, 128], [140, 142]]}
-      - {id: teal, sprite: apprentice, state: walk, path: [[74, 124], [124, 138]]}
+      - {id: auk,  sprite: auk, med: auk_med,     state: walk, path: [[90, 128], [140, 142]]}
+      - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[74, 124], [124, 138]]}
     captions: [{text: "HIGH ANGLE", t: [0.3, 3.5], y: 30}]
 
   # 4. framed: through a ruin doorway, the lantern coming
@@ -48,7 +48,7 @@ scenes:
                props: [{type: ruin, pos: [150, 152], width: 120, height: 70, arches: 3, seed: 4, color: ink1, layer: 1, parallax: 0.5}]}
     weather: none
     actors:
-      - {id: auk, sprite: shaman, state: walk, path: [[300, 158], [160, 158]], flip: true,
+      - {id: auk, sprite: auk, med: auk_med, state: walk, path: [[300, 158], [160, 158]], flip: true,
          light: {radius: 22, color: ember0, intensity: 0.5, flicker: true, offset: [-6, -14]}}
     captions: [{text: "FRAMED", t: [0.3, 3.5], y: 30}]
 
@@ -57,7 +57,7 @@ scenes:
     shot: "medium · over-shoulder · auk · static"
     backdrop: {region: interior, time: dusk, seed: 9}
     actors:
-      - {id: auk, sprite: shaman, state: idle, path: [[190, 162]], flip: true, scale: 2}
+      - {id: auk, sprite: auk, med: auk_med, state: idle, path: [[190, 162]], flip: true, scale: 2}
     cards:
       - {speaker: shaman, text: "Count the eyes before you count the fires. The fires lie."}
     captions: [{text: "OVER-SHOULDER", t: [0.3, 2.5], y: 30}]
@@ -71,7 +71,7 @@ scenes:
                        {type: branches, x: 0, width: 160, depth: 50, layer: front, parallax: 1.2, seed: 5}]}
     weather: none
     actors:
-      - {id: raider, sprite: raider, state: run, path: [[170, 150], [162, 170]], flip: true, scale: 2}
+      - {id: raider, sprite: raider, med: raider_med, state: run, path: [[170, 150], [162, 170]], flip: true, scale: 2}
     camera: {shake: {amp: 1, decay: 0}}
     captions: [{text: "POV", t: [0.3, 3.5], y: 30}]
 
@@ -86,8 +86,8 @@ scenes:
                        {type: trunk, pos: [380, 0], width: 30, layer: front, parallax: 1.7, seed: 2},
                        {type: trunk, pos: [700, 0], width: 20, layer: front, parallax: 1.7, seed: 3}]}
     actors:
-      - {id: teal, sprite: apprentice, state: walk, path: [[160, 160], [420, 160]], bob: 1}
-      - {id: auk,  sprite: shaman,     state: walk, path: [[130, 160], [390, 160]]}
+      - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[160, 160], [420, 160]], bob: 1}
+      - {id: auk,  sprite: auk, med: auk_med,     state: walk, path: [[130, 160], [390, 160]]}
     captions: [{text: "TRACK", t: [0.3, 3.5], y: 30}]
 
   # 8. depth walk: the figure comes to camera in three cuts, not a slide
@@ -95,7 +95,7 @@ scenes:
     backdrop: {region: uplands, time: dusk, seed: 6}
     weather: {type: snow, density: 0.3, wind: 0.5}
     actors:
-      - {id: teal, sprite: apprentice, state: walk, path: [[150, 150]], flip: true}
+      - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[150, 150]], flip: true}
     shots:
       - {duration: 1.4, set: {teal: {path: [[160, 152]]}}}
       - {duration: 1.2, set: {teal: {scale: 2, path: [[164, 170]]}}, backdrop: {angle: low}}
@@ -108,8 +108,8 @@ scenes:
     backdrop: {region: glass, time: dusk, seed: 8}
     weather: none
     actors:
-      - {id: auk,    sprite: shaman, state: windup, path: [[150, 162]]}
-      - {id: raider, sprite: raider, state: lunge,  path: [[186, 162]], flip: true}
+      - {id: auk,    sprite: auk, med: auk_med, state: windup, path: [[150, 162]]}
+      - {id: raider, sprite: raider, med: raider_med, state: lunge,  path: [[186, 162]], flip: true}
       - {id: rig,    sprite: rig,    state: hum,    path: [[110, 164]]}
     panels:
       - {rect: [8, 6, 180, 62],   at: 0.0, shot: "wide · eye · static"}
@@ -141,7 +141,7 @@ scenes:
     weather: none
     actors:
       - {id: rig, sprite: rig,    state: hum,  path: [[150, 164]]}
-      - {id: auk, sprite: shaman, state: idle, path: [[182, 162]], flip: true}
+      - {id: auk, sprite: auk, med: auk_med, state: idle, path: [[182, 162]], flip: true}
     lights:
       - {pos: [150, 146], radius: 20, color: ember0, intensity: 0.5, flicker: true}
     shots:

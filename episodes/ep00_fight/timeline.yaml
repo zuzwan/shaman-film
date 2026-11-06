@@ -20,8 +20,8 @@ scenes:
     weather: {type: ash, density: 0.5, wind: 0.3}
     actors:
       - {id: rig,    sprite: rig,    state: hum,  path: [[112, 163]]}
-      - {id: auk,    sprite: shaman, state: idle, path: [[150, 162]]}
-      - {id: raider, sprite: raider, state: run,  path: [[330, 162], [184, 162]], flip: true}
+      - {id: auk,    sprite: auk, med: auk_med, state: idle, path: [[150, 162]]}
+      - {id: raider, sprite: raider, med: raider_med, state: run,  path: [[330, 162], [184, 162]], flip: true}
     lights:
       - {pos: [112, 145], radius: 18, color: ember0, intensity: 0.45, flicker: true}
     cards:
