@@ -47,8 +47,7 @@ here inherits these rules. Change them only when drew says so.
   crouch, kneel, sit, point, look_back, windup, strike, hit, stagger, down (+ crank for Auk,
   lunge for the raider and the gaunt, rear for the gaunt; `teal_rig` carries the rig).
   Give every actor `med: <name>_med` and the engine draws the sharp sprite in any punch-in.
-  Faces (`auk_close`, `teal_close`) come from drew's reference photos in `assets/ref/` through
-  `tools/art/photo.py` (quantise, mask, cut expressions); `rig_face`, `hands_crank` from `tools/art/portraits.py`;
+  Faces (`auk_close`, `teal_close`), `rig_face`, `hands_crank` come from `tools/art/portraits.py`;
   the rig from `tools/art/rig.py`. Edit the generator and re-run; review with
   `tools/sheet.py <name>` (one row per state) before anything enters an episode.
 - Nothing stands like a statue: give idle actors `breathe`, walkers `bob`, and offset
