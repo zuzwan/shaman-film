@@ -59,7 +59,7 @@ def moon(c, p, ox, t):
     c[d <= r] = RGB[p.get("color", "moon")]
     # a few dark maria
     rng = np.random.default_rng(p.get("seed", 1))
-    for _ in range(4):
+    for _ in range(p.get("maria", 4)):  # a low sun: maria: 0
         mx, my = rng.uniform(-r * .5, r * .5, 2)
         mr = rng.uniform(r * .15, r * .35)
         c[np.sqrt((xx - cx - mx) ** 2 + (yy - cy - my) ** 2) <= mr] = RGB[p.get("shade", "ash4")]
@@ -359,11 +359,52 @@ def marker(c, p, ox, t):
             c[ly:ly + h, lx:lx + w][m] = col
 
 
+def smoke(c, p, ox, t):
+    """A smoke line rising from a chimney or a fire, leaning with the wind and
+    thinning as it climbs (dithered, never blended). The mill fires at dusk."""
+    H, W = c.shape[:2]
+    x0, y0 = p["pos"][0] - ox, p["pos"][1]
+    height, lean = p.get("height", 50), p.get("lean", 0.35)
+    col = RGB[p.get("color", "ash2")]
+    seed = p.get("seed", 0)
+    for k in range(int(height)):
+        f = k / height
+        w = 1.0 + f * p.get("spread", 5)
+        cx = x0 + lean * k + 1.5 * f * np.sin(k / 6.0 - t * 1.4 + seed)
+        dens = (1 - f) ** 1.3 * p.get("density", 0.9)
+        y = int(y0 - k)
+        if not (0 <= y < H):
+            continue
+        for x in range(int(cx - w), int(cx + w) + 1):
+            if 0 <= x < W and threshold(1, 1, x, y)[0, 0] < dens * (1 - abs(x - cx) / (w + 1)):
+                c[y, x] = col
+
+
+def gnats(c, p, ox, t):
+    """Columns of gnats rising off a field: thin dark spirals of single pixels."""
+    H, W = c.shape[:2]
+    rng = np.random.default_rng(p.get("seed", 0))
+    col = RGB[p.get("color", "ink1")]
+    for i in range(p.get("columns", 3)):
+        bx = p["pos"][0] - ox + rng.uniform(-p.get("spread", 60) / 2, p.get("spread", 60) / 2)
+        by = p["pos"][1]
+        hgt = rng.uniform(0.6, 1.0) * p.get("height", 40)
+        for j in range(p.get("count", 30)):
+            ph = rng.uniform(0, 6.28)
+            sp = rng.uniform(0.15, 0.35)
+            u = (t * sp + j / 30.0 + ph) % 1.0
+            y = int(by - u * hgt)
+            x = int(bx + (1 + u * 4) * np.sin(ph + t * 3 + u * 9))
+            if 0 <= x < W and 0 <= y < H:
+                c[y, x] = col
+
+
 EMISSIVE = {"fire", "eyes", "wanderlight"}
 DRAW = {"moon": moon, "tree": tree, "ruin": ruin, "fire": fire,
         "eyes": eyes, "wanderlight": wanderlight, "presence": presence,
         "trunk": trunk, "grass": grass, "doorway": doorway, "branches": branches,
-        "shoulder": shoulder, "contours": contours, "route": route, "marker": marker}
+        "shoulder": shoulder, "contours": contours, "route": route, "marker": marker,
+        "smoke": smoke, "gnats": gnats}
 
 
 def draw(c, props, cam_x, t):
