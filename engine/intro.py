@@ -152,6 +152,28 @@ SCENERY = {
 }
 
 
+# The low sun in each scenery becomes a pale disc by day and the moon by night;
+# smoke and gnats lighten after dark so they still read against the sky.
+_SKY_DISC = {"day": {"color": "ash5", "halo_color": "sky3", "glow": 0.3},
+             "night": {"color": "moon", "halo_color": "night3", "maria": 4, "glow": 0.35}}
+
+
+def _at_time(sc, time):
+    import copy
+    sc = copy.deepcopy(sc)
+    for p in sc.get("props", []):
+        if p["type"] == "moon" and time in _SKY_DISC:
+            p.update(_SKY_DISC[time])
+            if time == "night":
+                p["pos"] = [p["pos"][0], max(30, p["pos"][1] - 90)]
+                p["r"] = min(p.get("r", 8), 7)
+        if time == "night" and p["type"] in ("gnats",):
+            p["color"] = "ash2"
+        if time == "night" and p["type"] == "smoke":
+            p["color"] = "night3"
+    return sc
+
+
 class Layout:
     """Where the lettering sits: THE over SHAMAN, centred, with rules and a device."""
 
@@ -207,9 +229,11 @@ class Intro(Scene):
         self.style = intro.get("style", s.get("style", "swarm"))
         self.ep = ep
         self.scenery = intro.get("scenery", s.get("scenery", "plain"))
-        sc = SCENERY[self.scenery]
+        self.time = intro.get("time", s.get("time", "dusk"))
+        sc = _at_time(SCENERY[self.scenery], self.time)
+        self.gnat = "ash3" if self.time == "night" else "ink1"
         sp = {"id": "s00_intro", "duration": INTRO_LENGTH, "band": 0,
-              "backdrop": {"region": region, "time": "dusk", "seed": 131, "angle": "low",
+              "backdrop": {"region": region, "time": self.time, "seed": 131, "angle": "low",
                            "props": sc.get("props", [])},
               "weather": sc.get("weather", "none"),
               "actors": sc.get("actors", []), "lights": sc.get("lights", [])}
@@ -297,7 +321,7 @@ class Intro(Scene):
         if settle < 1:
             ok = (px >= 0) & (px < self.W) & (py >= 0) & (py < self.H)
             on = ok & (np.round(self.ph * 3 + frame) % 5 != 0)
-            c[py[on], px[on]] = RGB["ink1"]
+            c[py[on], px[on]] = RGB[self.gnat]
         if t >= land - 0.3:
             titlefont.carve(c, L.m, L.x, L.y, settle)
             if L.small:
@@ -309,7 +333,7 @@ class Intro(Scene):
             x = int(L.x + a * L.m.shape[1] + 18 * np.sin(t * (1 + b) + p * 6))
             y = int(L.y - 10 + q * 60 + 8 * np.cos(t * (1.5 + a) + p * 4))
             if 0 <= x < self.W and 0 <= y < self.H and (frame + i) % 4:
-                c[y, x] = RGB["ink1"]
+                c[y, x] = RGB[self.gnat]
         return c
 
     def _ember(self, t, frame):
