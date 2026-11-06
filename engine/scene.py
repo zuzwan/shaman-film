@@ -18,8 +18,20 @@ time, paths and animation restart at each shot; weather, fire and subtitle
 cards run on the scene's clock across the cuts.
 
 Camera: `pan`, `zoom` (a number, or [from, to]), `focus` (screen point the
-zoom centres on; whole-number zooms stay pixel-crisp), `shake` (amplitude in
-pixels, or {amp, decay}).
+zoom centres on; whole-number zooms stay pixel-crisp), `focus_on: <actor id>`
+(centre on that actor's chest), `follow: <actor id>` (track it), `shake`
+(amplitude in pixels, or {amp, decay}).
+
+Shot vocabulary: `shot: "close · low · auk · push-in"` on a scene, a shot or a
+panel fills camera, backdrop angle and fx defaults (engine/shotlist.py).
+
+Panels: `panels: [{rect: [x, y, w, h], at: 0.5, shot: ..., window: [x, y]}]`
+lays several sub-shots on one page, each appearing at its `at`.
+
+Actors: `scale: 2` blows a wide sprite up for a medium shot; `fps` overrides
+the sprite's cycle rate; `bob: 1` bounces a walking figure a pixel on each
+step; `breathe: 3` lifts the upper body a pixel for half of every 3 s, so a
+figure standing still is never a statue.
 """
 import copy
 
@@ -40,6 +52,7 @@ LIGHT_RAMPS = {
     "night3": ["night1", "night2", "night3", "cold1", "cold2"],
 }
 from .weather import Weather
+from . import shotlist
 
 
 def ease(f, kind="smooth"):
@@ -70,6 +83,9 @@ class Scene:
         self.fps = cfg["fps"]
         self.clock_offset, self.frame_offset = clock_offset, frame_offset
         self.band = spec.get("band", cfg.get("band", 0))
+        if "shot" in spec:  # 'close · low · auk · push-in' -> camera defaults (engine/shotlist.py)
+            spec = shotlist.resolve(spec, spec, cfg["fps"])
+            self.spec = spec
         self.shots = []
         if spec.get("shots"):
             t = 0.0
@@ -91,6 +107,10 @@ class Scene:
         z = cam.get("zoom", [1, 1])
         self.zoom = z if isinstance(z, list) else [z, z]
         self.focus = cam.get("focus")
+        self.focus_on = cam.get("focus_on")      # actor id the zoom centres on
+        self.focus_lift = cam.get("focus_lift", 18)
+        self.follow = cam.get("follow")          # actor id the camera tracks
+        self.follow_offset = cam.get("follow_offset", 0)
         self.shake = cam.get("shake")
         self.cam_ease = cam.get("ease", "smooth")
         extent = abs(self.pan[1] - self.pan[0]) + 16
@@ -101,13 +121,39 @@ class Scene:
         self.fx = spec.get("fx", [])
         self.lights = spec.get("lights", [])
         self.captions = spec.get("captions", [])
+        # manga panels: sub-shots in rectangles over a flat page, appearing in turn.
+        # `rect` is [x, y, w, h] on the visible picture (320 x (180 - band)).
+        self.panels = []
+        for p in spec.get("panels", []):
+            body = {k: v for k, v in p.items() if k not in ("rect", "at", "window", "border", "pop")}
+            body.setdefault("duration", max(0.1, self.duration - p.get("at", 0.0)))
+            sub = Scene(merge_shot(spec, body), cfg, clock_offset + p.get("at", 0.0),
+                        frame_offset + int(round(p.get("at", 0.0) * self.fps)))
+            self.panels.append((p, sub))
+        self.panel_bg = spec.get("panel_bg", "ink0")
 
     # -- camera ---------------------------------------------------------
     def camera(self, t):
         f = ease(t / self.duration, self.cam_ease)
         cam_x = self.pan[0] + (self.pan[1] - self.pan[0]) * f
         z = self.zoom[0] + (self.zoom[1] - self.zoom[0]) * f
+        if self.follow and (a := self._actor(self.follow)) is not None:
+            pos = self.actor_pos(a, min(max(t, a.get("t", [0])[0]), a.get("t", [0, self.duration])[1]))
+            if pos is not None:
+                cam_x = (pos[0] - self.W / 2 + self.follow_offset) / max(1e-6, a.get("parallax", 1.0))
         return cam_x, z
+
+    def _actor(self, aid):
+        return next((a for a in self.actors if a.get("id") == aid), None)
+
+    def _focus(self, t, cam_x):
+        """Screen point the zoom centres on: `focus`, or the named actor's chest."""
+        if self.focus_on and (a := self._actor(self.focus_on)) is not None:
+            pos = self.actor_pos(a, t)
+            if pos is not None:
+                s = a.get("scale", 1)
+                return (pos[0] - cam_x * a.get("parallax", 1.0), pos[1] - self.focus_lift * s)
+        return self.focus
 
     # -- layers ---------------------------------------------------------
     def _draw_light(self, c, L, t, cam_x):
@@ -164,16 +210,47 @@ class Scene:
         t0 = a.get("t", [0])[0] + a.get("phase", 0.0)
         px = a.get("parallax", 1.0)
         at = a["freeze"] if "freeze" in a else t - t0   # freeze: hold one moment of the cycle
+        if "fps" in a:                                   # run the cycle faster or slower than drawn
+            at = at * a["fps"] / spr.fps
         rgb, alpha = spr.frame(a.get("state", "idle"), at, a.get("flip", False))
+        rgb, alpha = self._secondary(a, spr, rgb, alpha, at)
         if a.get("tint"):  # solid silhouette, e.g. the white hit-flash
             rgb = np.broadcast_to(RGB[a["tint"]], rgb.shape)
         ax, ay = spr.anchor
+        if (s := int(a.get("scale", 1))) > 1:  # whole-number blow-up: a medium shot from a wide sprite
+            rgb = rgb.repeat(s, 0).repeat(s, 1)
+            alpha = alpha.repeat(s, 0).repeat(s, 1)
+            ax, ay = ax * s, ay * s
         if a.get("flip"):
             ax = alpha.shape[1] - 1 - ax
         bx, by = int(round(x - cam_x * px)) - ax, int(round(y)) - ay
         sprites.blit(c, rgb, alpha, bx, by)
         if amask is not None:
             sprites.blit_mask(amask, alpha, bx, by)
+
+    @staticmethod
+    def _secondary(a, spr, rgb, alpha, at):
+        """Secondary motion on top of the drawn cycle: a step bob and a breath."""
+        n = len(spr.states[a.get("state", "idle")])
+        shift = 0
+        if a.get("bob") and n > 1:  # up on the passing frames, down on the contact frames
+            k = int(at * (a.get("fps", spr.fps))) % n
+            shift = -int(a["bob"]) if k % 2 == 1 else 0
+        if shift:
+            rgb = np.roll(rgb, shift, axis=0)
+            alpha = np.roll(alpha, shift, axis=0)
+            if shift < 0:
+                alpha[shift:] = False
+        if a.get("breathe"):  # the rows above the waist rise a pixel for half the cycle
+            period = float(a["breathe"])
+            if (at + a.get("phase", 0.0)) % period < period / 2:
+                waist = int(alpha.shape[0] * 0.55)
+                top = alpha[:waist]
+                if top.any() and not alpha[0].any():
+                    rgb = rgb.copy(); alpha = alpha.copy()
+                    rgb[:waist - 1] = rgb[1:waist]; alpha[:waist - 1] = alpha[1:waist]
+                    # the waist row is doubled, which stretches the torso by one pixel
+        return rgb, alpha
 
     def _draw_captions(self, c, t):
         for cap in self.captions:
@@ -215,6 +292,8 @@ class Scene:
             for start, sub in reversed(self.shots):
                 if t >= start - 1e-9:
                     return sub.picture(t - start, frame)
+        if self.panels:
+            return self._panels(t, frame)
         cam_x, z = self.camera(t)
         clock = t + self.clock_offset  # the scene's clock, continuous across cuts
         c = np.zeros((self.H, self.W, 3), dtype=np.uint8)
@@ -233,11 +312,14 @@ class Scene:
                 L = dict(a["light"], pos=[pos[0] + dx, pos[1] + dy], parallax=a.get("parallax", 1.0))
                 self._draw_light(c, L, clock, cam_x)
         self.backdrop.draw_props(c, cam_x, clock, emissive=True)  # flames sit on top of their own light
+        self.backdrop.draw_front(c, cam_x, clock)  # foreground framing, over the figures
         if self.weather:
             self.weather.draw(c, clock, cam_x)
         if z != 1:
-            c = self._zoom(c, z)
-            amask = self._zoom(amask, z)
+            focus = self._focus(t, cam_x)
+            c = self._zoom(c, z, focus)
+            amask = self._zoom(amask, z, focus)
+        self.backdrop.draw_screen(c, clock)
         fx.apply(c, self.fx, frame, amask, top=self.cfg.get("band", 0))
         dx, dy = fx.shake_offset(self.shake, t, self.duration, frame)
         if dx or dy:
@@ -255,13 +337,36 @@ class Scene:
         subtitles.draw(c, self.cards, t, self.band)
         return c
 
-    def _zoom(self, c, z):
+    def _panels(self, t, frame):
+        """Manga page: each panel is its own shot, cut into a rectangle, appearing in turn."""
+        H, W = self.H, self.W
+        c = np.zeros((H, W, 3), dtype=np.uint8)
+        c[:] = RGB[self.panel_bg]
+        for p, sub in self.panels:
+            at = p.get("at", 0.0)
+            if t < at - 1e-9:
+                continue
+            x, y, w, h = p["rect"]
+            y += self.cfg.get("band", 0)  # rects are laid out on the visible picture, under the band's crop
+            pic = sub.picture(min(t - at, sub.duration - 1e-6), frame)
+            wx, wy = p.get("window", [(W - w) // 2, (H - h) // 2])  # which part of the shot shows
+            wx, wy = min(max(0, wx), W - w), min(max(0, wy), H - h)
+            crop = pic[wy:wy + h, wx:wx + w]
+            if p.get("pop", True) and t - at < 1.5 / self.fps:  # one white frame as the panel lands
+                crop = np.broadcast_to(RGB["bone"], crop.shape)
+            c[y:y + h, x:x + w] = crop
+            b = RGB[p.get("border", "bone")]
+            c[y, x:x + w] = b; c[y + h - 1, x:x + w] = b
+            c[y:y + h, x] = b; c[y:y + h, x + w - 1] = b
+        return c
+
+    def _zoom(self, c, z, focus=None):
         """Zoom about `focus` (default: centre) by nearest-neighbour resampling.
 
         Whole-number zooms keep every source pixel the same size; fractional
         zooms work but make uneven pixels, so keep those small and slow."""
         H, W = self.H, self.W
-        fx_, fy_ = self.focus or (W / 2, H / 2)
+        fx_, fy_ = focus if focus is not None else (W / 2, H / 2)
         # keep the crop inside the frame so the edges never smear
         hw, hh = W / (2 * z), H / (2 * z)
         cx = min(max(fx_, hw), W - hw)
@@ -278,11 +383,15 @@ class Scene:
 def merge_shot(spec, shot):
     """The scene's spec with one shot laid over it (see module docstring)."""
     base = {k: v for k, v in spec.items()
-            if k not in ("shots", "cards", "captions", "transition_in", "transition_out", "duration", "id")}
+            if k not in ("shots", "panels", "cards", "captions", "transition_in", "transition_out",
+                         "duration", "id", "shot")}
     out = copy.deepcopy(base)
+    shot = shotlist.resolve(shot, base)
     for k, v in shot.items():
         if k == "camera":
             out["camera"] = {**base.get("camera", {}), **v}
+        elif k == "backdrop":
+            out["backdrop"] = {**base.get("backdrop", {}), **v}
         elif k == "set":
             for a in out.get("actors", []):
                 if a.get("id") in v:

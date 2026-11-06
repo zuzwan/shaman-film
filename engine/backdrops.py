@@ -77,6 +77,8 @@ class Backdrop:
         all_props = self.spec.get("props", [])
         canvas[:] = self.sky
         props.draw(canvas, [p for p in all_props if p.get("layer") == -1], cam_x, t)
+        if self.spec.get("plain"):  # flat or two-tone ground for inserts and close-ups
+            return
         ys = np.arange(H)[:, None]
         for i, (L, heights) in enumerate(self.layers):
             off = int(round(cam_x * L.get("parallax", 0.5)))
@@ -102,3 +104,12 @@ class Backdrop:
         """Front props. Emissive ones (fire) are drawn in a second pass, after lights."""
         props.draw(canvas, [p for p in self.spec.get("props", []) if "layer" not in p
                             and (p["type"] in props.EMISSIVE) == emissive], cam_x, t)
+
+    def draw_front(self, canvas, cam_x, t):
+        """Foreground framing props (`layer: front`), over the actors."""
+        props.draw(canvas, [p for p in self.spec.get("props", []) if p.get("layer") == "front"], cam_x, t)
+
+    def draw_screen(self, canvas, t):
+        """Props pinned to the frame (`layer: screen`): drawn after the zoom, so a
+        shoulder or a hand stays in its corner however the camera punches in."""
+        props.draw(canvas, [p for p in self.spec.get("props", []) if p.get("layer") == "screen"], 0, t)

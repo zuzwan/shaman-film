@@ -4,6 +4,9 @@ A scene's backdrop can name a region and a time, then override anything:
 
     backdrop: {region: uplands, time: dusk, seed: 4, props: [...]}
 
+`angle: low | high | skyline | eye` (or a raw `shift` in pixels) moves the
+horizon for low and high camera angles; see ANGLES.
+
 The preset fills sky, ridge layers, ground, and suggests weather. Keys the
 scene sets win. Regions follow the world doc: river country, uplands, coast,
 glass towns, interior. Night is shared blue in every region, tinted by the
@@ -64,6 +67,12 @@ REGIONS = {
 }
 
 
+# Camera angle as a horizon shift (pixels; + moves the horizon down = more sky).
+# Actors keep the y you give them, so put feet on the shifted ground line:
+# ground y = 152 + shift.
+ANGLES = {"eye": 0, "low": 22, "skyline": 14, "high": -34}
+
+
 def expand(backdrop, weather=None):
     """Return (backdrop, weather) with the region preset filled in under the scene's own keys."""
     name = backdrop.get("region")
@@ -79,8 +88,15 @@ def expand(backdrop, weather=None):
                    for col, (y, amp, r, p) in zip(look["layers"], shape)],
         "ground": {"color": look["ground"][0], "y": 152, "speckle": look["ground"][1]},
     }
+    shift = backdrop.get("shift", ANGLES.get(backdrop.get("angle", "eye"), 0))
+    if backdrop.get("angle") == "skyline":  # one hard ridge, figures stand on its crest
+        base["layers"] = base["layers"][:2]
+    for L in base["layers"]:
+        L["y"] += shift
+    base["ground"]["y"] += shift
+    base["horizon"] += shift
     out = copy.deepcopy(base)
-    out.update({k: v for k, v in backdrop.items() if k not in ("region", "time", "shape")})
+    out.update({k: v for k, v in backdrop.items() if k not in ("region", "time", "shape", "angle", "shift")})
     if weather is None and backdrop.get("weather", True) is not False:
         weather = dict(R["weather"])
     return out, weather

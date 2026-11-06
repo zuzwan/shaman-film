@@ -9,13 +9,14 @@ Used through a scene's or a shot's `fx` list:
       - {type: impact, bg: ink0, fg: ember1}     # the negative version
       - {type: flash, color: bone, amount: 0.5}  # dithered flash over the picture
       - {type: bars, size: 18}                   # letterbox bars that close in for a beat
+      - {type: vignette, inner: 0.5, amount: 1.0} # dark dithered edges: pov, memory, fever
 
 Lines are re-drawn at random every frame, as in hand-drawn anime action,
 but deterministically, so frame N always looks the same.
 """
 import numpy as np
 
-from .dither import mask
+from .dither import mask, threshold
 from .palette import RGB
 
 
@@ -72,6 +73,17 @@ def bars(c, spec, top=0):
         c[c.shape[0] - s:] = RGB["ink0"]
 
 
+def vignette(c, spec, frame):
+    """Darken toward the frame edge, dithered. `inner` is the clear radius (0..1)."""
+    H, W = c.shape[:2]
+    yy, xx = np.mgrid[0:H, 0:W]
+    d = np.sqrt(((xx - W / 2) / (W / 2)) ** 2 + ((yy - H / 2) / (H / 2)) ** 2)
+    inner = spec.get("inner", 0.5)
+    amount = np.clip((d - inner) / max(1e-6, 1.05 - inner), 0, 1) * spec.get("amount", 1.0)
+    on = threshold(H, W, (frame // 2) % 4 if spec.get("crawl") else 0, 0) < amount
+    c[on] = RGB[spec.get("color", "ink0")]
+
+
 def apply(c, fx_list, frame, actor_mask, top=0):
     for f in fx_list:
         kind = f["type"]
@@ -83,6 +95,8 @@ def apply(c, fx_list, frame, actor_mask, top=0):
             flash(c, f, frame)
         elif kind == "bars":
             bars(c, f, top)
+        elif kind == "vignette":
+            vignette(c, f, frame)
         else:
             raise ValueError(f"unknown fx type {kind!r}")
 

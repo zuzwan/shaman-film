@@ -1,0 +1,185 @@
+# Fight types test. Not story content. Five ways a fight can be cut, so the
+# script can ask for one by name: standoff, ambush, creature, chase, capture.
+# Every fight is short. The long part is the stillness before and after.
+episode: ep00_fights
+resolution: [320, 180]
+scale: 6
+fps: 12
+band: 40
+
+scenes:
+  # ------------------------------------------------------------ 1. STANDOFF
+  # two figures hold; the cut is to eyes, not to blows; one flash decides it
+  - id: g01_standoff
+    transition_in: {duration: 0.8}
+    backdrop: {region: uplands, time: dusk, seed: 11}
+    weather: {type: snow, density: 0.35, wind: 0.5}
+    actors:
+      - {id: auk,   sprite: shaman,    state: idle, path: [[110, 160]]}
+      - {id: teal,  sprite: apprentice, state: idle, path: [[80, 160]]}
+      - {id: gaunt, sprite: gaunt,     state: idle, path: [[230, 160]], flip: true}
+      - {id: auk_c, sprite: auk_close,  state: glare, path: [[150, 180]], hidden: true}
+      - {id: teal_c, sprite: teal_close, state: idle, path: [[150, 180]], hidden: true}
+    cards:
+      - {narration: "Neither moved. The snow did the moving for them.", at: 0.5}
+      - {narration: "It was over in the time it takes to say so.", at: 13.0}
+    shots:
+      - {duration: 3.4, shot: "extreme-wide · eye · static"}
+      # the page: his eye, its skull, her held breath
+      - duration: 3.6
+        panels:
+          - {rect: [8, 6, 150, 62], at: 0.0, backdrop: {plain: true, sky: [ink0, ink1]}, weather: none, set: {auk_c: {hidden: false}, auk: {hidden: true}, teal: {hidden: true}, gaunt: {hidden: true}}, window: [85, 112]}
+          - {rect: [166, 6, 146, 62], at: 0.5, shot: "close · eye · gaunt · static"}
+          - {rect: [8, 74, 304, 60], at: 1.1, backdrop: {plain: true, sky: [ink1, ink0]}, weather: none, set: {teal_c: {hidden: false, state: idle}, auk: {hidden: true}, teal: {hidden: true}, gaunt: {hidden: true}}, window: [8, 112]}
+      - {duration: 1.2, shot: "medium · eye · auk · static"}
+      - {duration: 0.34, shot: "medium · eye · gaunt · static", set: {gaunt: {state: rear}}, fx: [{type: speedlines, kind: radial, center: [230, 120], inner: 30, color: bone, density: 50}]}
+      - {duration: 0.17, fx: [{type: impact, bg: bone, fg: ink0}], set: {auk: {state: strike, path: [[150, 160]]}, gaunt: {state: lunge, path: [[196, 160]]}}}
+      - {duration: 0.17, fx: [{type: impact, bg: ink0, fg: mauve4}], set: {auk: {state: strike, path: [[150, 160]]}, gaunt: {state: lunge, path: [[196, 160]]}}}
+      - {duration: 0.5, camera: {shake: {amp: 4, decay: 1}}, set: {auk: {state: strike, path: [[150, 160]]}, gaunt: {state: lunge, tint: bone, path: [[196, 160], [230, 160]]}}}
+      # aftermath: the thing is gone into the snow; a long hold
+      - {duration: 6.0, shot: "wide · eye · auk · push-in", set: {auk: {state: idle, path: [[150, 160]]}, gaunt: {hidden: true}}}
+
+  # ------------------------------------------------------------ 2. AMBUSH (from the foreground)
+  # the threat is already in frame, hidden by what is nearest the camera
+  - id: g02_ambush
+    backdrop:
+      region: glass
+      time: night
+      seed: 5
+      props:
+        - {type: ruin, pos: [200, 152], width: 110, height: 66, arches: 3, seed: 7, color: ink1, layer: 1, parallax: 0.5}
+        - {type: trunk, pos: [34, 0], width: 36, color: ink0, rim: ink1, layer: front, parallax: 1.0, seed: 4}
+    weather: none
+    actors:
+      - {id: auk,    sprite: shaman,     state: walk, path: [[250, 162], [190, 162]], flip: true,
+         light: {radius: 20, color: ember0, intensity: 0.45, flicker: true, offset: [-6, -14]}}
+      - {id: teal,   sprite: apprentice, state: walk, path: [[280, 162], [222, 162]], flip: true}
+      - {id: raider, sprite: raider,     state: idle, path: [[50, 162]]}
+      - {id: teal_c, sprite: teal_close, state: flinch, path: [[150, 180]], hidden: true}
+    cards:
+      - {narration: "The dark had a shape in it, and the shape had been waiting.", at: 0.4}
+    shots:
+      - {duration: 4.0}
+      # the whip: the raider breaks from behind the trunk, the frame drags after him
+      - {duration: 0.34, camera: {pan: [0, 40], ease: linear}, set: {raider: {state: run, path: [[60, 162], [120, 162]]}, auk: {path: [[190, 162]]}, teal: {path: [[222, 162]]}},
+         fx: [{type: speedlines, kind: horizontal, color: ash3, density: 40}]}
+      - {duration: 0.34, backdrop: {plain: true, sky: [ink0, ink0], props: []}, set: {teal_c: {hidden: false}, auk: {hidden: true}, teal: {hidden: true}, raider: {hidden: true}}}
+      - {duration: 0.42, shot: "medium · eye · auk · static", set: {raider: {state: lunge, path: [[164, 162]]}, auk: {state: windup, path: [[190, 162]]}, teal: {path: [[222, 162]]}},
+         fx: [{type: speedlines, kind: radial, center: [176, 140], inner: 20, color: bone, density: 44}]}
+      - {duration: 0.17, fx: [{type: impact, bg: bone, fg: ink0}], set: {raider: {state: hit, path: [[166, 162]]}, auk: {state: strike, path: [[190, 162]]}, teal: {path: [[222, 162]]}}}
+      - {duration: 0.6, camera: {shake: {amp: 5, decay: 1}}, set: {raider: {state: hit, path: [[166, 162], [130, 162]], ease: smooth}, auk: {state: strike, path: [[190, 162]]}, teal: {path: [[222, 162]]}}}
+      - {duration: 3.5, set: {raider: {state: down, path: [[130, 162]]}, auk: {state: idle, path: [[190, 162]]}, teal: {path: [[222, 162]]}}}
+
+  # ------------------------------------------------------------ 3. CREATURE
+  # it is seen before it is understood: eyes, a walk, a skull; the attack is three frames
+  - id: g03_creature
+    backdrop:
+      region: interior
+      time: night
+      seed: 9
+      props:
+        - {type: tree, pos: [40, 152], height: 90, seed: 21, color: ink0, thick: 4, depth: 7}
+        - {type: tree, pos: [290, 152], height: 80, seed: 22, color: ink0, thick: 4, depth: 7}
+        - {type: eyes, pos: [250, 136], pairs: 1, spread: [8, 2], color: ember2, seed: 4}
+        - {type: fire, pos: [120, 162], size: 0.7}
+    weather: none
+    lights:
+      - {pos: [120, 158], radius: 24, color: ember0, intensity: 0.5, flicker: true}
+    actors:
+      - {id: auk,    sprite: shaman,     state: idle, path: [[100, 164]], flip: true}
+      - {id: teal,   sprite: apprentice, state: idle, path: [[140, 164]]}
+      - {id: rig,    sprite: rig,        state: idle, path: [[84, 166]]}
+      - {id: gaunt,  sprite: gaunt,      state: stalk, path: [[330, 162], [210, 162]], flip: true, t: [0, 9]}
+      - {id: auk_c,  sprite: auk_close,  state: idle, path: [[150, 180]], hidden: true}
+      - {id: face,   sprite: rig_face,   state: lit,  path: [[160, 176]], hidden: true}
+    cards:
+      - {narration: "Teal saw the eyes first and thought: another pair. Then the eyes came closer, and they came closer on legs.", at: 0.6}
+    shots:
+      - {duration: 3.0, shot: "wide · pov · static"}
+      - {duration: 5.5, shot: "wide · eye · static"}
+      - duration: 3.0
+        panels:
+          - {rect: [8, 6, 100, 128], at: 0.0, shot: "close · eye · gaunt · static", set: {gaunt: {state: rear, path: [[210, 162]]}}, window: [110, 26]}
+          - {rect: [116, 6, 196, 60], at: 0.6, backdrop: {plain: true, sky: [ink0, ink1], props: []}, set: {auk_c: {hidden: false, state: glare}, auk: {hidden: true}, teal: {hidden: true}, rig: {hidden: true}, gaunt: {hidden: true}}, window: [62, 110]}
+          - {rect: [116, 74, 196, 60], at: 1.2, backdrop: {plain: true, sky: [ink0, ink0], props: []}, set: {face: {hidden: false}, auk: {hidden: true}, teal: {hidden: true}, rig: {hidden: true}, gaunt: {hidden: true}}, window: [62, 110]}
+      - {duration: 0.34, shot: "medium · eye · gaunt · static", set: {gaunt: {state: lunge, path: [[210, 162], [150, 162]], ease: linear}},
+         fx: [{type: speedlines, kind: radial, center: [180, 120], inner: 24, color: fern4, density: 60}]}
+      - {duration: 0.17, fx: [{type: impact, bg: ink0, fg: fern4}], set: {gaunt: {state: lunge, path: [[150, 162]]}, teal: {state: idle, tint: bone}}}
+      - {duration: 0.17, fx: [{type: impact, bg: bone, fg: ink0}], set: {gaunt: {state: lunge, path: [[150, 162]]}, auk: {state: strike, path: [[118, 164]]}}}
+      - {duration: 0.6, camera: {shake: {amp: 6, decay: 1}}, set: {gaunt: {state: lunge, tint: bone, path: [[150, 162], [190, 162]]}, auk: {state: strike, path: [[118, 164]]}, teal: {state: idle, path: [[150, 164]]}}}
+      - {duration: 4.5, shot: "wide · eye · auk · pull-out", set: {gaunt: {state: stalk, path: [[190, 162], [340, 162]], flip: false, ease: linear}, auk: {state: windup, path: [[118, 164]]}, teal: {path: [[150, 164]]}},
+         fx: [{type: vignette, inner: 0.6}]}
+
+  # ------------------------------------------------------------ 4. CHASE
+  # the camera runs with her; feet, breath, a look back; the end comes from off frame
+  - id: g04_chase
+    backdrop:
+      region: coast
+      time: day
+      seed: 3
+      props:
+        - {type: ruin, pos: [240, 150], width: 80, height: 40, arches: 2, seed: 9, color: tide1, layer: 1, parallax: 0.5}
+        - {type: trunk, pos: [120, 0], width: 14, color: ink1, layer: front, parallax: 1.8, seed: 7}
+        - {type: trunk, pos: [420, 0], width: 18, color: ink1, layer: front, parallax: 1.8, seed: 8}
+        - {type: trunk, pos: [760, 0], width: 12, color: ink1, layer: front, parallax: 1.8, seed: 9}
+    weather: {type: rain, density: 0.4, wind: 0.7}
+    actors:
+      - {id: teal,   sprite: apprentice, state: walk, path: [[120, 162], [520, 162]], phase: 0}
+      - {id: raider, sprite: raider,     state: run,  path: [[40, 162], [470, 162]]}
+      - {id: auk,    sprite: shaman,     state: idle, path: [[560, 162]], flip: true, hidden: true}
+      - {id: teal_c, sprite: teal_close, state: idle, path: [[150, 180]], hidden: true}
+    cards:
+      - {narration: "She ran the way the Survey had taught her: in a straight line, which is how the Survey loses people.", at: 0.5}
+    shots:
+      - {duration: 4.0, shot: "wide · eye · teal · track", fx: [{type: speedlines, kind: horizontal, color: ash5, density: 18}]}
+      # the page of the run: feet, the look back, the one behind
+      - duration: 2.4
+        panels:
+          - {rect: [8, 6, 150, 56], at: 0.0, weather: none, backdrop: {ground: {y: 152, color: ash1}}, camera: {zoom: 3, follow: teal, focus_on: teal, focus_lift: -6}, fx: [{type: speedlines, kind: horizontal, color: ash5, density: 30}]}
+          - {rect: [166, 6, 146, 56], at: 0.4, backdrop: {plain: true, sky: [tide1, ink1], props: []}, set: {teal_c: {hidden: false, flip: true, state: flinch}, teal: {hidden: true}, raider: {hidden: true}}, window: [85, 108]}
+          - {rect: [8, 68, 304, 66], at: 0.9, shot: "medium · low · raider · track", fx: [{type: speedlines, kind: horizontal, color: ash5, density: 30}]}
+      - {duration: 2.0, shot: "wide · eye · teal · track", fx: [{type: speedlines, kind: horizontal, color: ash5, density: 18}]}
+      # Auk steps out of the rain from the far side of frame
+      - {duration: 0.42, camera: {pan: [360, 360]}, set: {auk: {hidden: false, state: windup}, teal: {path: [[500, 162], [530, 162]]}, raider: {path: [[440, 162], [520, 162]], ease: linear}},
+         fx: [{type: speedlines, kind: radial, center: [200, 110], inner: 26, color: bone, density: 50}]}
+      - {duration: 0.17, camera: {pan: [360, 360]}, fx: [{type: impact, bg: bone, fg: ink0}], set: {auk: {hidden: false, state: strike}, teal: {path: [[530, 162]]}, raider: {state: hit, path: [[536, 162]]}}}
+      - {duration: 0.6, camera: {pan: [360, 360], shake: {amp: 5, decay: 1}}, set: {auk: {hidden: false, state: strike}, teal: {state: idle, path: [[530, 162]]}, raider: {state: hit, path: [[536, 162], [500, 162]], ease: smooth}}}
+      - {duration: 4.0, camera: {pan: [360, 360]}, set: {auk: {hidden: false, state: idle}, teal: {state: idle, path: [[530, 162]]}, raider: {state: down, path: [[500, 162]]}}}
+
+  # ------------------------------------------------------------ 5. THE CAPTURE
+  # not a fight: a ritual with teeth. hands, the crank, a face lighting, the thing held still
+  - id: g05_capture
+    transition_out: {duration: 2.0}
+    backdrop:
+      region: river
+      time: night
+      seed: 2
+      props:
+        - {type: moon, pos: [60, 44], r: 7, halo: 20, layer: -1, parallax: 0}
+        - {type: tree, pos: [280, 152], height: 70, seed: 31, color: ink0, thick: 3, depth: 6}
+    weather: none
+    actors:
+      - {id: rig,   sprite: rig,         state: idle,  path: [[150, 166]]}
+      - {id: auk,   sprite: shaman,      state: idle,  path: [[126, 164]]}
+      - {id: teal,  sprite: apprentice,  state: idle,  path: [[90, 164]]}
+      - {id: gaunt, sprite: gaunt,       state: rear,  path: [[226, 162]], flip: true}
+      - {id: hands, sprite: hands_crank, state: crank, path: [[160, 170]], hidden: true}
+      - {id: face,  sprite: rig_face,    state: dark,  path: [[160, 176]], hidden: true}
+    lights:
+      - {pos: [150, 146], radius: 22, color: ember0, intensity: 0.0}
+    cards:
+      - {narration: "He did not fight it. He turned the handle, and the handle did the fighting.", at: 0.5}
+      - {narration: "Thirteen.", at: 12.6}
+    shots:
+      - {duration: 4.0}
+      - {duration: 1.6, backdrop: {plain: true, sky: [ink0, ink1], props: []}, set: {hands: {hidden: false}, rig: {hidden: true}, auk: {hidden: true}, teal: {hidden: true}, gaunt: {hidden: true}}}
+      - {duration: 1.2, backdrop: {plain: true, sky: [ink0, ink0], props: []}, set: {face: {hidden: false, state: dark}, rig: {hidden: true}, auk: {hidden: true}, teal: {hidden: true}, gaunt: {hidden: true}}}
+      - {duration: 1.0, backdrop: {plain: true, sky: [ink0, ink0], props: []}, set: {face: {hidden: false, state: lit}, rig: {hidden: true}, auk: {hidden: true}, teal: {hidden: true}, gaunt: {hidden: true}}}
+      - {duration: 1.2, shot: "medium · eye · gaunt · static", set: {rig: {state: hum}}, lights: [{pos: [150, 146], radius: 26, color: ember0, intensity: 0.5, flicker: true}]}
+      - {duration: 0.5, backdrop: {plain: true, sky: [ink0, ink0], props: []}, set: {face: {hidden: false, state: flare}, rig: {hidden: true}, auk: {hidden: true}, teal: {hidden: true}, gaunt: {hidden: true}},
+         fx: [{type: flash, color: ember2, amount: 0.3}]}
+      - {duration: 0.17, fx: [{type: impact, bg: ember2, fg: ink0}], set: {rig: {state: capture}}}
+      - {duration: 0.8, camera: {shake: {amp: 4, decay: 1}}, set: {rig: {state: capture}, gaunt: {tint: bone}}, lights: [{pos: [150, 146], radius: 40, color: ember1, intensity: 0.8, flicker: true}],
+         fx: [{type: flash, color: bone, amount: 0.25}]}
+      - {duration: 0.34, set: {rig: {state: capture}, gaunt: {tint: ember2, freeze: 0}}, lights: [{pos: [150, 146], radius: 30, color: ember0, intensity: 0.6}]}
+      - {duration: 5.5, shot: "wide · eye · rig · push-in", set: {rig: {state: hum}, gaunt: {hidden: true}}, lights: [{pos: [150, 146], radius: 22, color: ember0, intensity: 0.45, flicker: true}]}
