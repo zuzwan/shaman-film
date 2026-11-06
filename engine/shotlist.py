@@ -71,7 +71,7 @@ def resolve(shot, base, fps=12):
     if "bars" in size:
         fx.append({"type": "bars", "size": size["bars"]})
 
-    ids = {a.get("id") for a in base.get("actors", [])}
+    ids = {a.get("id") for a in out.get("actors", base.get("actors", []))}
     subj = v.get("subject") if v.get("subject") in ids else None
     if subj:
         cam.setdefault("focus_on", subj)
@@ -82,7 +82,8 @@ def resolve(shot, base, fps=12):
     if ang == "pov":
         fx.append({"type": "vignette", "inner": 0.45, "amount": 1.0})
     if ang in FRAMING:
-        props = list(base.get("backdrop", {}).get("props", [])) + copy.deepcopy(FRAMING[ang])
+        own = out.get("backdrop", {}).get("props")
+        props = list(own if own is not None else base.get("backdrop", {}).get("props", [])) + copy.deepcopy(FRAMING[ang])
         if ang == "over-shoulder":
             z = max(z, 2)
 
@@ -100,6 +101,12 @@ def resolve(shot, base, fps=12):
         cam.setdefault("follow", subj)
     elif move == "shake":
         cam.setdefault("shake", {"amp": 3, "decay": 1.0})
+    plain = {**base.get("backdrop", {}), **out.get("backdrop", {})}.get("plain")
+    if plain and ang in FRAMING and props and v.get("size") in ("close", "insert"):
+        props = props[:-1]  # an insert is already framed; no doorway or shoulder over it
+    if plain and "zoom" not in cam:
+        z = 1  # an insert on a plain backdrop is drawn at its own size (close sprites, insert props)
+        cam.pop("follow", None)
     cam.setdefault("zoom", z)
 
     if "hold" in v:

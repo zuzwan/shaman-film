@@ -63,9 +63,16 @@ SPRITES = {"shaman": "auk", "auk": "auk", "apprentice": "teal", "teal": "teal", 
            "clerk": "clerk", "guard": "guard", "surveyor": "chainman", "host": "fold_host",
            "fold host": "fold_host", "fold": "fold_host"}
 NAMES = {"auk": "shaman", "shaman": "shaman", "teal": "apprentice", "apprentice": "apprentice", "rig": "rig"}
+# SOUND: lines -> ambience beds (engine/audio.py BEDS). Events (a bar dropping, a ratchet)
+# are cut by hand against the picture; the draft lists the line in notes.sound.
+SOUND_BEDS = [("cricket", "crickets"), ("river", "river"), ("wind", "wind"), ("gnat", "gnats"),
+              ("flies", "flies"), ("fly ", "flies"), ("wheel", "wheel"), ("moth", "moths"), ("beetle", "beetles"),
+              ("rope", "rope"), ("silk", "silk"), ("smoke", "fire"), ("crackl", "fire"), ("humming", "hum"),
+              ("race", "race"), ("ford", "ford"), ("quern", "querns"), ("gear", "gear"), ("rig", "rig")]
 NUMBERS = {"two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "a few": 3, "several": 4}
 SCENE_RE = re.compile(r"^#{2,4}\s*(.+)$")
-SHOT_RE = re.compile(r"^shot\s*:\s*(.+)$", re.I)
+SHOT_RE = re.compile(r"^SHOT\s*:\s*(.+)$")          # the shot list: upper case only
+HEAD_SHOT_RE = re.compile(r"^Shot\s*:\s*(.+)$")     # the scene header's one-line shot idea: a note
 LINE_RE = re.compile(r"^([A-Z][A-Z .'\-]+?)\s*(\(([^)]*)\))?\s*:\s*(.+)$")
 
 
@@ -208,6 +215,9 @@ def convert(text, episode):
                     if w is not None:
                         cur["weather"] = w
             continue
+        if m := HEAD_SHOT_RE.match(line):
+            cur["notes"]["shot"] = m.group(1).strip()
+            continue
         if m := SHOT_RE.match(line):
             ids = {a["id"] for a in cur["actors"]}
             cur.setdefault("shots", []).append(parse_shot(m.group(1), ids))
@@ -233,6 +243,10 @@ def convert(text, episode):
             target = cur["shots"][-1]["cards"] if cur.get("shots") else cur["cards"]
             if who == "SOUND":
                 cur["notes"].setdefault("sound", []).append(said)
+                beds = cur.setdefault("sound", {}).setdefault("bed", [])
+                for key, bed in SOUND_BEDS:
+                    if key in said.lower() and bed not in beds:
+                        beds.append(bed)
             elif who == "NARRATION":
                 target.append({"narration": said})
             else:

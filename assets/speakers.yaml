@@ -12,3 +12,12 @@ chainman:   {name: "Chainman",     color: ash5}
 clerk:      {name: "Clerk",        color: ash5}
 guard:      {name: "Guard",        color: ash4}
 # Anyone not listed shows their script name in ash4.
+# ep01 cast, by the names the scripts use
+auk:        {name: "Auk",          color: ember2}
+teal:       {name: "Teal",         color: bone_hi}
+ida:        {name: "Ida",          color: ash5}
+pim:        {name: "Pim",          color: ash4}
+hask:       {name: "Hask",         color: ash4}
+bett:       {name: "Bett",         color: fern4}
+woman:      {name: "Woman",        color: ash4}
+hauler:     {name: "Hauler",       color: ash4}

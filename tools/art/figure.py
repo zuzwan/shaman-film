@@ -90,6 +90,19 @@ POSES["walk"] = [walk(i) for i in range(8)]
 POSES["run"] = [run(i) for i in range(6)]
 POSES["crank"] = [pose(lean=12, shF=40 + 18 * math.cos(2 * math.pi * i / 4), elF=55 - 35 * math.sin(2 * math.pi * i / 4),
                        shB=30, elB=50, hipF=6, hipB=-6, kneeB=6, head=-10) for i in range(4)]
+# ep01: life in a town that moves as one body
+POSES["doze"] = [pose(head=-16, lean=6, shF=2, elF=4, shB=-2, elB=4), pose(head=-17, lean=7, shF=2, elF=4, shB=-2, elB=4, breath=1)]
+POSES["sit_doze"] = [pose(hipF=82, kneeF=28, hipB=82, kneeB=28, lean=24, shF=60, elF=70, shB=55, elB=70, head=-18),
+                     pose(hipF=82, kneeF=28, hipB=82, kneeB=28, lean=25, shF=60, elF=70, shB=55, elB=70, head=-19, breath=1)]
+POSES["haul"] = [dict(walk(i, amp=16, speed=0.3), lean=30, head=6, shF=70, elF=-20, shB=60, elB=-10) for i in range(8)]
+POSES["sweep"] = [pose(lean=14, hipF=10, hipB=-8, kneeB=8, shF=50 + 22 * math.sin(2 * math.pi * i / 4), elF=10,
+                       shB=40 + 22 * math.sin(2 * math.pi * i / 4), elB=20, head=-10) for i in range(4)]
+POSES["grind"] = [pose(hipF=82, kneeF=28, hipB=82, kneeB=28, lean=16 + 4 * math.cos(2 * math.pi * i / 4),
+                       shF=55 + 20 * math.cos(2 * math.pi * i / 4), elF=40 - 25 * math.sin(2 * math.pi * i / 4),
+                       shB=40, elB=60, head=-8) for i in range(4)]
+POSES["carry"] = [dict(walk(i), shF=-10 if i % 2 else -6, elF=-8, shB=55, elB=-60) for i in range(8)]  # a tool on the shoulder
+POSES["drink"] = [pose(lean=18, head=-14, shF=70, elF=80, shB=60, elB=80, hipF=6, hipB=-4, kneeB=6)]
+POSES["look_up"] = [pose(head=26, lean=-4), pose(head=27, lean=-4, breath=1)]
 POSES["lunge"] = [pose(lean=30, hipF=55, kneeF=10, hipB=-35, kneeB=8, shF=95, elF=-5, shB=-30, elB=40, head=-4, speed=0.8),
                   pose(lean=34, hipF=58, kneeF=6, hipB=-38, kneeB=6, shF=100, elF=-5, shB=-35, elB=40, head=-6, speed=0.8)]
 
@@ -291,6 +304,22 @@ class Figure:
                 yy = by - H * 0.36 + i * H * 0.14
                 c.stroke(bx - H * 0.06, yy, bx + H * 0.04, yy, "ash0", 1)
             c.put(bx, by - H * 0.44, "ember0")  # the antenna tip
+        elif k["pack"] == "rig_open":  # Auk's rig unwrapped: the iron pole, the stack of faces above his head, the crown
+            top = by - H * 0.62
+            c.stroke(bx + H * 0.02, top, bx - H * 0.1, by + H * 0.52, "ink1", max(1, H * 0.04))
+            fw, fh = max(2, H * 0.1), max(2, H * 0.075)
+            n = 6 if not self.med else 7
+            for i in range(n):  # faces stacked down the pole, oldest at the top
+                yy = top + H * 0.04 + i * (fh + max(0, H * 0.012))
+                xx = bx + H * 0.02 - (yy - top) * 0.12 / 0.62 * 0.9 - fw / 2
+                col = ("rust1", "ash1", "rust0", "ash2")[i % 4]
+                c.rect(xx, yy, fw, fh, col)
+                if self.med:
+                    c.put(xx + fw * 0.3, yy + fh * 0.4, "ink0"); c.put(xx + fw * 0.7, yy + fh * 0.4, "ink0")
+                    c.stroke(xx, yy, xx + fw - 1, yy, LIGHT.get(col, "ash3"), 1)
+            for j in range(-2, 3):  # the crown of antenna rods
+                c.stroke(bx + H * 0.02, top, bx + H * 0.02 + j * H * 0.06, top - H * 0.16 + abs(j) * H * 0.03, "ash2", 1)
+            c.put(bx + H * 0.02, top - H * 0.17, "ember0")
         else:
             c.ellipse(bx, by + H * 0.08, H * 0.07, H * 0.13, k["pack"], shade=(DARK.get(k["pack"], "ink0"), k["pack"], (1, 0)) if self.med else None)
             if self.med:
@@ -444,6 +473,20 @@ class Figure:
             c.rect(fx - H * 0.04, ly - H * 0.06, max(2, H * 0.08), max(2, H * 0.1), "ash0")
             c.rect(fx - H * 0.025, ly - H * 0.045, max(1, H * 0.05), max(1, H * 0.07), "ember2")
             c.put(fx, ly - H * 0.03, "flame")
+        if k.get("broom"):  # handle from the near hand down to a bristle head on the ground
+            bx, by = fx + H * 0.22, self.ay - 1
+            c.stroke(fx - H * 0.12, fy - H * 0.14, bx, by - H * 0.04, "rust0", max(1, H * 0.03))
+            c.stroke(bx - H * 0.04, by, bx + H * 0.08, by, "ash3", max(1, H * 0.05))
+        if k.get("hoe"):  # carried on the shoulder like a spear
+            sx, sy = self.px(J["shoulder"], p)
+            c.stroke(sx - H * 0.35, sy + H * 0.12, sx + H * 0.45, sy - H * 0.2, "rust0", max(1, H * 0.03))
+            c.stroke(sx + H * 0.45, sy - H * 0.2, sx + H * 0.45, sy - H * 0.06, "ash1", max(1, H * 0.05))
+        if k.get("bucket"):
+            c.rect(fx - H * 0.05, fy, max(2, H * 0.1), max(2, H * 0.1), "rust0")
+            c.stroke(fx - H * 0.05, fy, fx + H * 0.05, fy, "ash1", 1)
+        if k.get("slate"):  # the clerk's slate under the near hand
+            c.rect(fx - H * 0.02, fy - H * 0.1, max(2, H * 0.09), max(3, H * 0.13), "ink2")
+            c.stroke(fx - H * 0.02, fy - H * 0.1, fx + H * 0.07, fy - H * 0.1, "rust1", 1)
         if k.get("satchel"):
             hx, hy = self.px(J["hip"], p)
             c.rect(hx - H * 0.1, hy - H * 0.04, max(2, H * 0.12), max(2, H * 0.1), k["satchel"])
@@ -455,7 +498,7 @@ COSTUMES = {
                 staff="rust0", rim="ash0", rim_of={"ink1", "ink2"}, prop=dict(torso=0.26, head_r=0.1), hunch=10,
                 staff_forward=0.1,
                 states=["idle", "walk", "run", "turn", "talk", "crouch", "kneel", "sit", "point", "look_back",
-                        "windup", "strike", "hit", "stagger", "down", "crank"]),
+                        "windup", "strike", "hit", "stagger", "down", "crank", "doze", "drink"]),
     "teal": dict(coat="ash0", trousers="ink2", boots="ink1", skin="ash2", hair="ink1", scarf="rust1", pack="rust0",
                  strap="rust0", lantern=False, rim="ash1", rim_of={"ash0"}, prop=dict(head_r=0.11, thigh=0.23, shin=0.22),
                  states=["idle", "walk", "run", "turn", "talk", "crouch", "kneel", "sit", "point", "look_back",
@@ -481,6 +524,29 @@ COSTUMES = {
                   canvas_w=1.5, canvas_h=1.35, scale=2.0, rim="ink2", rim_of={"ink1"},
                   states=["idle", "walk", "run", "turn", "crouch", "look_back", "rear", "lunge", "hit", "stagger", "down"]),
 }
+# ep01 cast
+COSTUMES.update({
+    "auk_rig": dict(base="auk", staff=None, pack="rig_open", canvas_h=1.5,
+                    states=["idle", "walk", "turn", "crouch", "kneel", "look_back", "point", "doze", "drink", "look_up", "crank"]),
+    "ida": dict(coat="ash4", trousers="ink2", boots="ink1", skin="ash2", hair="ash1", longcoat=True, satchel="ash1",
+                scarf="ash2", rim="ash5", rim_of={"ash4"},
+                states=["idle", "walk", "turn", "talk", "sit", "point", "look_back"]),
+    "hask": dict(coat="ash1", trousers="ink2", boots="ink0", skin="ash2", hair="ink2", longcoat=True, belt="ink0",
+                 rim="ash2", rim_of={"ash1"}, prop=dict(sh_w=0.19, torso=0.29),
+                 states=["idle", "walk", "turn", "talk", "point", "look_back", "crouch"]),
+    "bett": dict(coat="rust0", trousers="rust0", boots="ink1", skin="ash3", hair="ash4", longcoat=True, rim="rust1",
+                 rim_of={"rust0"}, states=["idle", "sit", "talk"]),
+    "hauler": dict(coat="rust0", trousers="ink2", boots="ink1", skin="ash1", cap="ash0", rim="rust1", rim_of={"rust0"},
+                   states=["idle", "walk", "haul"]),
+    "pim": dict(base="clerk", slate=True, states=["idle", "walk", "turn", "talk", "sit", "point", "look_back", "crouch", "kneel"]),
+    "pim_lantern": dict(base="clerk", lantern=True, states=["idle", "walk", "look_back"]),
+    "host_broom": dict(base="fold_host", broom=True, states=["idle", "sweep", "walk"]),
+    "host_hoe": dict(base="fold_host", hoe=True, states=["idle", "carry"]),
+    "host_bucket": dict(base="fold_host", bucket=True, states=["idle", "walk", "kneel"]),
+    "host_boy": dict(base="fold_host", scale=0.72, states=["idle", "walk", "look_up", "talk"]),
+})
+COSTUMES["fold_host"]["states"] = COSTUMES["fold_host"]["states"] + ["grind", "sit_doze", "look_up"]
+COSTUMES["teal"]["states"] = COSTUMES["teal"]["states"] + ["sit_doze", "look_up", "drink"]
 GAUNT_STATES = {"walk": "stalk"}  # renamed on write
 
 

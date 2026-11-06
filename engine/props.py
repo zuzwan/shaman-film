@@ -407,6 +407,11 @@ DRAW = {"moon": moon, "tree": tree, "ruin": ruin, "fire": fire,
         "smoke": smoke, "gnats": gnats}
 
 
+from . import sets as _sets  # noqa: E402  river-country set pieces and inserts
+DRAW.update(_sets.DRAW)
+EMISSIVE |= _sets.EMISSIVE
+
+
 def draw(c, props, cam_x, t):
     for p in props:
         DRAW[p["type"]](c, p, cam_x * p.get("parallax", 1.0), t)
