@@ -18,10 +18,24 @@ Scene format (one block per scene; header fields optional, any order):
     HOST (all three at once): Here.
     SOUND: wind, a mill wheel turning with no one at it
 
+Shot lists. A `SHOT:` line starts a shot; the cards after it play over that shot:
+
+    SHOT: wide · eye · the square · static
+    NARRATION: The town had given itself over a month before.
+    SHOT: close · low · Auk · push-in · 2s
+    SHAMAN: Here.
+    SHOT: insert · eye · the rig's face · static · 6f
+
+    size · angle · subject and action · camera move · hold (seconds or frames; omit for
+    auto = long enough to read the shot's cards). Vocabulary in docs/shots.md and
+    engine/shotlist.py. The subject's first word, if it is a cast name (Auk, Teal, rig),
+    becomes the shot's focus.
+
 The draft fills region, time, weather, cast and every card in order with
-automatic timing. Where, Shot, Action and Sound go into `notes` for the
-hand pass on camera and blocking. Unknown names stay as speakers and are
-listed at the end so sprites can be planned.
+automatic timing. Where, Action and Sound go into `notes` for the hand pass on
+camera and blocking (every Action line is kept, in order; one inside a shot is
+also noted on that shot). Unknown names stay as speakers and are listed at the
+end so sprites can be planned.
 """
 import re
 import sys
@@ -45,11 +59,13 @@ WEATHER = [("locust", {"type": "swarm", "density": 0.8, "wind": 0.6}),
            ("light ash", {"type": "ash", "density": 0.25, "wind": 0.2}),
            ("ash", {"type": "ash", "density": 0.5, "wind": 0.3}),
            ("none", "none"), ("clear", "none")]
-SPRITES = {"shaman": "shaman", "apprentice": "apprentice", "rig": "rig", "chainman": "chainman",
+SPRITES = {"shaman": "auk", "auk": "auk", "apprentice": "teal", "teal": "teal", "rig": "rig", "chainman": "chainman",
            "clerk": "clerk", "guard": "guard", "surveyor": "chainman", "host": "fold_host",
            "fold host": "fold_host", "fold": "fold_host"}
+NAMES = {"auk": "shaman", "shaman": "shaman", "teal": "apprentice", "apprentice": "apprentice", "rig": "rig"}
 NUMBERS = {"two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "a few": 3, "several": 4}
 SCENE_RE = re.compile(r"^#{2,4}\s*(.+)$")
+SHOT_RE = re.compile(r"^shot\s*:\s*(.+)$", re.I)
 LINE_RE = re.compile(r"^([A-Z][A-Z .'\-]+?)\s*(\(([^)]*)\))?\s*:\s*(.+)$")
 
 
@@ -98,14 +114,66 @@ def parse_cast(who):
 def place(actors):
     """Stand the cast in a loose row centre stage, facing the middle."""
     n = len(actors)
-    out = []
+    out, seen = [], {}
+    ids = {"auk": "auk", "teal": "teal", "rig": "rig"}
     for i, spr in enumerate(actors):
         x = 160 + (i - (n - 1) / 2) * 22
-        a = {"sprite": spr, "state": "hum" if spr == "rig" else "idle", "path": [[round(x), 162]]}
+        a = {"sprite": spr, "state": "hum" if spr == "rig" else "idle", "path": [[round(x), 162]], "breathe": 3}
+        if spr != "rig":
+            a["med"] = spr + "_med"
+        base = ids.get(spr, spr)
+        seen[base] = seen.get(base, 0) + 1
+        a["id"] = base if seen[base] == 1 else f"{base}{seen[base]}"
         if x > 160:
             a["flip"] = True
         out.append(a)
     return out
+
+
+def parse_shot(text, ids):
+    """'close · low · Auk draws the knife · push-in · 2s' -> a shot dict for the timeline."""
+    from engine import shotlist
+    parts = [p.strip() for p in text.replace("|", "·").replace(",", "·").split("·") if p.strip()]
+    v = shotlist.parse(" · ".join(parts))
+    words = [v.get("size", "wide"), v.get("angle", "eye")]
+    subj = v.get("subject")
+    if subj:
+        key = NAMES.get(subj, subj)
+        key = {"shaman": "auk", "apprentice": "teal"}.get(key, key)
+        if key in ids:
+            words.append(key)
+    words.append(v.get("move", "static"))
+    shot = {"shot": " · ".join(words), "cards": []}
+    if "hold" in v:
+        shot["duration"] = v["hold"]
+    elif "hold_frames" in v:
+        shot["duration"] = round(v["hold_frames"] / 12, 3)
+    subject_text = next((p for p in parts if p.split()[0].lower() not in
+                         set(shotlist.SIZES) | set(shotlist.ANGLE_SHIFT) | set(shotlist.FRAMING)
+                         | {"static", "pan-left", "pan-right", "push-in", "pull-out", "track", "shake"}
+                         and not re.match(r"^\d+(\.\d+)?[sf]$", p)), None)
+    if subject_text and len(subject_text.split()) > 1:  # 'Auk draws the knife', not just 'Auk'
+        shot["note"] = subject_text
+    return shot
+
+
+def finish_shots(scene):
+    """Give each shot a duration (its hold, or the time its cards take) and pin the
+    first card of each shot to the shot's start. Cards stay scene-level."""
+    from engine.subtitles import total_time
+    if not scene.get("shots"):
+        return
+    t = 0.0
+    cards = []
+    for shot in scene["shots"]:
+        own = shot.pop("cards")
+        if "duration" not in shot:
+            shot["duration"] = round(max(1.5, total_time(own, 0.3, 0.8)), 2) if own else 2.0
+        if own:
+            own[0]["at"] = round(t + 0.3, 2)
+            cards += own
+        t += shot["duration"]
+    scene["cards"] = cards
 
 
 def convert(text, episode):
@@ -140,8 +208,18 @@ def convert(text, episode):
                     if w is not None:
                         cur["weather"] = w
             continue
-        if m := re.match(r"^(where|shot|action)\s*:\s*(.+)$", line, re.I):
-            cur["notes"][m.group(1).lower()] = m.group(2).strip()
+        if m := SHOT_RE.match(line):
+            ids = {a["id"] for a in cur["actors"]}
+            cur.setdefault("shots", []).append(parse_shot(m.group(1), ids))
+            continue
+        if m := re.match(r"^(where|action)\s*:\s*(.+)$", line, re.I):
+            key, val = m.group(1).lower(), m.group(2).strip()
+            if key == "action":
+                cur["notes"].setdefault("action", []).append(val)
+                if cur.get("shots"):
+                    cur["shots"][-1]["note"] = (cur["shots"][-1].get("note", "") + " — " + val).strip(" —")
+            else:
+                cur["notes"][key] = val
             continue
         if m := re.match(r"^who\s*:\s*(.+)$", line, re.I):
             actors, unknown = parse_cast(m.group(1))
@@ -152,23 +230,26 @@ def convert(text, episode):
             continue
         if m := LINE_RE.match(line):
             who, note, said = m.group(1).strip(), m.group(3), m.group(4).strip()
+            target = cur["shots"][-1]["cards"] if cur.get("shots") else cur["cards"]
             if who == "SOUND":
                 cur["notes"].setdefault("sound", []).append(said)
             elif who == "NARRATION":
-                cur["cards"].append({"narration": said})
+                target.append({"narration": said})
             else:
                 card = {"speaker": who.lower(), "text": said}
                 if note:
                     card["note"] = note
-                cur["cards"].append(card)
+                target.append(card)
                 speakers.add(who.lower())
             continue
         # anything else continues the previous card (wrapped paragraphs)
-        if cur["cards"]:
-            last = cur["cards"][-1]
+        target = cur["shots"][-1]["cards"] if cur.get("shots") else cur["cards"]
+        if target:
+            last = target[-1]
             k = "narration" if "narration" in last else "text"
             last[k] = f"{last[k]} {line}"
     for s in scenes:
+        finish_shots(s)
         if not s["notes"]:
             del s["notes"]
     tl = {"episode": episode, "resolution": [320, 180], "scale": 6, "fps": 12, "band": 40, "scenes": scenes}

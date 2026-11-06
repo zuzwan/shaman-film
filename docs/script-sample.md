@@ -24,3 +24,19 @@ Action: the hosts stop work together and turn.
 APPRENTICE: Where is everyone?
 HOST (all three at once): Here.
 NARRATION: They spoke the word together, the way a congregation says amen, and went back to work in step.
+
+### EP00 / SC03: The knife
+Region: glass · Time: dusk · Weather: ash
+Where: a broken arcade, glass underfoot
+Who: shaman, apprentice, rig
+Action: the raider comes out of the ash at a run.
+Action: Auk's staff is up before Teal has seen anything.
+
+SHOT: wide · eye · the arcade · static
+NARRATION: He did not see the second one until it was too late to matter.
+SHOT: close · low · Auk · push-in · 1.5s
+SHAMAN: Down.
+SHOT: insert · eye · the rig's face · static · 6f
+SHOT: medium · over-shoulder · Teal · static
+APPRENTICE: I didn't see him.
+SHAMAN: You weren't meant to.

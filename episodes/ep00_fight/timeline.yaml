@@ -1,0 +1,62 @@
+# Combat toolkit test. Not story content: one short, brutal exchange cut the
+# way anime cuts action. Shots, punch-ins, speed lines, impact frames, shake.
+episode: ep00_fight
+resolution: [320, 180]
+scale: 6
+fps: 12
+band: 40
+
+scenes:
+  - id: f01_ambush
+    transition_in: {duration: 0.8}
+    transition_out: {duration: 1.5}
+    backdrop:
+      region: glass
+      time: dusk
+      seed: 4
+      props:
+        - {type: ruin, pos: [10, 134], width: 90, height: 60, arches: 4, seed: 3, color: blood0, layer: 0, parallax: 0.2}
+        - {type: ruin, pos: [210, 152], width: 100, height: 64, arches: 3, seed: 8, color: ink0, rim: blood2, layer: 2, parallax: 0.6}
+    weather: {type: ash, density: 0.5, wind: 0.3}
+    actors:
+      - {id: rig,    sprite: rig,    state: hum,  path: [[112, 163]]}
+      - {id: auk,    sprite: auk, med: auk_med, state: idle, path: [[150, 162]]}
+      - {id: raider, sprite: raider, med: raider_med, state: run,  path: [[330, 162], [184, 162]], flip: true}
+    lights:
+      - {pos: [112, 145], radius: 18, color: ember0, intensity: 0.45, flicker: true}
+    cards:
+      - {narration: "He did not see the second one until it was too late to matter.", at: 4.4}
+    shots:
+      # 1. wide: the raider comes out of the ash at a run
+      - {duration: 1.6}
+      # 2. punch-in on Auk: the staff comes up
+      - duration: 0.42
+        camera: {zoom: 3, focus: [152, 146]}
+        set: {auk: {state: windup}, raider: {path: [[186, 162]]}}
+        fx: [{type: speedlines, kind: horizontal, color: ash3, density: 26}]
+      # 3. medium: the knife and the staff meet
+      - duration: 0.42
+        camera: {zoom: 2, focus: [168, 148]}
+        set: {auk: {state: strike, path: [[152, 162]]}, raider: {state: lunge, path: [[184, 162]]}}
+        fx: [{type: speedlines, kind: radial, center: [176, 150], inner: 18, color: bone, density: 48}]
+      # 4-5. two impact frames: flat bone, then the negative in ember
+      - duration: 0.17
+        set: {auk: {state: strike, path: [[152, 162]]}, raider: {state: hit, path: [[184, 162]]}}
+        camera: {zoom: 2, focus: [168, 148]}
+        fx: [{type: impact, bg: bone, fg: ink0}]
+      - duration: 0.17
+        set: {auk: {state: strike, path: [[152, 162]]}, raider: {state: hit, path: [[184, 162]]}}
+        camera: {zoom: 2, focus: [168, 148]}
+        fx: [{type: impact, bg: ink0, fg: ember1}]
+      # 6. wide: the raider is thrown back in a white flash, the frame shakes
+      - duration: 0.17
+        camera: {shake: {amp: 5, decay: 0.5}}
+        set: {auk: {state: strike, path: [[152, 162]]}, raider: {state: hit, tint: bone, path: [[184, 162], [192, 162]]}}
+      - duration: 0.5
+        camera: {shake: {amp: 3, decay: 1.0}}
+        set: {auk: {state: strike, path: [[152, 162]]}, raider: {state: hit, path: [[192, 162], [212, 162]], ease: smooth}}
+      # 7. hold: down in the ash, a slow push in on the shaman
+      - duration: 4.2
+        camera: {zoom: [1.0, 1.5], focus: [160, 140]}
+        fx: [{type: bars, size: 14}]
+        set: {raider: {state: down, path: [[214, 162]]}}

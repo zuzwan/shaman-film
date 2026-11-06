@@ -40,9 +40,11 @@ Night is blue everywhere, tinted by the region's darkest ramp.
 - **Creatures.** Everyday animals of the Americas plus beings from the
   Americas' folklore and myth share the world (wendigo-type, Appalachian
   horrors, and others). The world bible avoids closed or sacred beings.
-- **The rig** is salvage that reads a dying nervous system, heavy and finite.
-  It is a machine on a handcart, not a tower. Ember is reserved for it, fire, and
-  the capture.
+- **The rig** is salvage that reads a dying nervous system, shaped and worshipped
+  as a totem (world bible): two columns of carved face-housings, one storage
+  cell and one crude animal face each. Auk's has 14 slots, 12 filled and 2 blank.
+  Planted at night its eyes glow; a dead rig is a carved pole. Ember is reserved
+  for it, fire, and the capture.
 - **The shaman** is old and hunched, with a ragged cloak and a forked staff. Capture
   scars are not readable at this scale; show them in close shots.
 - **The apprentice** is upright, carries the pack and the lantern, and is the
@@ -51,3 +53,11 @@ Night is blue everywhere, tinted by the region's darkest ramp.
   chainmen, clerks, guards.
 - **The Fold** looks like a devout farming community. Its hosts share one sprite
   and one gait, so put them in step with no phase offsets. The sameness is the tell.
+
+## Shots and cutting (2026-11-06)
+
+A scene is a shot list, never one wide shot with a figure crossing it. Size
+and angle change every few seconds; something sits between the camera and the
+figures; fights are a handful of frames between two long holds. The catalogue
+is `docs/shots.md`. The first creature is the gaunt: a starved, antlered walker
+in the Appalachian-horror register, never named as a myth.

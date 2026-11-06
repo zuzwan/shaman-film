@@ -11,42 +11,83 @@ scenes:
   duration: auto
   backdrop: {region: river, time: dusk}
   actors:
-  - {sprite: shaman, state: idle, path: [[138, 162]]}
-  - {sprite: apprentice, state: idle, path: [[160, 162]]}
-  - {sprite: rig, state: hum, path: [[182, 162]], flip: true}
+  - {sprite: auk, med: auk_med, state: idle, path: [[138, 162]], id: auk}
+  - {sprite: teal, med: teal_med, state: idle, path: [[160, 162]], id: teal}
+  - {sprite: rig, state: hum, path: [[182, 162]], id: rig, flip: true}
   cards:
   - narration: The mill town had been listed for forty years. This season the Survey had struck it from the route.
+    at: 0.3
   - speaker: apprentice
     text: There's no smoke from the chimneys.
   - speaker: shaman
     text: There's no one to light them.
   notes:
     where: the mill road, a dead tree, fields gone to stubble
-    shot: wide
-    action: they stop at the edge of the town's fields.
+    action:
+    - they stop at the edge of the town's fields.
     sound:
     - wind, a cart wheel
   weather: {type: ash, density: 0.25, wind: 0.2}
+  shots:
+  - shot: wide · eye · static
+    note: they stop at the edge of the town's fields.
+    duration: 19.64
   transition_in: {duration: 1.0}
 - id: sc02_the_square
   title: 'EP00 / SC02: The square'
   duration: auto
   backdrop: {region: river, time: night}
   actors:
-  - {sprite: apprentice, state: idle, path: [[127, 162]]}
-  - {sprite: fold_host, state: idle, path: [[149, 162]]}
-  - {sprite: fold_host, state: idle, path: [[171, 162]], flip: true}
-  - {sprite: fold_host, state: idle, path: [[193, 162]], flip: true}
+  - {sprite: teal, med: teal_med, state: idle, path: [[127, 162]], id: teal}
+  - {sprite: fold_host, med: fold_host_med, state: idle, path: [[149, 162]], id: fold_host}
+  - {sprite: fold_host, med: fold_host_med, state: idle, path: [[171, 162]], id: fold_host2, flip: true}
+  - {sprite: fold_host, med: fold_host_med, state: idle, path: [[193, 162]], id: fold_host3, flip: true}
   cards:
   - speaker: apprentice
     text: Where is everyone?
+    at: 0.3
   - speaker: host
     text: Here.
     note: all three at once
   - narration: They spoke the word together, the way a congregation says amen, and went back to work in step.
   notes:
     where: the square, every door unlocked
-    shot: wide
-    action: the hosts stop work together and turn.
+    action:
+    - the hosts stop work together and turn.
   weather: {type: motes, density: 0.5, wind: 0.1}
+  shots:
+  - shot: wide · eye · static
+    note: the hosts stop work together and turn.
+    duration: 15.43
+- id: sc03_the_knife
+  title: 'EP00 / SC03: The knife'
+  duration: auto
+  backdrop: {region: glass, time: dusk}
+  actors:
+  - {sprite: auk, med: auk_med, state: idle, path: [[138, 162]], id: auk}
+  - {sprite: teal, med: teal_med, state: idle, path: [[160, 162]], id: teal}
+  - {sprite: rig, state: hum, path: [[182, 162]], id: rig, flip: true}
+  cards:
+  - narration: He did not see the second one until it was too late to matter.
+    at: 0.3
+  - speaker: shaman
+    text: Down.
+    at: 8.08
+  - speaker: apprentice
+    text: I didn't see him.
+    at: 10.08
+  - speaker: shaman
+    text: You weren't meant to.
+  notes:
+    where: a broken arcade, glass underfoot
+    action:
+    - the raider comes out of the ash at a run.
+    - Auk's staff is up before Teal has seen anything.
+  weather: {type: ash, density: 0.5, wind: 0.3}
+  shots:
+  - {shot: wide · eye · static, note: the arcade, duration: 7.78}
+  - {shot: close · low · auk · push-in, duration: 1.5}
+  - {shot: insert · eye · static, duration: 0.5, note: the rig's face}
+  - shot: medium · over-shoulder · teal · static
+    duration: 6.88
   transition_out: {duration: 1.5}
