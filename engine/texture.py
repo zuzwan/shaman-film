@@ -29,10 +29,12 @@ for fam in FAMILIES:
 _RGB2NAME = {tuple(int(v) for v in RGB[n]): n for n in PALETTE}
 
 _NOISE = {}
+UNIT = 1  # density (engine/units.py): features keep their size in the frame, drawn with more pixels
 
 
 def _value_noise(h, w, scale_x, scale_y, seed, octaves=3):
     """Tileable-enough value noise in [-1, 1], cached by its parameters."""
+    scale_x, scale_y = scale_x * UNIT, scale_y * UNIT
     key = (h, w, scale_x, scale_y, seed, octaves)
     if key in _NOISE:
         return _NOISE[key]
@@ -75,16 +77,16 @@ def field(kind, h, w, ox=0, oy=0, seed=0):
         n = _value_noise(h, big_w, 28, 16, seed, 2)[:, ox:ox + w] * 0.9
     elif kind == "bark":
         n = _value_noise(h, big_w, 1.8, 9, seed, 2)[:, ox:ox + w]
-        n = n * 0.9 + 0.3 * np.sign(np.sin(xx * 2.1 + yy * 0.2))
+        n = n * 0.9 + 0.3 * np.sign(np.sin((xx * 2.1 + yy * 0.2) / UNIT))
     elif kind == "stone":
-        bw, bh = 9, 5
+        bw, bh = 9 * UNIT, 5 * UNIT
         row = (yy + oy) // bh
         bx = (xx + ox + (row % 2) * (bw // 2)) % bw
-        mortar = (bx == 0) | (((yy + oy) % bh) == 0)
+        mortar = (bx < UNIT) | (((yy + oy) % bh) < UNIT)
         n = _value_noise(h, big_w, 4, 3, seed, 2)[:, ox:ox + w] * 0.6
         n = np.where(mortar, -1.4, n + 0.2)
     elif kind == "cloth":
-        weave = ((xx + yy) % 2) * 0.5 - 0.25
+        weave = (((xx + yy) // UNIT) % 2) * 0.5 - 0.25
         n = _value_noise(h, big_w, 4, 4, seed, 2)[:, ox:ox + w] * 0.8 + weave
     elif kind == "wool":
         n = _value_noise(h, big_w, 2.5, 2.5, seed, 3)[:, ox:ox + w] * 1.1
@@ -93,7 +95,7 @@ def field(kind, h, w, ox=0, oy=0, seed=0):
     elif kind == "hair":
         n = _value_noise(h, big_w, 1.2, 6, seed, 2)[:, ox:ox + w] * 1.2
     elif kind == "leather":
-        n = _value_noise(h, big_w, 3, 3, seed, 3)[:, ox:ox + w] * 0.7 + 0.2 * (((xx * 3 + yy * 5) % 7) / 7 - 0.5)
+        n = _value_noise(h, big_w, 3, 3, seed, 3)[:, ox:ox + w] * 0.7 + 0.2 * ((((xx * 3 + yy * 5) // UNIT) % 7) / 7 - 0.5)
     elif kind == "wood":
         n = _value_noise(h, big_w, 2, 14, seed, 2)[:, ox:ox + w] * 1.0
     else:

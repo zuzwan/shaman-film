@@ -55,7 +55,7 @@ def parse(shot):
     return out
 
 
-def resolve(shot, base, fps=12):
+def resolve(shot, base, fps=12, unit=1):
     """Return `shot` with camera/backdrop/fx defaults from its `shot` vocabulary filled in."""
     if "shot" not in shot:
         return shot
@@ -82,16 +82,20 @@ def resolve(shot, base, fps=12):
     if ang == "pov":
         fx.append({"type": "vignette", "inner": 0.45, "amount": 1.0})
     if ang in FRAMING:
-        props = list(base.get("backdrop", {}).get("props", [])) + copy.deepcopy(FRAMING[ang])
+        framing = copy.deepcopy(FRAMING[ang])
+        for p in framing:
+            if "rect" in p:
+                p["rect"] = [v * unit for v in p["rect"]]
+        props = list(base.get("backdrop", {}).get("props", [])) + framing
         if ang == "over-shoulder":
             z = max(z, 2)
 
     move = v.get("move", "static")
     pan0 = base.get("camera", {}).get("pan", [0, 0])[0]
     if move == "pan-left":
-        cam.setdefault("pan", [pan0 + PAN / 2, pan0 - PAN / 2])
+        cam.setdefault("pan", [pan0 + PAN * unit / 2, pan0 - PAN * unit / 2])
     elif move == "pan-right":
-        cam.setdefault("pan", [pan0 - PAN / 2, pan0 + PAN / 2])
+        cam.setdefault("pan", [pan0 - PAN * unit / 2, pan0 + PAN * unit / 2])
     elif move == "push-in":
         cam.setdefault("zoom", [z, z + 1])
     elif move == "pull-out":
@@ -99,7 +103,7 @@ def resolve(shot, base, fps=12):
     elif move == "track" and subj:
         cam.setdefault("follow", subj)
     elif move == "shake":
-        cam.setdefault("shake", {"amp": 3, "decay": 1.0})
+        cam.setdefault("shake", {"amp": 3 * unit, "decay": 1.0})
     cam.setdefault("zoom", z)
 
     if "hold" in v:

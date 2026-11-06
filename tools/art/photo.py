@@ -63,7 +63,7 @@ def to_canvas(names, mask):
 class Face:
     """A quantised portrait plus the regions needed to cut expressions."""
 
-    def __init__(self, base, eyes, mouth, brow_y, skin, teeth="ash3", tongue="rust0"):
+    def __init__(self, base, eyes, mouth, brow_y, skin, teeth="ash3", tongue="rust0", unit=1):
         self.base = base          # Canvas
         self.eyes = eyes          # list of (x0, y0, x1, y1) boxes, the open eye incl. lids
         self.mouth = mouth        # (xl, yl, xr, yr): the line between the lips, corner to corner
@@ -71,6 +71,7 @@ class Face:
         self.skin = skin          # palette name for painted lids
         self.teeth = teeth
         self.tongue = tongue
+        self.u = unit             # density: expression offsets are in base pixels times this
 
     def copy(self):
         c = Canvas(self.base.w, self.base.h)
@@ -88,18 +89,27 @@ class Face:
 
     def close_eyes(self, c, amount=1.0):
         """The lid comes down over the eye: the top `amount` of the box takes the
-        cheek's texture (mirrored up from below the box), with a lash line at its edge."""
+        skin above the eye (mirrored down from the brow), a step darker since the
+        lid sits in the socket's shadow, with a lash line at its lower edge. The
+        lid's edge is an almond, deepest at the eye's middle, so a closed eye is a
+        curved line and not a bar."""
+        darker = {"bone_hi": "ash4", "bone": "ash3", "ash5": "ash3", "ash4": "ash2", "ash3": "ash1", "ash2": "ash1", "ink0": "ink2"}
+        U = self.u
         for x0, y0, x1, y1 in self.eyes:
             h = y1 - y0
             n = int(round(h * amount))
             if n <= 0:
                 continue
+            cx, rx = (x0 + x1 - 1) / 2, (x1 - x0) / 2
             for x in range(x0, x1):
-                for y in range(y0, y0 + n):
-                    src = c.px[min(c.h - 1, y1 + 1 + (y - y0))][x] or self.skin
-                    c.px[y][x] = {"ink0": self.skin, "bone": "ash4"}.get(src, src)
-            for x in range(x0 + 2, x1 - 2):
-                c.px[y0 + n - 1][x] = "ink0" if amount >= 1 else "ink1"
+                v = (x - cx) / rx
+                depth = int(round(n * max(0.0, 1 - v * v) ** 0.35))
+                for y in range(y0, y0 + depth):
+                    src = c.px[max(0, y0 - 1 - (y - y0))][x] or self.skin
+                    c.px[y][x] = darker.get(src, src)
+                if depth >= U and abs(v) < 0.92:
+                    for y in range(y0 + depth - U, y0 + depth):
+                        c.px[y][x] = "ink0" if amount >= 1 else "ink1"
         return c
 
     def gaze(self, c, dx):
@@ -152,11 +162,12 @@ class Face:
                 if y >= c.h:
                     break
                 if hx > 0 and top <= y < top + hx:
-                    edge = y == top or y == top + hx - 1 or abs(u) > 0.8
+                    U = self.u
+                    edge = y < top + U or y >= top + hx - U or abs(u) > 0.8
                     v = "ink1" if edge else "ink0"
-                    if h >= 3 and hx >= 3 and y == top + 1 and abs(u) < 0.62 and (x % 3 != 1):
+                    if h >= 3 * U and hx >= 3 * U and top + U <= y < top + 2 * U and abs(u) < 0.62 and ((x // U) % 3 != 1):
                         v = teeth
-                    if h >= 5 and hx >= 5 and y == top + hx - 2 and abs(u) < 0.4:
+                    if h >= 5 * U and hx >= 5 * U and top + hx - 2 * U <= y < top + hx - U and abs(u) < 0.4:
                         v = tongue
                     c.px[y][x] = v
                 else:
@@ -182,19 +193,19 @@ class Face:
         return c
 
     def states(self):
-        F = self
-        idle = [F.copy(), F.shift(F.copy(), -1), F.copy(), F.close_eyes(F.copy(), 1.0)]
+        F, u = self, self.u
+        idle = [F.copy(), F.shift(F.copy(), -u), F.copy(), F.close_eyes(F.copy(), 1.0)]
         # talking is uneven: a few shapes, a closed beat, never a metronome
-        speak = [F.mouth_open(F.copy(), 2), F.mouth_open(F.shift(F.copy(), -1), 5), F.mouth_open(F.copy(), 3),
-                 F.copy(), F.mouth_open(F.copy(), 4), F.mouth_open(F.shift(F.copy(), -1), 2)]
+        speak = [F.mouth_open(F.copy(), 2 * u), F.mouth_open(F.shift(F.copy(), -u), 5 * u), F.mouth_open(F.copy(), 3 * u),
+                 F.copy(), F.mouth_open(F.copy(), 4 * u), F.mouth_open(F.shift(F.copy(), -u), 2 * u)]
         return {
             "idle": idle,
             "speak": speak,
             "glare": [F.brow(F.close_eyes(F.copy(), 0.35), -1)],
-            "flinch": [F.shift(F.brow(F.close_eyes(F.copy(), 1.0), 1), 2)],
-            "look_down": [F.shift(F.close_eyes(F.copy(), 0.6), 2)],
-            "look_away": [F.gaze(F.copy(), -3), F.gaze(F.shift(F.copy(), -1), -3)],
-            "closed": [F.shift(F.close_eyes(F.copy(), 1.0), 1)],
+            "flinch": [F.shift(F.brow(F.close_eyes(F.copy(), 1.0), 1), 2 * u)],
+            "look_down": [F.shift(F.close_eyes(F.copy(), 0.6), 2 * u)],
+            "look_away": [F.gaze(F.copy(), -3 * u), F.gaze(F.shift(F.copy(), -u), -3 * u)],
+            "closed": [F.shift(F.close_eyes(F.copy(), 1.0), u)],
             "grim": [F.brow(F.close_eyes(F.copy(), 0.2), -1)],
         }
 
@@ -202,17 +213,18 @@ class Face:
 GREYS = ["ink0", "ink1", "ink2", "ash0", "ash1", "ash2", "ash3", "ash4", "ash5", "bone"]
 
 
-def build_auk():
+def build_auk(u=1):
+    """u is the density (engine/units.py): every measure below is in base pixels times u."""
     im = Image.open(ROOT / "assets/ref/auk_face.png").convert("RGB")
-    im = im.crop((30, 0, 570, 700)).resize((96, 124), Image.LANCZOS)
+    im = im.crop((30, 0, 570, 700)).resize((96 * u, 124 * u), Image.LANCZOS)
     arr = np.array(im)
     names = quantise(arr, GREYS, gamma=1.15, contrast=1.1, lift=-0.04)
     H, W = names.shape
     # mask: head egg plus the hood and shoulders; the bokeh background goes
-    m = ellipse_mask(H, W, 48, 52, 36, 50)
+    m = ellipse_mask(H, W, 48 * u, 52 * u, 36 * u, 50 * u)
     yy, xx = np.mgrid[0:H, 0:W]
-    m |= (yy > 78) & (xx > 6 - (yy - 78) * 0.3) & (xx < 90 + (yy - 78) * 0.3)
-    m |= (yy > 100)
+    m |= (yy > 78 * u) & (xx > 6 * u - (yy - 78 * u) * 0.3) & (xx < 90 * u + (yy - 78 * u) * 0.3)
+    m |= (yy > 100 * u)
     c = to_canvas(names, m)
     # the hood: everything outside the face but inside the mask reads darker, like cloth
     for y in range(H):
@@ -220,53 +232,58 @@ def build_auk():
             v = c.px[y][x]
             if v is None:
                 continue
-            in_face = ((x - 48) / 32) ** 2 + ((y - 56) / 46) ** 2 <= 1
-            if not in_face and y < 96:
+            in_face = ((x - 48 * u) / (32 * u)) ** 2 + ((y - 56 * u) / (46 * u)) ** 2 <= 1
+            if not in_face and y < 96 * u:
                 c.px[y][x] = {"ash5": "ash1", "ash4": "ash0", "ash3": "ash0", "ash2": "ink2", "ash1": "ink1", "ash0": "ink1", "bone": "ash1"}.get(v, v)
-    for y in range(112, H):  # the hoodie's grommet goes; plain cloth at the bottom
+    for y in range(112 * u, H):  # the hoodie's grommet goes; plain cloth at the bottom
         for x in range(W):
             if c.px[y][x] is not None:
                 c.px[y][x] = "ink1"
     c.outline("ink0")
-    return Face(c, eyes=[(27, 45, 44, 52), (54, 43, 73, 50)], mouth=(39, 84, 63, 84), brow_y=38, skin="ash1", teeth="ash2", tongue="ink2")
+    return Face(c, eyes=[(27 * u, 45 * u, 44 * u, 52 * u), (54 * u, 43 * u, 73 * u, 50 * u)], mouth=(39 * u, 84 * u, 63 * u, 84 * u),
+                brow_y=38 * u, skin="ash1", teeth="ash2", tongue="ink2", unit=u)
 
 
-def build_teal():
+def build_teal(u=1):
     im = Image.open(ROOT / "assets/ref/teal_face.png").convert("RGB")
-    im = im.crop((60, 0, 360, 390)).resize((88, 114), Image.LANCZOS)
+    im = im.crop((60, 0, 360, 390)).resize((88 * u, 114 * u), Image.LANCZOS)
     arr = np.array(im)
     names = quantise(arr, GREYS + ["rust0", "rust1", "blood3", "blood4"], gamma=1.25, contrast=1.0, lift=-0.06)
     H, W = names.shape
-    m = ellipse_mask(H, W, 46, 42, 40, 50)
+    m = ellipse_mask(H, W, 46 * u, 42 * u, 40 * u, 50 * u)
     yy, xx = np.mgrid[0:H, 0:W]
-    m |= (yy > 72) & (xx > 14 - (yy - 72) * 0.4) & (xx < 78 + (yy - 72) * 0.4)
+    m |= (yy > 72 * u) & (xx > 14 * u - (yy - 72 * u) * 0.4) & (xx < 78 * u + (yy - 72 * u) * 0.4)
     c = to_canvas(names, m)
     # hair: the painting's bright highlights read as grey hair; pull them down
     for y in range(H):
         for x in range(W):
             v = c.px[y][x]
-            in_face = ((x - 46) / 24) ** 2 + ((y - 50) / 34) ** 2 <= 1
-            if v is not None and not in_face and y < 84:
+            in_face = ((x - 46 * u) / (24 * u)) ** 2 + ((y - 50 * u) / (34 * u)) ** 2 <= 1
+            if v is not None and not in_face and y < 84 * u:
                 c.px[y][x] = {"bone": "ash3", "ash5": "ash2", "ash4": "ash1", "ash3": "ash0", "blood4": "rust1", "blood3": "rust0"}.get(v, v)
     # the painted collar and coat below the jaw are not our world: a scarf and a jacket instead
-    for y in range(70, H):
+    for y in range(70 * u, H):
         for x in range(W):
-            if c.px[y][x] is not None and (y >= 86 or x < 28 or x > 64):
+            if c.px[y][x] is not None and (y >= 86 * u or x < 28 * u or x > 64 * u):
                 c.px[y][x] = None
-    c.poly([(0, 104), (10, 90), (44, 86), (80, 90), (88, 102), (88, H), (0, H)], "ash0", shade=("ink2", "ash0", (1, -0.3), 2.5))
-    c.poly([(4, 118), (14, 118), (40, 92), (34, 90)], "rust0")
-    c.poly([(8, 78), (30, 82), (46, 84), (62, 82), (80, 78), (84, 90), (74, 100), (44, 104), (12, 100), (4, 90)], "rust1", shade=("rust0", "rust1", (1, -0.5), 2))
-    c.stroke(12, 90, 74, 92, "rust0", 1); c.stroke(10, 96, 70, 98, "rust0", 1)
+    P = lambda pts: [(x * u, y * u) for x, y in pts]
+    c.poly(P([(0, 104), (10, 90), (44, 86), (80, 90), (88, 102)]) + [(88 * u, H), (0, H)], "ash0", shade=("ink2", "ash0", (1, -0.3), 2.5))
+    c.poly(P([(4, 118), (14, 118), (40, 92), (34, 90)]), "rust0")
+    c.poly(P([(8, 78), (30, 82), (46, 84), (62, 82), (80, 78), (84, 90), (74, 100), (44, 104), (12, 100), (4, 90)]), "rust1", shade=("rust0", "rust1", (1, -0.5), 2))
+    c.stroke(12 * u, 90 * u, 74 * u, 92 * u, "rust0", u); c.stroke(10 * u, 96 * u, 70 * u, 98 * u, "rust0", u)
     c.outline("ink0")
-    return Face(c, eyes=[(27, 43, 42, 49), (52, 42, 67, 48)], mouth=(35, 66, 53, 64), brow_y=35, skin="ash2", teeth="ash4", tongue="rust0")
+    return Face(c, eyes=[(27 * u, 43 * u, 42 * u, 49 * u), (52 * u, 42 * u, 67 * u, 48 * u)], mouth=(35 * u, 66 * u, 53 * u, 64 * u),
+                brow_y=35 * u, skin="ash2", teeth="ash4", tongue="rust0", unit=u)
 
 
 if __name__ == "__main__":
-    out = ROOT / "assets/sprites"
+    u = int(sys.argv[sys.argv.index("--unit") + 1]) if "--unit" in sys.argv else 1
+    out = ROOT / ("assets/sprites" if u == 1 else f"assets/sprites_x{u}")
+    out.mkdir(exist_ok=True)
     for name, builder, anchor in (("auk_close", build_auk, (48, 123)), ("teal_close", build_teal, (44, 113))):
-        f = builder()
+        f = builder(u)
         write_sprite(out / f"{name}.yaml", name,
                      f"# {name}: from drew's reference photo (assets/ref/), quantised to the palette by\n"
                      "# tools/art/photo.py; expressions cut from the eye and mouth regions. Faces camera.",
-                     anchor, 4, f.states())
+                     (anchor[0] * u, anchor[1] * u), 4, f.states())
         print(name, f.base.w, f.base.h)

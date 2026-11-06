@@ -85,26 +85,27 @@ class Scene:
     def __init__(self, spec, cfg, clock_offset=0.0, frame_offset=0):
         self.spec, self.cfg = spec, cfg
         self.W, self.H = cfg["resolution"]
+        self.unit = cfg.get("unit", 1)   # density (engine/units.py); text is laid out on the base grid
         self.fps = cfg["fps"]
         self.clock_offset, self.frame_offset = clock_offset, frame_offset
         self.band = spec.get("band", cfg.get("band", 0))
         if "shot" in spec:  # 'close · low · auk · push-in' -> camera defaults (engine/shotlist.py)
-            spec = shotlist.resolve(spec, spec, cfg["fps"])
+            spec = shotlist.resolve(spec, spec, cfg["fps"], self.unit)
             self.spec = spec
         self.shots = []
         if spec.get("shots"):
             t = 0.0
             for shot in spec["shots"]:
-                sub = Scene(merge_shot(spec, shot), cfg, clock_offset + t, frame_offset + int(round(t * self.fps)))
+                sub = Scene(merge_shot(spec, shot, self.unit), cfg, clock_offset + t, frame_offset + int(round(t * self.fps)))
                 self.shots.append((t, sub))
                 t += sub.duration
             if spec.get("duration", "auto") == "auto":
                 spec = {**spec, "duration": t}
-        self.cards = subtitles.schedule(spec.get("cards", []), spec.get("cards_start", 0.6), self.W, self.band)
+        self.cards = subtitles.schedule(spec.get("cards", []), spec.get("cards_start", 0.6), self.W // self.unit, self.band // self.unit)
         dur = spec.get("duration", "auto")
         if dur == "auto":  # long enough to read every card
             dur = max(spec.get("min_duration", 3.0), subtitles.total_time(spec.get("cards", []),
-                      spec.get("cards_start", 0.6), spec.get("tail", 1.2), self.W, self.band))
+                      spec.get("cards_start", 0.6), spec.get("tail", 1.2), self.W // self.unit, self.band // self.unit))
         self.duration = float(dur)
         self.n_frames = int(round(self.duration * self.fps))
         cam = spec.get("camera", {})
@@ -113,15 +114,15 @@ class Scene:
         self.zoom = z if isinstance(z, list) else [z, z]
         self.focus = cam.get("focus")
         self.focus_on = cam.get("focus_on")      # actor id the zoom centres on
-        self.focus_lift = cam.get("focus_lift", 18)
+        self.focus_lift = cam.get("focus_lift", 18 * self.unit)
         self.follow = cam.get("follow")          # actor id the camera tracks
         self.follow_offset = cam.get("follow_offset", 0)
         self.shake = cam.get("shake")
         self.cam_ease = cam.get("ease", "smooth")
         extent = abs(self.pan[1] - self.pan[0]) + 16
-        bd, w = regions.expand(spec.get("backdrop", {}), spec.get("weather"))
+        bd, w = regions.expand(spec.get("backdrop", {}), spec.get("weather"), self.unit)
         self.backdrop = Backdrop(bd, self.W, self.H, extent, textured=bool(cfg.get("texture")))
-        self.weather = Weather(w, self.W, self.H) if w and w != "none" else None
+        self.weather = Weather(w, self.W, self.H, unit=self.unit) if w and w != "none" else None
         self.actors = spec.get("actors", [])
         self.fx = spec.get("fx", [])
         self.lights = spec.get("lights", [])
@@ -132,7 +133,7 @@ class Scene:
         for p in spec.get("panels", []):
             body = {k: v for k, v in p.items() if k not in ("rect", "at", "window", "border", "pop")}
             body.setdefault("duration", max(0.1, self.duration - p.get("at", 0.0)))
-            sub = Scene(merge_shot(spec, body), cfg, clock_offset + p.get("at", 0.0),
+            sub = Scene(merge_shot(spec, body, self.unit), cfg, clock_offset + p.get("at", 0.0),
                         frame_offset + int(round(p.get("at", 0.0) * self.fps)))
             self.panels.append((p, sub))
         self.panel_bg = spec.get("panel_bg", "ink0")
@@ -298,6 +299,7 @@ class Scene:
         return rgb, alpha
 
     def _draw_captions(self, c, t):
+        H, W = c.shape[:2]
         for cap in self.captions:
             t0, t1 = cap["t"]
             if not (t0 <= t <= t1):
@@ -305,11 +307,11 @@ class Scene:
             fade = cap.get("fade", 0.6)
             amt = min(1.0, (t - t0) / fade if fade else 1, (t1 - t) / fade if fade else 1)
             lines = wrap(cap["text"], cap.get("width", 56))
-            base_y = cap.get("y", self.H - 14 - (len(lines) - 1) * (CH + 3))
+            base_y = cap.get("y", H - 14 - (len(lines) - 1) * (CH + 3))
             for i, line in enumerate(lines):
                 m = text_mask(line)
                 h, w = m.shape
-                x = (self.W - w) // 2
+                x = (W - w) // 2
                 y = base_y + i * (CH + 3)
                 show = m & mask(amt, h, w, x, y)
                 shadow = np.zeros((h + 1, w + 1), dtype=bool)
@@ -382,9 +384,25 @@ class Scene:
             c = np.concatenate([c[self.band:], np.zeros((self.band, self.W, 3), np.uint8)])
             c[self.H - self.band:] = RGB["ink0"]
         self._transition(c, t)
-        self._draw_captions(c, t)
-        subtitles.draw(c, self.cards, t, self.band)
+        self._draw_text(c, t)
         return c
+
+    def _draw_text(self, c, t):
+        """Captions and subtitles. They are laid out on the base grid whatever the
+        density, so type reads the same at every unit: draw on a 1-in-unit sample of
+        the frame and write back the pixels that changed, each as a unit-sized block."""
+        u = self.unit
+        if u == 1:
+            self._draw_captions(c, t)
+            subtitles.draw(c, self.cards, t, self.band)
+            return
+        small = np.ascontiguousarray(c[::u, ::u])
+        before = small.copy()
+        self._draw_captions(small, t)
+        subtitles.draw(small, self.cards, t, self.band // u)
+        changed = (small != before).any(-1).repeat(u, 0).repeat(u, 1)[:c.shape[0], :c.shape[1]]
+        big = small.repeat(u, 0).repeat(u, 1)[:c.shape[0], :c.shape[1]]
+        c[changed] = big[changed]
 
     def _panels(self, t, frame):
         """Manga page: each panel is its own shot, cut into a rectangle, appearing in turn."""
@@ -429,13 +447,13 @@ class Scene:
             yield i, self.render(i / self.fps, i)
 
 
-def merge_shot(spec, shot):
+def merge_shot(spec, shot, unit=1):
     """The scene's spec with one shot laid over it (see module docstring)."""
     base = {k: v for k, v in spec.items()
             if k not in ("shots", "panels", "cards", "captions", "transition_in", "transition_out",
                          "duration", "id", "shot")}
     out = copy.deepcopy(base)
-    shot = shotlist.resolve(shot, base)
+    shot = shotlist.resolve(shot, base, unit=unit)
     for k, v in shot.items():
         if k == "camera":
             out["camera"] = {**base.get("camera", {}), **v}

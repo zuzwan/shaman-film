@@ -26,6 +26,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from raster import Canvas, write_sprite  # noqa: E402
 
 HD = True  # the hyper-detailed style: every fill is textured by its material (engine/texture.py)
+UNIT = 1  # density (engine/units.py): --unit 2 draws every figure with twice the pixels
+
+
+_KIND_SEED = {"cloth": 1, "wool": 2, "skin": 3, "hair": 4, "leather": 5, "wood": 6}  # str hash is salted per process
 
 
 def texturize(c, k, H, seed=0):
@@ -50,11 +54,11 @@ def texturize(c, k, H, seed=0):
             if v is not None:
                 rgb[y, x] = RGB[v]
                 names[y, x] = v
-    amp = 0.55 if H < 40 else 0.95
+    amp = (0.55 if H < 40 * UNIT else 0.95) * (1 + 0.25 * (UNIT - 1))
     for col, kind in kinds.items():
         m = names == col
         if m.any():
-            texture.texture(rgb, m, kind, 0, 0, seed=seed + hash(kind) % 97, amp=amp)
+            texture.texture(rgb, m, kind, 0, 0, seed=seed + _KIND_SEED[kind], amp=amp)
     back = {tuple(int(v) for v in RGB[n]): n for n in RGB}
     for y in range(c.h):
         for x in range(c.w):
@@ -62,6 +66,14 @@ def texturize(c, k, H, seed=0):
                 c.px[y][x] = back.get(tuple(int(v) for v in rgb[y, x]), names[y, x])
 
 OUT = Path(__file__).resolve().parents[2] / "assets/sprites"
+
+
+def dot(c, x, y, col):
+    """One base pixel: a single pixel at unit 1, a small disc at higher density."""
+    if UNIT == 1:
+        c.put(x, y, col)
+    else:
+        c.disc(x, y, UNIT * 0.5, col)
 
 # proportions, as fractions of standing height
 PROP = dict(hip=0.47, torso=0.28, neck=0.05, head_r=0.105, thigh=0.24, shin=0.23, foot=0.07,
@@ -173,7 +185,7 @@ class Figure:
         self.HH = int(H * costume.get("canvas_h", 1.22)) + 4
         self.ax = self.W // 2 - int(H * 0.12)
         self.ay = self.HH - 2
-        self.med = H >= 40
+        self.med = H >= 40 * UNIT
 
     # pixel coordinates of a joint
     def px(self, pt, p):
@@ -240,7 +252,7 @@ class Figure:
         self.limb(c, knee, foot, col, t * 0.9, p)
         if self.med and side == "F":
             kx, ky = self.px(knee, p)
-            c.put(kx + 1, ky - 1, LIGHT.get(col, "ash0"))
+            dot(c, kx + UNIT, ky - UNIT, LIGHT.get(col, "ash0"))
         # boot: a short foot pointing the way the shin leans
         fx, fy = self.px(foot, p)
         fl = self.prop["foot"] * self.H
@@ -249,7 +261,7 @@ class Figure:
             if self.med:
                 kx, ky = self.px(knee, p)
                 c.stroke(fx + (kx - fx) * 0.3, fy + (ky - fy) * 0.3, fx, fy, boot, t * 0.95)  # the boot's shaft
-                c.stroke(fx - 1, fy - t * 0.6, fx + fl * 0.3, fy - t * 0.6, LIGHT.get(boot, "ink1"), 1)
+                c.stroke(fx - UNIT, fy - t * 0.6, fx + fl * 0.3, fy - t * 0.6, LIGHT.get(boot, "ink1"), UNIT)
 
     def torso(self, c, J, p):
         k, H = self.k, self.H
@@ -268,13 +280,13 @@ class Figure:
         c.poly(pts, k["coat"], shade=(DARK.get(k["coat"], "ink0"), k["coat"], (1, -0.2), 3) if self.med else None)
         if self.med:
             # a seam down the front, the collar, a belt unless a cloak covers it
-            c.stroke(sx + nx * sw * 0.5, sy + ny * sw * 0.5, hx + nx * hw * 0.7, hy + ny * hw * 0.7, DARK.get(k["coat"], "ink0"), 1)
+            c.stroke(sx + nx * sw * 0.5, sy + ny * sw * 0.5, hx + nx * hw * 0.7, hy + ny * hw * 0.7, DARK.get(k["coat"], "ink0"), UNIT)
             if not k.get("hood"):
                 c.poly([(sx - nx * sw * 0.5, sy - 1), (sx + nx * sw * 0.8, sy - 1), (sx + nx * sw * 0.6, sy + H * 0.05), (sx - nx * sw * 0.3, sy + H * 0.05)],
                        LIGHT.get(k["coat"], "ash1"))
             if not k.get("cloak") and not k.get("longcoat") and k.get("belt", "ink0"):
                 c.stroke(hx - nx * hw * 1.05, hy - ny * hw - 1, hx + nx * hw * 1.05, hy + ny * hw - 1, k.get("belt", "ink0"), 1.5)
-                c.put(hx + nx * hw * 0.4, hy - 1, "ash3")  # buckle
+                dot(c, hx + nx * hw * 0.4, hy - UNIT, "ash3")  # buckle
             if k.get("plate"):
                 c.poly([(sx - nx * sw * 0.6, sy + 1), (sx + nx * sw * 0.7, sy + 1), (hx + nx * hw * 0.8, hy - 2), (hx - nx * hw * 0.6, hy - 2)],
                        k["plate"], shade=(DARK.get(k["plate"], "ash0"), LIGHT.get(k["plate"], "ash3"), (1, -0.5)))
@@ -300,7 +312,7 @@ class Figure:
         if self.med:  # folds
             for i in range(3):
                 fx0 = back + (sx - back) * (0.3 + i * 0.25)
-                c.stroke(fx0, sy + H * 0.12, fx0 - sway * 0.5 - H * 0.03 * i, hem - 1, DARK.get(col, "ink0"), 1)
+                c.stroke(fx0, sy + H * 0.12, fx0 - sway * 0.5 - H * 0.03 * i, hem - UNIT, DARK.get(col, "ink0"), UNIT)
 
     def cloak_front(self, c, J, p):
         """The front panel, over the near leg, ragged at the hem."""
@@ -315,8 +327,8 @@ class Figure:
         # ragged hem
         for i in range(int(fw * 1.4)):
             if i % 3 == 0:
-                c.put(hx - fw * 0.2 + i, hem, None)
-                c.put(hx - fw * 0.2 + i, hem - 1, None)
+                for dy in range(2 * UNIT):
+                    c.put(hx - fw * 0.2 + i, hem - dy, None)
 
     def pack(self, c, J, p):
         k, H = self.k, self.H
@@ -328,13 +340,13 @@ class Figure:
             c.stroke(bx, by - H * 0.42, bx - H * 0.08, by + H * 0.3, "ink2", H * 0.11)
             for i in range(5):
                 yy = by - H * 0.36 + i * H * 0.14
-                c.stroke(bx - H * 0.06, yy, bx + H * 0.04, yy, "ash0", 1)
-            c.put(bx, by - H * 0.44, "ember0")  # the antenna tip
+                c.stroke(bx - H * 0.06, yy, bx + H * 0.04, yy, "ash0", UNIT)
+            dot(c, bx, by - H * 0.44, "ember0")  # the antenna tip
         else:
             c.ellipse(bx, by + H * 0.08, H * 0.07, H * 0.13, k["pack"], shade=(DARK.get(k["pack"], "ink0"), k["pack"], (1, 0)) if self.med else None)
             if self.med:
-                c.stroke(bx - H * 0.05, by - H * 0.02, bx + H * 0.05, by - H * 0.02, LIGHT.get(k["pack"], "ash1"), 1)
-                c.stroke(bx - H * 0.07, by + H * 0.15, bx + H * 0.06, by + H * 0.15, DARK.get(k["pack"], "ink0"), 1)
+                c.stroke(bx - H * 0.05, by - H * 0.02, bx + H * 0.05, by - H * 0.02, LIGHT.get(k["pack"], "ash1"), UNIT)
+                c.stroke(bx - H * 0.07, by + H * 0.15, bx + H * 0.06, by + H * 0.15, DARK.get(k["pack"], "ink0"), UNIT)
 
     def head(self, c, J, p):
         k, H = self.k, self.H
@@ -357,17 +369,17 @@ class Figure:
                    shade=(DARK.get(k["hair"], "ink0"), k["hair"], (0.4 * look, -1)) if self.med else None)
         if self.med and k.get("hair"):
             for i, (ox, oy) in enumerate(((-0.7, -0.9), (-0.2, -1.15), (0.4, -1.0), (-0.95, -0.4))):
-                c.put(hx + look * r * ox, hy + r * oy, LIGHT.get(k["hair"], "ash0") if i % 2 else DARK.get(k["hair"], "ink0"))
+                dot(c, hx + look * r * ox, hy + r * oy, LIGHT.get(k["hair"], "ash0") if i % 2 else DARK.get(k["hair"], "ink0"))
         if self.med and not k.get("hood") and not k.get("helmet"):
-            c.put(hx - look * r * 0.05, hy, DARK.get(skin, "ink1"))  # ear
+            dot(c, hx - look * r * 0.05, hy, DARK.get(skin, "ink1"))  # ear
         # face
         ex, ey = hx + look * r * 0.45, hy - r * 0.15
         if self.med:
-            c.rect(ex - 1, ey, 3, 2, "ink0")
-            c.put(ex + look * 0.5, ey, "bone")
-            c.stroke(hx + look * r * 0.85, hy - r * 0.05, hx + look * r * 1.02, hy + r * 0.25, DARK.get(skin, "ink1"), 1)  # nose
-            c.stroke(hx + look * r * 0.5, hy + r * 0.5, hx + look * r * 0.85, hy + r * 0.5, "ink0", 1)  # mouth
-            c.stroke(hx + look * r * 0.3, ey - 2, hx + look * r * 0.8, ey - 2, DARK.get(skin, "ink1"), 1)  # brow
+            c.rect(ex - UNIT, ey, 3 * UNIT, 2 * UNIT, "ink0")
+            dot(c, ex + look * 0.5 * UNIT, ey, "bone")
+            c.stroke(hx + look * r * 0.85, hy - r * 0.05, hx + look * r * 1.02, hy + r * 0.25, DARK.get(skin, "ink1"), UNIT)  # nose
+            c.stroke(hx + look * r * 0.5, hy + r * 0.5, hx + look * r * 0.85, hy + r * 0.5, "ink0", UNIT)  # mouth
+            c.stroke(hx + look * r * 0.3, ey - 2 * UNIT, hx + look * r * 0.8, ey - 2 * UNIT, DARK.get(skin, "ink1"), UNIT)  # brow
         else:
             c.put(ex, ey, "ink0")
         if k.get("beard"):
@@ -386,7 +398,7 @@ class Figure:
             c.poly([(hx - look * r * 1.05, hy + r * 0.2), (hx - look * r * 1.0, hy - r * 0.7), (hx - look * r * 0.3, hy - r * 1.25),
                     (hx + look * r * 0.6, hy - r * 1.2), (hx + look * r * 1.05, hy - r * 0.5), (hx + look * r * 1.1, hy - r * 0.1)], k["helmet"],
                    shade=(DARK.get(k["helmet"], "ash0"), LIGHT.get(k["helmet"], "ash3"), (0.6, -1)) if self.med else None)
-            c.stroke(hx - look * r * 1.0, hy - r * 0.1, hx + look * r * 1.1, hy - r * 0.1, DARK.get(k["helmet"], "ash0"), 1)
+            c.stroke(hx - look * r * 1.0, hy - r * 0.1, hx + look * r * 1.1, hy - r * 0.1, DARK.get(k["helmet"], "ash0"), UNIT)
         if k.get("scarf"):
             self.scarf(c, J, p)
 
@@ -401,7 +413,7 @@ class Figure:
         c.poly([(hx + look * r * 0.05, hy - r * 0.6), (hx + look * r * 0.9, hy - r * 0.45), (hx + look * r * 0.8, hy - r * 0.15),
                 (hx + look * r * 0.1, hy - r * 0.05)], "ink0")
         if self.med:
-            c.stroke(hx - look * r * 0.9, hy - r * 0.9, hx - look * r * 1.1, hy + r * 1.0, DARK.get(col, "ink0"), 1)
+            c.stroke(hx - look * r * 0.9, hy - r * 0.9, hx - look * r * 1.1, hy + r * 1.0, DARK.get(col, "ink0"), UNIT)
 
     def scarf(self, c, J, p):
         k, H = self.k, self.H
@@ -415,8 +427,8 @@ class Figure:
         ex, ey = tx + math.sin(ang) * tail, ty - math.cos(ang) * tail
         c.stroke(tx, ty, ex, ey, col, max(1, H * 0.04))
         if self.med:
-            c.put(ex, ey, DARK.get(col, "ink0"))
-            c.put(nx + H * 0.02, ny + H * 0.025, DARK.get(col, "ink0"))  # the knot
+            dot(c, ex, ey, DARK.get(col, "ink0"))
+            dot(c, nx + H * 0.02, ny + H * 0.025, DARK.get(col, "ink0"))  # the knot
 
     def skull(self, c, hx, hy, r, look, p):
         """The gaunt's head: a stag's skull, muzzle forward, black sockets, antlers."""
@@ -426,13 +438,13 @@ class Figure:
                (hx - look * r * 1.0, hy)]
         c.poly(pts, "ash3", shade=("ash2", "bone", (0.4 * look, -1)))
         c.rect(hx + look * r * 0.1, hy - r * 0.25, max(1, r * 0.35), max(1, r * 0.3), "ink0")
-        c.put(hx + look * r * 1.4, hy + r * 0.45, "ink0")
+        dot(c, hx + look * r * 1.4, hy + r * 0.45, "ink0")
         if p.get("eyes"):
-            c.put(hx + look * r * 0.2, hy - r * 0.15, "ember2")
+            dot(c, hx + look * r * 0.2, hy - r * 0.15, "ember2")
         if self.med:
-            c.stroke(hx + look * r * 0.5, hy + r * 0.6, hx + look * r * 1.3, hy + r * 0.5, "ash1", 1)  # the jaw line
+            c.stroke(hx + look * r * 0.5, hy + r * 0.6, hx + look * r * 1.3, hy + r * 0.5, "ash1", UNIT)  # the jaw line
             for i in range(3):
-                c.put(hx + look * r * (0.7 + i * 0.3), hy + r * 0.75, "ash1")
+                dot(c, hx + look * r * (0.7 + i * 0.3), hy + r * 0.75, "ash1")
         for side in (-1, 1):
             bx, by = hx + side * r * 0.5, hy - r * 0.7
             t = max(1, H * 0.02)
@@ -560,11 +572,20 @@ NAMES = {"auk": "auk", "teal": "teal"}  # file names equal costume names
 
 
 def main(names):
+    global UNIT
+    unit = 1  # --unit 2: twice the pixels, into assets/sprites_x2 (engine/units.py)
+    if "--unit" in names:
+        i = names.index("--unit")
+        unit = int(names[i + 1])
+        names = names[:i] + names[i + 2:]
+    UNIT = unit
+    out_dir = OUT if unit == 1 else OUT.parent / f"sprites_x{unit}"
+    out_dir.mkdir(exist_ok=True)
     names = names or [n for n in COSTUMES]
     for name in names:
         for suffix, H in SIZES.items():
-            fig, states = build(name, H)
-            out = OUT / f"{name}{suffix}.yaml"
+            fig, states = build(name, H * unit)
+            out = out_dir / f"{name}{suffix}.yaml"
             fps = 6 if suffix == "" else 8
             if name == "gaunt":
                 fps = 4

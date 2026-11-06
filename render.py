@@ -19,6 +19,7 @@ import numpy as np
 import yaml
 from PIL import Image
 
+from engine import sprites, texture, units
 from engine.scene import Scene
 
 KEYS_PER_SCENE = 4
@@ -47,7 +48,8 @@ def render_scene(spec, cfg, out, keys_only=False):
             proc.stdin.write(frame.tobytes())
         if i in key_idx:
             p = out / "keys" / f"{spec['id']}_{len(keys)}.png"
-            Image.fromarray(frame).resize((W * 3, H * 3), Image.NEAREST).save(p)
+            k = max(1, 3 // cfg.get("unit", 1))
+            Image.fromarray(frame).resize((W * k, H * k), Image.NEAREST).save(p)
             keys.append((i / cfg["fps"], frame))
         elif keys_only and i > max(key_idx):
             break
@@ -61,7 +63,7 @@ def contact_sheet(rows, cfg, path):
     """rows: [(scene_id, [(t, frame), ...])] -> one PNG, a row per scene at 2x."""
     from PIL import ImageDraw
     W, H = cfg["resolution"]
-    s, pad, label = 2, 6, 14
+    s, pad, label = max(1, 2 // cfg.get("unit", 1)), 6, 14
     cols = max(len(k) for _, k in rows)
     sheet = Image.new("RGB", (pad + cols * (W * s + pad), pad + len(rows) * (H * s + pad + label)), (20, 19, 17))
     d = ImageDraw.Draw(sheet)
@@ -83,8 +85,11 @@ def main():
 
     ep = Path(args.episode)
     tl = yaml.safe_load(open(ep / "timeline.yaml"))
-    cfg = {"resolution": tl.get("resolution", [320, 180]), "fps": tl.get("fps", 12), "scale": tl.get("scale", 6), "texture": tl.get("texture", False),
-           "band": tl.get("band", 0)}
+    unit = int(tl.get("unit", 1))  # density: 2 = the 640 x 360 grid (engine/units.py)
+    sprites.UNIT = texture.UNIT = unit
+    cfg = {"resolution": tl.get("resolution", [320 * unit, 180 * unit]), "fps": tl.get("fps", 12),
+           "scale": tl.get("scale", 6 // unit), "texture": tl.get("texture", False),
+           "band": tl.get("band", 0) * unit, "unit": unit}
     out = Path("out") / ep.name
     for sub in ("scenes", "keys"):
         (out / sub).mkdir(parents=True, exist_ok=True)
@@ -93,7 +98,7 @@ def main():
     rows = []
     for spec in scenes:
         print(f"rendering {spec['id']}")
-        rows.append((spec["id"], render_scene(spec, cfg, out, args.keys)))
+        rows.append((spec["id"], render_scene(units.scale_scene(spec, unit), cfg, out, args.keys)))
     contact_sheet(rows, cfg, out / "contact.png")
     print(f"contact sheet: {out / 'contact.png'}")
 

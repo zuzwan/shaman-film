@@ -2,8 +2,7 @@
 # size, through their moves, so the animation set can be judged in a scene.
 episode: ep00_cast_hd
 texture: true
-resolution: [320, 180]
-scale: 6
+unit: 2   # the dense trial: 640 x 360, upscaled x3 (engine/units.py)
 fps: 12
 band: 40
 

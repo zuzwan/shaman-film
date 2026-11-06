@@ -73,7 +73,7 @@ REGIONS = {
 ANGLES = {"eye": 0, "low": 22, "skyline": 14, "high": -34}
 
 
-def expand(backdrop, weather=None):
+def expand(backdrop, weather=None, unit=1):
     """Return (backdrop, weather) with the region preset filled in under the scene's own keys."""
     name = backdrop.get("region")
     if not name:
@@ -83,12 +83,12 @@ def expand(backdrop, weather=None):
     shape = _SHAPES[backdrop.get("shape", R["shape"])]
     base = {
         "sky": look["sky"],
-        "horizon": 130,
-        "layers": [{"color": col, "y": y, "amp": amp, "rough": r, "parallax": p}
+        "horizon": 130 * unit,
+        "layers": [{"color": col, "y": y * unit, "amp": amp * unit, "rough": r, "parallax": p}
                    for col, (y, amp, r, p) in zip(look["layers"], shape)],
-        "ground": {"color": look["ground"][0], "y": 152, "speckle": look["ground"][1]},
+        "ground": {"color": look["ground"][0], "y": 152 * unit, "speckle": look["ground"][1]},
     }
-    shift = backdrop.get("shift", ANGLES.get(backdrop.get("angle", "eye"), 0))
+    shift = backdrop.get("shift", ANGLES.get(backdrop.get("angle", "eye"), 0) * unit)
     if backdrop.get("angle") == "skyline":  # one hard ridge, figures stand on its crest
         base["layers"] = base["layers"][:2]
     for L in base["layers"]:

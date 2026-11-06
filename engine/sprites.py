@@ -26,6 +26,7 @@ import yaml
 from .palette import RGB
 
 _CACHE = {}
+UNIT = 1  # density (engine/units.py): 2 loads assets/sprites_x2/<name>.yaml, or doubles the base sprite
 
 
 class Sprite:
@@ -62,10 +63,21 @@ class Sprite:
 
 
 def load(name, root="assets/sprites"):
-    if name not in _CACHE:
-        with open(Path(root) / f"{name}.yaml") as f:
-            _CACHE[name] = Sprite(yaml.safe_load(f))
-    return _CACHE[name]
+    key = (name, UNIT)
+    if key not in _CACHE:
+        dense = Path(f"{root}_x{UNIT}") / f"{name}.yaml"
+        if UNIT > 1 and dense.exists():
+            with open(dense) as f:
+                _CACHE[key] = Sprite(yaml.safe_load(f))
+        else:
+            with open(Path(root) / f"{name}.yaml") as f:
+                spr = Sprite(yaml.safe_load(f))
+            if UNIT > 1:  # no dense version drawn yet: the base sprite, pixel-doubled
+                spr.anchor = (spr.anchor[0] * UNIT, spr.anchor[1] * UNIT)
+                for st, frames in spr.states.items():
+                    spr.states[st] = [(rgb.repeat(UNIT, 0).repeat(UNIT, 1), a.repeat(UNIT, 0).repeat(UNIT, 1)) for rgb, a in frames]
+            _CACHE[key] = spr
+    return _CACHE[key]
 
 
 def blit(canvas, rgb, alpha, x, y):

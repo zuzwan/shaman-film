@@ -21,11 +21,12 @@ _KINDS = {
 
 
 class Weather:
-    def __init__(self, spec, W, H, seed=11):
-        self.W, self.H = W, H
+    def __init__(self, spec, W, H, seed=11, unit=1):
+        self.W, self.H, self.u = W, H, unit
         self.kind = spec["type"]
         count, self.fall, self.colors, self.streak = _KINDS[self.kind]
-        n = int(count * spec.get("density", 0.5))
+        self.fall, self.streak = self.fall * unit, self.streak * unit
+        n = int(count * spec.get("density", 0.5) * unit * unit)
         self.wind = spec.get("wind", 0.0)
         rng = np.random.default_rng(seed)
         self.x0 = rng.uniform(0, W, n)
@@ -35,27 +36,28 @@ class Weather:
 
     def draw(self, canvas, t, cam_x):
         W, H = self.W, self.H
+        u = self.u
         d = self.depth
         if self.kind == "motes":
             # slow wandering, each blinks on its own cycle
-            x = (self.x0 + np.sin(t * 0.4 + self.phase) * 12 + t * self.wind * 8 - cam_x * d) % W
-            y = (self.y0 * 0.75 + 20 + np.cos(t * 0.5 + self.phase * 1.7) * 6) % H
+            x = (self.x0 + np.sin(t * 0.4 + self.phase) * 12 * u + t * self.wind * 8 * u - cam_x * d) % W
+            y = (self.y0 * 0.75 + 20 * u + np.cos(t * 0.5 + self.phase * 1.7) * 6 * u) % H
             on = np.sin(t * 2.2 + self.phase * 3) > 0.35
             for sel, col in ((on & (d > 0.6), self.colors[0]), (on & (d <= 0.6), self.colors[1])):
                 canvas[y[sel].astype(int), x[sel].astype(int)] = RGB[col]
             return
         if self.kind == "swarm":
             # a band of locusts streaming sideways, thickest mid-sky
-            x = (self.x0 + t * 70 * d * (1 + self.wind) - cam_x * d) % W
-            y = (H * 0.35 + (self.y0 - H / 2) * 0.45 + np.sin(t * 3 + self.phase) * 2) % H
+            x = (self.x0 + t * 70 * u * d * (1 + self.wind) - cam_x * d) % W
+            y = (H * 0.35 + (self.y0 - H / 2) * 0.45 + np.sin(t * 3 + self.phase) * 2 * u) % H
             for sel, col in ((d <= 0.65, self.colors[1]), (d > 0.65, self.colors[0])):
                 xi, yi = x[sel].astype(int), y[sel].astype(int)
                 canvas[yi, xi] = RGB[col]
                 canvas[yi, (xi - 1) % W] = RGB[col]
             return
         y = (self.y0 + t * self.fall * d) % H
-        sway = np.sin(t * 0.9 + self.phase) * 1.5 * (self.streak == 0)
-        x = (self.x0 + t * self.wind * 30 * d + sway - cam_x * d) % W
+        sway = np.sin(t * 0.9 + self.phase) * 1.5 * u * (self.streak == 0)
+        x = (self.x0 + t * self.wind * 30 * u * d + sway - cam_x * d) % W
         near = d > 0.65
         for sel, col in ((~near, self.colors[1]), (near, self.colors[0])):
             xi, yi = x[sel].astype(int), y[sel].astype(int)
