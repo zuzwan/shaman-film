@@ -100,6 +100,58 @@ def _paint(c, m, x, y, col, amount=1.0):
     c[y0:y1, x0:x1][sub] = RGB[col]
 
 
+# What stands behind the swarm card. The title owns the middle of the frame
+# (about x 60-260, y 50-125), so scenery keeps to the horizon, the edges and
+# the foreground. Pick one with `scenery:` in assets/show.yaml.
+SCENERY = {
+    "plain": {},
+    # river country at dusk: mill chimneys on the horizon, each with its smoke line
+    "mills": {"props": [
+        {"type": "moon", "pos": [276, 112], "r": 9, "halo": 26, "glow": 0.45, "color": "blood4",
+         "halo_color": "blood3", "maria": 0, "layer": -1, "parallax": 0},
+        {"type": "ruin", "pos": [22, 140], "width": 18, "height": 22, "arches": 1, "seed": 2, "color": "ink2", "layer": 0},
+        {"type": "smoke", "pos": [30, 119], "height": 70, "lean": 0.5, "color": "ash3", "seed": 1, "spread": 11, "layer": 0},
+        {"type": "ruin", "pos": [138, 141], "width": 14, "height": 14, "arches": 1, "seed": 5, "color": "ink2", "layer": 0},
+        {"type": "smoke", "pos": [144, 128], "height": 36, "lean": 0.9, "color": "ash2", "seed": 2, "spread": 8, "layer": 0},
+        {"type": "ruin", "pos": [282, 142], "width": 20, "height": 26, "arches": 1, "seed": 7, "color": "ink2", "layer": 0},
+        {"type": "smoke", "pos": [292, 117], "height": 75, "lean": 0.4, "color": "ash3", "seed": 3, "spread": 11, "layer": 0},
+        {"type": "gnats", "pos": [80, 168], "columns": 2, "spread": 60, "height": 34, "count": 26, "seed": 4},
+        {"type": "gnats", "pos": [236, 170], "columns": 2, "spread": 50, "height": 30, "count": 22, "seed": 9},
+        {"type": "grass", "height": 9, "color": "ink0", "seed": 3, "layer": "front"}]},
+    # a dead orchard framing the card, marsh lights low in the rows
+    "orchard": {"props": [
+        {"type": "moon", "pos": [160, 150], "r": 11, "halo": 30, "glow": 0.4, "color": "blood4",
+         "halo_color": "blood3", "maria": 0, "layer": -1, "parallax": 0},
+        {"type": "tree", "pos": [92, 150], "height": 26, "seed": 21, "color": "ink2", "thick": 1, "depth": 5, "layer": 1},
+        {"type": "tree", "pos": [214, 150], "height": 24, "seed": 22, "color": "ink2", "thick": 1, "depth": 5, "layer": 1},
+        {"type": "tree", "pos": [128, 152], "height": 18, "seed": 23, "color": "ink2", "thick": 1, "depth": 4, "layer": 1},
+        {"type": "tree", "pos": [22, 178], "height": 120, "seed": 11, "color": "ink0", "thick": 5, "depth": 7},
+        {"type": "tree", "pos": [300, 178], "height": 110, "seed": 12, "color": "ink0", "thick": 5, "depth": 7},
+        {"type": "wanderlight", "pos": [160, 160], "count": 3, "spread": [160, 10], "color": "ash4", "seed": 2},
+        {"type": "gnats", "pos": [160, 166], "columns": 3, "spread": 140, "height": 30, "count": 24, "seed": 3},
+        {"type": "grass", "height": 12, "color": "ink0", "seed": 5, "layer": "front"}]},
+    # the glass towns on the skyline: broken arcades against a low sun, gnats rising
+    "towers": {"props": [
+        {"type": "moon", "pos": [196, 128], "r": 13, "halo": 34, "glow": 0.5, "color": "blood4",
+         "halo_color": "blood3", "maria": 0, "layer": -1, "parallax": 0},
+        {"type": "ruin", "pos": [0, 150], "width": 46, "height": 70, "arches": 2, "seed": 3, "color": "ink1", "layer": 0},
+        {"type": "ruin", "pos": [52, 146], "width": 30, "height": 30, "arches": 2, "seed": 4, "color": "ink2", "layer": 0},
+        {"type": "ruin", "pos": [120, 146], "width": 40, "height": 22, "arches": 3, "seed": 6, "color": "ink2", "layer": 0},
+        {"type": "ruin", "pos": [230, 146], "width": 34, "height": 34, "arches": 2, "seed": 8, "color": "ink2", "layer": 0},
+        {"type": "ruin", "pos": [272, 152], "width": 48, "height": 82, "arches": 3, "seed": 9, "color": "ink1", "layer": 0},
+        {"type": "gnats", "pos": [160, 170], "columns": 4, "spread": 220, "height": 44, "count": 30, "seed": 6}]},
+    # a camp far off on the plain: a fire, its smoke, two sitting, the dead tree they chose
+    "camp": {"props": [
+        {"type": "tree", "pos": [252, 156], "height": 50, "seed": 4, "color": "ink1", "thick": 2, "depth": 6},
+        {"type": "fire", "pos": [232, 156], "size": 0.6},
+        {"type": "smoke", "pos": [232, 148], "height": 90, "lean": 0.45, "color": "ash3", "seed": 5, "spread": 10},
+        {"type": "grass", "height": 10, "color": "ink0", "seed": 8, "layer": "front"}],
+        "actors": [{"sprite": "auk", "state": "sit", "path": [[247, 157]], "flip": True, "breathe": 4},
+                   {"sprite": "teal", "state": "sit", "path": [[216, 158]], "breathe": 3, "phase": 1.1}],
+        "lights": [{"pos": [232, 152], "radius": 22, "color": "ember0", "intensity": 0.55, "flicker": True}]},
+}
+
+
 class Layout:
     """Where the lettering sits: THE over SHAMAN, centred, with rules and a device."""
 
@@ -154,9 +206,13 @@ class Intro(Scene):
             (a["region"] for a in s.get("acts", []) if a["episodes"][0] <= ep <= a["episodes"][1]), "river")
         self.style = intro.get("style", s.get("style", "swarm"))
         self.ep = ep
+        self.scenery = intro.get("scenery", s.get("scenery", "plain"))
+        sc = SCENERY[self.scenery]
         sp = {"id": "s00_intro", "duration": INTRO_LENGTH, "band": 0,
-              "backdrop": {"region": region, "time": "dusk", "seed": 131, "angle": "low"},
-              "weather": "none"}
+              "backdrop": {"region": region, "time": "dusk", "seed": 131, "angle": "low",
+                           "props": sc.get("props", [])},
+              "weather": sc.get("weather", "none"),
+              "actors": sc.get("actors", []), "lights": sc.get("lights", [])}
         super().__init__(sp, cfg)
         self.L = Layout(s["title"], self.W, self.H)
         self.inl = inline(self.L.full)
