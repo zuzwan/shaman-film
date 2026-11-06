@@ -1,70 +1,228 @@
-# A rig: salvaged nervous-system reader on a handcart. Storage cells on top,
-# cable coil at the back, read-cell glows ember when it hums.
+# The rig, per the world bible: a salvaged machine worshipped as a totem.
+# Two columns of seven carved face-housings, one storage cell each. Auk's rig:
+# 14 slots, 12 filled, 2 blank (bottom right, raw wood). Crank and leads at the base.
+# States: idle (dark, a dead rig is a carved pole), hum (charged: eyes glow),
+# capture (the last blank face flares as it takes an animal).
 name: rig
-anchor: [8, 14]
-fps: 2
+anchor: [8, 27]
+fps: 3
 legend:
-  c: ash0
-  C: ash2
-  b: rust0
-  B: rust1
-  m: ink2
-  M: ash1
-  g: ember1
-  G: ember0
-  q: ink2
-  h: ink1
-  H: ash1
-  w: ink1
-  W: ash1
+  p: ink2
+  w: rust0
+  W: rust1
+  b: ash2
+  B: ash3
+  e: ink0
+  m: ink1
+  l: ember1
+  L: ember2
+  c: ash2
+  f: flame
+  F: ember2
 states:
   idle:
     - |
-      ...CC.CC.CC......
-      ..CccCccCccC.....
-      ..Cbbbbbbbbc.....
-      ..Cbmmmmmmbc..qq.
-      ..CbmGGmmmbc.q..q
-      ..CbmGGmmmbc.q..q
-      ..Cbmmmmmmbc..qq.
-      ..Cbbbbbbbbc.....
-      ..Cccccccccc.....
-      HHhhhhhhhhhhHHHHH
-      ..Www.....Www....
-      .W...W...W...W...
-      .W.W.W...W.W.W...
-      .W...W...W...W...
-      ..WWW.....WWW....
+      ........p.........
+      .......ppp........
+      ........p.........
+      ..WWWWWW.W.WWWW.W.
+      .wewwwwewwewwwwew.
+      .wwwmmwwwwmwmmwmw.
+      .WW.WW.WW.WWWWWW..
+      .wewwwwewweewweew.
+      .wwmmmmwwwwwmmwww.
+      ..WWWWWW.WWWWWWWW.
+      .wwewwewwwwewweww.
+      .wwwmwwwwwmmmmmmw.
+      .W.WWWW.W.W.WW.W..
+      .wewwwwewwewwwwew.
+      .wmwmmwmwwwmwwmww.
+      ..WWWWWW..WWWWWW..
+      .weewweewwewwwwew.
+      .wwwmmwwwwwwmmwww.
+      .WWWWWWWW.BBBBBB..
+      .wwewwewwbbbbbbbb.
+      .wmmmmmmwbbbbbbbb.
+      ..W.WW.W..BBBBBB..
+      .wewwwwewbbbbbbbb.
+      .wwmwwmwwbbbbbbbb.
+      ........pp........
+      ........pp..c.....
+      .......pppp.cc....
+      ......pppppp......
   hum:
     - |
-      ...CC.CC.CC......
-      ..CccCccCccC.....
-      ..Cbbbbbbbbc.....
-      ..Cbmmmmmmbc..qq.
-      ..Cbmggmmmbc.q..q
-      ..Cbmggmmmbc.q..q
-      ..Cbmmmmmmbc..qq.
-      ..Cbbbbbbbbc.....
-      ..Cccccccccc.....
-      HHhhhhhhhhhhHHHHH
-      ..Www.....Www....
-      .W...W...W...W...
-      .W.W.W...W.W.W...
-      .W...W...W...W...
-      ..WWW.....WWW....
+      ........p.........
+      .......ppp........
+      ........p.........
+      ..WWWWWW.W.WWWW.W.
+      .wlwwwwlwwlwwwwlw.
+      .wwwmmwwwwmwmmwmw.
+      .WW.WW.WW.WWWWWW..
+      .wlwwwwlwwllwwllw.
+      .wwmmmmwwwwwmmwww.
+      ..WWWWWW.WWWWWWWW.
+      .wwlwwlwwwwlwwlww.
+      .wwwmwwwwwmmmmmmw.
+      .W.WWWW.W.W.WW.W..
+      .wlwwwwlwwlwwwwlw.
+      .wmwmmwmwwwmwwmww.
+      ..WWWWWW..WWWWWW..
+      .wllwwllwwlwwwwlw.
+      .wwwmmwwwwwwmmwww.
+      .WWWWWWWW.BBBBBB..
+      .wwlwwlwwbbbbbbbb.
+      .wmmmmmmwbbbbbbbb.
+      ..W.WW.W..BBBBBB..
+      .wlwwwwlwbbbbbbbb.
+      .wwmwwmwwbbbbbbbb.
+      ........pp........
+      ........pp..c.....
+      .......pppp.cc....
+      ......pppppp......
     - |
-      ...CC.CC.CC......
-      ..CccCccCccC.....
-      ..Cbbbbbbbbc.....
-      ..Cbmmmmmmbc..qq.
-      ..CbmGGmmmbc.q..q
-      ..CbmGGmmmbc.q..q
-      ..Cbmmmmmmbc..qq.
-      ..Cbbbbbbbbc.....
-      ..Cccccccccc.....
-      HHhhhhhhhhhhHHHHH
-      ..Www.....Www....
-      .W...W...W...W...
-      .W.W.W...W.W.W...
-      .W...W...W...W...
-      ..WWW.....WWW....
+      ........p.........
+      .......ppp........
+      ........p.........
+      ..WWWWWW.W.WWWW.W.
+      .wLwwwwLwwLwwwwLw.
+      .wwwmmwwwwmwmmwmw.
+      .WW.WW.WW.WWWWWW..
+      .wLwwwwLwwLLwwLLw.
+      .wwmmmmwwwwwmmwww.
+      ..WWWWWW.WWWWWWWW.
+      .wwLwwLwwwwLwwLww.
+      .wwwmwwwwwmmmmmmw.
+      .W.WWWW.W.W.WW.W..
+      .wLwwwwLwwLwwwwLw.
+      .wmwmmwmwwwmwwmww.
+      ..WWWWWW..WWWWWW..
+      .wLLwwLLwwLwwwwLw.
+      .wwwmmwwwwwwmmwww.
+      .WWWWWWWW.BBBBBB..
+      .wwLwwLwwbbbbbbbb.
+      .wmmmmmmwbbbbbbbb.
+      ..W.WW.W..BBBBBB..
+      .wLwwwwLwbbbbbbbb.
+      .wwmwwmwwbbbbbbbb.
+      ........pp........
+      ........pp..c.....
+      .......pppp.cc....
+      ......pppppp......
+  capture:
+    - |
+      ........p.........
+      .......ppp........
+      ........p.........
+      ..WWWWWW.W.WWWW.W.
+      .wewwwwewwewwwwew.
+      .wwwmmwwwwmwmmwmw.
+      .WW.WW.WW.WWWWWW..
+      .wewwwwewweewweew.
+      .wwmmmmwwwwwmmwww.
+      ..WWWWWW.WWWWWWWW.
+      .wwewwewwwwewweww.
+      .wwwmwwwwwmmmmmmw.
+      .W.WWWW.W.W.WW.W..
+      .wewwwwewwewwwwew.
+      .wmwmmwmwwwmwwmww.
+      ..WWWWWW..WWWWWW..
+      .weewweewwewwwwew.
+      .wwwmmwwwwwwmmwww.
+      .WWWWWWWW.BBBBBB..
+      .wwewwewwbbbbbbbb.
+      .wmmmmmmwbbbbbbbb.
+      ..W.WW.W..BBBBBB..
+      .wewwwwewbfbbbbfb.
+      .wwmwwmwwbbbFFbbb.
+      ........pp........
+      ........pp..c.....
+      .......pppp.cc....
+      ......pppppp......
+    - |
+      ........p.........
+      .......ppp........
+      ........p.........
+      ..WWWWWW.W.WWWW.W.
+      .wewwwwewwewwwwew.
+      .wwwmmwwwwmwmmwmw.
+      .WW.WW.WW.WWWWWW..
+      .wewwwwewweewweew.
+      .wwmmmmwwwwwmmwww.
+      ..WWWWWW.WWWWWWWW.
+      .wwewwewwwwewweww.
+      .wwwmwwwwwmmmmmmw.
+      .W.WWWW.W.W.WW.W..
+      .wewwwwewwewwwwew.
+      .wmwmmwmwwwmwwmww.
+      ..WWWWWW..WWWWWW..
+      .weewweewwewwwwew.
+      .wwwmmwwwwwwmmwww.
+      .WWWWWWWW.BBBBBB..
+      .wwewwewwbbbbbbbb.
+      .wmmmmmmwbbbbbbbb.
+      ..W.WW.W..BBBBBB..
+      .wewwwwewbbbbbbbb.
+      .wwmwwmwwbbbbbbbb.
+      ........pp........
+      ........pp..c.....
+      .......pppp.cc....
+      ......pppppp......
+    - |
+      ........p.........
+      .......ppp........
+      ........p.........
+      ..WWWWWW.W.WWWW.W.
+      .wewwwwewwewwwwew.
+      .wwwmmwwwwmwmmwmw.
+      .WW.WW.WW.WWWWWW..
+      .wewwwwewweewweew.
+      .wwmmmmwwwwwmmwww.
+      ..WWWWWW.WWWWWWWW.
+      .wwewwewwwwewweww.
+      .wwwmwwwwwmmmmmmw.
+      .W.WWWW.W.W.WW.W..
+      .wewwwwewwewwwwew.
+      .wmwmmwmwwwmwwmww.
+      ..WWWWWW..WWWWWW..
+      .weewweewwewwwwew.
+      .wwwmmwwwwwwmmwww.
+      .WWWWWWWW.BBBBBB..
+      .wwewwewwbbbbbbbb.
+      .wmmmmmmwbbbbbbbb.
+      ..W.WW.W..BBBBBB..
+      .wewwwwewbfbbbbfb.
+      .wwmwwmwwbbbFFbbb.
+      ........pp........
+      ........pp..c.....
+      .......pppp.cc....
+      ......pppppp......
+    - |
+      ........p.........
+      .......ppp........
+      ........p.........
+      ..WWWWWW.W.WWWW.W.
+      .wewwwwewwewwwwew.
+      .wwwmmwwwwmwmmwmw.
+      .WW.WW.WW.WWWWWW..
+      .wewwwwewweewweew.
+      .wwmmmmwwwwwmmwww.
+      ..WWWWWW.WWWWWWWW.
+      .wwewwewwwwewweww.
+      .wwwmwwwwwmmmmmmw.
+      .W.WWWW.W.W.WW.W..
+      .wewwwwewwewwwwew.
+      .wmwmmwmwwwmwwmww.
+      ..WWWWWW..WWWWWW..
+      .weewweewwewwwwew.
+      .wwwmmwwwwwwmmwww.
+      .WWWWWWWW.BBBBBB..
+      .wwewwewwbbbbbbbb.
+      .wmmmmmmwbbbbbbbb.
+      ..W.WW.W..BBBBBB..
+      .wewwwwewbfbbbbfb.
+      .wwmwwmwwbbbFFbbb.
+      ........pp........
+      ........pp..c.....
+      .......pppp.cc....
+      ......pppppp......

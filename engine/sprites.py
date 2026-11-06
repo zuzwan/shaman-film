@@ -78,3 +78,13 @@ def blit(canvas, rgb, alpha, x, y):
         return
     sa = alpha[y0 - y:y1 - y, x0 - x:x1 - x]
     canvas[y0:y1, x0:x1][sa] = rgb[y0 - y:y1 - y, x0 - x:x1 - x][sa]
+
+
+def blit_mask(m, alpha, x, y):
+    """Mark a sprite's opaque pixels in a boolean mask, clipped like blit."""
+    H, W = m.shape
+    h, w = alpha.shape
+    x0, y0 = max(0, x), max(0, y)
+    x1, y1 = min(W, x + w), min(H, y + h)
+    if x0 < x1 and y0 < y1:
+        m[y0:y1, x0:x1] |= alpha[y0 - y:y1 - y, x0 - x:x1 - x]
