@@ -92,6 +92,9 @@ class Scene:
             spec = shotlist.resolve(spec, spec, cfg["fps"])
             self.spec = spec
         self.shots = []
+        if spec.get("shots") and any("cards" in sh for sh in spec["shots"]):
+            spec = hoist_cards(spec, self.W, self.band)
+            self.spec = spec
         if spec.get("shots"):
             t = 0.0
             for shot in spec["shots"]:
@@ -429,12 +432,49 @@ class Scene:
             yield i, self.render(i / self.fps, i)
 
 
+def hoist_cards(spec, W, band):
+    """Cards written on a shot play over that shot: the first starts 0.3 s in, the rest
+    follow, and a shot with no duration lasts as long as its cards take to read."""
+    spec = dict(spec)
+    cards = list(spec.get("cards", []))
+    shots, t = [], 0.0
+    for sh in spec["shots"]:
+        sh = dict(sh)
+        own = sh.pop("cards", None) or []
+        if own:
+            if "duration" not in sh and not _hold_in(sh):
+                sh["duration"] = round(max(sh.get("min", 1.5), subtitles.total_time(own, 0.3, sh.get("tail", 0.6), W, band)), 2)
+            own = [dict(c) for c in own]
+            own[0].setdefault("at", round(t + 0.3, 2))
+            cards += own
+        shots.append(sh)
+        d = sh.get("duration")
+        if d is None:
+            d = _hold_in(sh) or 1.0
+        t += d
+    spec["shots"], spec["cards"] = shots, cards
+    return spec
+
+
+def _hold_in(sh):
+    """A hold written in the shot's vocabulary string ('... · 2s' or '6f'), in seconds."""
+    if isinstance(sh.get("shot"), str):
+        v = shotlist.parse(sh["shot"])
+        if "hold" in v:
+            return v["hold"]
+        if "hold_frames" in v:
+            return v["hold_frames"] / 12
+    return None
+
+
 def merge_shot(spec, shot):
     """The scene's spec with one shot laid over it (see module docstring)."""
     base = {k: v for k, v in spec.items()
             if k not in ("shots", "panels", "cards", "captions", "transition_in", "transition_out",
                          "duration", "id", "shot")}
     out = copy.deepcopy(base)
+    if shot.get("backdrop", {}).get("plain") and "actors" not in shot and "set" not in shot:
+        out["actors"] = []  # an insert on its own plain ground shows only what it lists
     shot = shotlist.resolve(shot, base)
     for k, v in shot.items():
         if k == "camera":

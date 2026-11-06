@@ -1,0 +1,1590 @@
+# EP01 "Here": the pilot. From /mnt/project-files/storyboard/episodes/ep01.md (26 scenes).
+# Drafted with tools/script2timeline.py, then cut by hand: every scene is a shot list,
+# shots carry their own cards, and `sound` / `sfx` cue the effects (engine/audio.py).
+# `music` notes go to out/ep01/cues.yaml for the score after picture lock.
+episode: ep01
+resolution: [320, 180]
+scale: 6
+fps: 12
+band: 40
+intro: {episode: 1}
+
+scenes:
+# ---------------------------------------------------------------- SC01 sleeping standing
+- id: sc01_sleeping_standing
+  title: Sleeping standing
+  transition_in: {duration: 0.6}
+  music: {cue: 1M1 "Here" (cold open), in: 0.0, mood: "near silence; one low drone under the valve, nothing melodic until the match cut", out: end}
+  backdrop: {region: river, time: night, seed: 4}
+  weather: none
+  sound:
+    bed: [crickets, {river: 0.35}]
+    events:
+      - {at: 0.3, fx: ratchet, n: 3, gain: 1.2}
+      - {at: 1.9, fx: valve, dur: 2.5, gain: 0.9}
+      - {at: 6.0, fx: breath, dur: 4.5, rate: 0.28, gain: 0.8}
+  actors:
+    - {id: face, sprite: rig_face, state: dark, path: [[160, 150]], hidden: true}
+  shots:
+    - shot: insert · eye · static
+      duration: 1.6
+      backdrop: {plain: true, sky: [ink0], props: []}
+    - shot: insert · eye · static
+      duration: 1.2
+      backdrop: {plain: true, sky: [ink0], props: []}
+      set: {face: {hidden: false, state: wake}}
+      lights: [{pos: [160, 112], radius: 30, color: ember0, intensity: 0.5}]
+    - shot: insert · eye · static
+      duration: 1.4
+      backdrop: {plain: true, sky: [ink0], props: []}
+      set: {face: {hidden: false, state: lit}}
+      lights: [{pos: [160, 112], radius: 40, color: ember1, intensity: 0.6, pulse: 3}]
+    - shot: close · eye · static
+      duration: 3
+      camera: {zoom: [2, 1], focus: [160, 110], ease: smooth}
+      backdrop:
+        plain: true
+        sky: [night0, night1]
+        props:
+          - {type: stars, count: 50, y: 120}
+          - {type: faces, pos: [160, 168], n: 5, size: 0.9, light: [0, 0.01]}
+      lights: [{pos: [160, 110], radius: 70, color: ember0, intensity: 0.35, pulse: 3}]
+    - shot: wide · eye · static
+      duration: 4.5
+      backdrop:
+        props:
+          - {type: stars, count: 60, y: 110, layer: -1}
+          - {type: moon, pos: [268, 70], r: 5, halo: 14, layer: -1, parallax: 0}
+          - {type: water, y: [128, 133], color: night2, shine: night3, flow: 2, layer: 0}
+          - {type: slab, rect: [182, 152, 12, 2], color: ink0}
+          - {type: frost, y: 150, count: 70}
+          - {type: willow, x: 0, width: 330, depth: 110, layer: front, canopy: 44}
+          - {type: tree, pos: [40, 156], height: 80, seed: 4, color: ink0, thick: 3, depth: 6}
+          - {type: tree, pos: [290, 156], height: 70, seed: 8, color: ink0, thick: 3, depth: 6}
+      actors:
+        - {id: rig, sprite: rig, state: hum, path: [[168, 154]]}
+        - {id: auk, sprite: auk, med: auk_med, state: doze, path: [[196, 154]], flip: true, breathe: 4, fps: 1}
+        - {id: teal, sprite: teal, med: teal_med, state: sit_doze, path: [[150, 155]], breathe: 3.4, phase: 1.1, fps: 1}
+      lights: [{pos: [168, 128], radius: 26, color: ember0, intensity: 0.5, pulse: 3}]
+
+# ---------------------------------------------------------------- SC02 the levee road
+- id: sc02_the_levee_road
+  title: The levee road
+  music: {cue: 1M2 "The levee", in: 0.0, mood: "the theme's first statement: a slow walking figure, sparse, under the narration", out: end}
+  backdrop:
+    region: river
+    time: dusk
+    seed: 7
+    props:
+      - {type: sun, pos: [160, 112], r: 8, halo: 30, streak: 136, layer: -1}
+      - {type: smoke, pos: [58, 124], height: 46, lean: 0.25, color: ash1, layer: 0, parallax: 0.15}
+      - {type: smoke, pos: [212, 125], height: 38, lean: 0.3, color: ash1, seed: 2, layer: 0, parallax: 0.15}
+      - {type: smoke, pos: [286, 124], height: 52, lean: 0.2, color: ash1, seed: 4, layer: 0, parallax: 0.15}
+      - {type: fields, y: [132, 180], furrow: ink2, shine: rust1}
+      - {type: levee, y: 126, height: 7, color: ink2, top: rust1, snow: ash3}
+  weather: {type: ash, density: 0.2, wind: 0.2}
+  sound:
+    bed: [wind, gnats, {wheel: 0.25}]
+  actors:
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: walk, path: [[70, 126], [190, 126]], bob: 1, fps: 5}
+    - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[48, 126], [168, 126]], bob: 1, phase: 0.3, fps: 5}
+  shots:
+    - shot: extreme-wide · eye · static
+      duration: 2
+      set: {auk: {hidden: true}, teal: {hidden: true}}
+    - shot: extreme-wide · eye · static
+      duration: 4
+      set: {auk: {t: [0, 12]}, teal: {t: [0, 12]}}
+    - shot: wide · high · static
+      backdrop:
+        props:
+          - {type: water, y: [40, 180], color: rust1, shine: ember0, flow: 0.5, deep: rust0}
+          - {type: line, points: [[0, 100], [320, 96]], color: ink2, thick: 2}
+          - {type: line, points: [[0, 140], [320, 134]], color: ink2, thick: 3}
+          - {type: gnats, pos: [80, 150], columns: 5, spread: 110, height: 90, count: 70, color: ink0}
+          - {type: gnats, pos: [230, 170], columns: 4, spread: 90, height: 100, count: 70, color: ink0, seed: 3}
+          - {type: gnats, pos: [160, 110], columns: 3, spread: 120, height: 60, count: 50, color: ink1, seed: 5}
+      set: {auk: {hidden: true}, teal: {hidden: true}}
+      cards:
+        - {narration: "The hundred-and-thirty-first year after the Quiet. I was nineteen, and I did his talking."}
+    - shot: medium · low · auk · track
+      backdrop:
+        props:
+          - {type: sun, pos: [250, 120], r: 8, halo: 30, layer: -1}
+          - {type: fields, y: [174, 180]}
+          - {type: grass, y: 180, height: 10, layer: front, parallax: 1.5, seed: 3, color: ink1}
+      set: {auk: {path: [[60, 174], [200, 174]]}, teal: {path: [[30, 174], [170, 174]]}}
+      cards:
+        - {narration: "He hadn't answered me in about a year. I talked anyway. It made the road shorter."}
+
+# ---------------------------------------------------------------- SC03 under the footbridge
+- id: sc03_under_the_footbridge
+  title: Under the footbridge
+  backdrop:
+    plain: true
+    sky: [sky1, sky2, sky3]
+    props: []
+  weather: none
+  sound:
+    bed: [{river: 0.5}, {wind: 0.3}]
+    events:
+      - {at: 2.2, fx: creak, dur: 0.9, base: 70}
+      - {at: 3.4, fx: creak, dur: 0.7, base: 60}
+      - {at: 4.8, fx: creak, dur: 1.0, base: 75}
+      - {at: 7.0, fx: creak, dur: 0.8, base: 65}
+      - {at: 9.0, fx: creak, dur: 0.6, base: 80}
+  actors:
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: walk, path: [[-30, 112], [350, 112]], t: [0, 7], fps: 5, steps: false}
+    - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[-20, 112], [340, 112]], t: [5, 11], fps: 5, steps: false}
+  shots:
+    - shot: wide · low · static
+      duration: 2
+      backdrop:
+        props:
+          - {type: slab, rect: [0, 40, 320, 140], color: ink0, layer: front}
+          - {type: slab, rect: [70, 40, 8, 140], color: sky2, layer: front}
+          - {type: slab, rect: [158, 40, 8, 140], color: sky3, layer: front}
+          - {type: slab, rect: [246, 40, 8, 140], color: sky2, layer: front}
+    - shot: wide · low · static
+      duration: 4
+      panel_bg: ink0
+      panels:
+        - {rect: [30, 6, 70, 128], at: 0.0, window: [130, 30], set: {auk: {path: [[60, 160], [260, 160]], t: [0, 4], scale: 2}}}
+        - {rect: [125, 6, 70, 128], at: 1.2, window: [125, 30], set: {auk: {path: [[60, 160], [260, 160]], t: [-1.5, 2.5], scale: 2}}}
+        - {rect: [220, 6, 70, 128], at: 2.4, window: [125, 30], set: {auk: {path: [[60, 160], [260, 160]], t: [-3, 1], scale: 2}}}
+    - shot: close · low · static
+      duration: 2.2
+      camera: {pan: [0, 60]}
+      backdrop:
+        plain: true
+        sky: [sky2, sky3]
+        props:
+          - {type: faces, pos: [120, 160], n: 3, size: 1.0}
+          - {type: slab, rect: [0, 40, 320, 30], color: ink0, layer: front, parallax: 0}
+          - {type: slab, rect: [0, 150, 320, 30], color: ink0, layer: front, parallax: 0}
+    - shot: wide · low · static
+      duration: 4
+      backdrop:
+        props:
+          - {type: slab, rect: [0, 112, 320, 68], color: ink0, layer: front}
+          - {type: slab, rect: [0, 40, 320, 10], color: ink0, layer: front}
+      set: {auk: {t: [-4, 3]}, teal: {t: [0, 6]}}
+    - shot: wide · eye · static
+      backdrop:
+        plain: false
+        region: river
+        time: dusk
+        sky: [sky1, sky2, sky3]
+        props:
+          - {type: water, y: [140, 180], color: cold0, shine: cold1, flow: 0.4}
+          - {type: reeds, x: [0, 320], y: 142, height: 22, color: ash1, density: 0.8}
+          - {type: slab, rect: [196, 120, 6, 22], color: bone, rim: bone_hi}
+          - {type: slab, rect: [0, 40, 320, 14], color: ink0, layer: front}
+          - {type: stripes, rect: [0, 54, 320, 126], period: 34, width: 5, slant: 0.0, color: ash3, amount: 0.2}
+      set: {auk: {hidden: true}, teal: {hidden: true}}
+      cards:
+        - {narration: "Twelve faces. Two blank. He'd carried that pole longer than I'd been alive."}
+
+# ---------------------------------------------------------------- SC04 the hamlet gate
+- id: sc04_the_hamlet_gate
+  title: The hamlet gate
+  backdrop:
+    region: river
+    time: dusk
+    seed: 12
+    props:
+      - {type: wall, x: [0, 320], top: 86, base: 152, kind: mud, gate: {x: 176, w: 34, h: 46, kind: bar}, slot: [146, 126], post: 214}
+      - {type: waterstone, pos: [104, 152], bowl: full}
+      - {type: gnats, pos: [60, 150], columns: 2, spread: 40, height: 30, count: 25}
+  weather: {type: ash, density: 0.18, wind: 0.2}
+  sound:
+    bed: [gnats, {wind: 0.4}]
+  actors:
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: idle, path: [[96, 152]], breathe: 4}
+    - {id: teal, sprite: teal, med: teal_med, state: idle, path: [[138, 152]], breathe: 3, phase: 0.8}
+  shots:
+    - {shot: wide · eye · static, duration: 2.4}
+    - shot: insert · high · static
+      duration: 3
+      backdrop: {plain: true, sky: [ink1], props: [{type: bowl, pos: [160, 112], r: 52}]}
+      sfx: [{at: 0.6, fx: splash, dur: 0.3, size: 0.3, gain: 0.3}, {at: 1.6, fx: splash, dur: 0.3, size: 0.3, gain: 0.3}]
+    - shot: medium · over-shoulder · static
+      camera: {focus: [150, 128], zoom: [2, 3]}
+      set: {teal: {state: talk}}
+      cards:
+        - {speaker: teal, text: "Water's taken, and thank you. News for it: the relisting column is up at Hollin Mill."}
+    - shot: close · framed · static
+      backdrop: {plain: true, sky: [ash1], props: [{type: eye_slot, pos: [160, 110], w: 220, h: 56}]}
+      cards:
+        - {speaker: woman, note: behind the gate, text: "Then they're counting nobody. Hollin went over at the turn of the month."}
+        - {speaker: woman, note: behind the gate, text: "You got meal? Cricket, bean, anything. No? Then piss off and take him with you."}
+    - shot: insert · eye · static
+      duration: 3
+      backdrop: {plain: true, sky: [ash1], props: [{type: slab, rect: [0, 92, 60, 36], color: ink0}, {type: hand, pos: [96, 112], size: 1.4}]}
+    - shot: close · eye · static
+      duration: 3
+      backdrop: {plain: true, sky: [ash0, ash1], props: []}
+      actors: [{id: tc, sprite: teal_close, state: look_down, path: [[176, 180]], breathe: 3}]
+    - shot: insert · eye · static
+      duration: 1.4
+      backdrop: {plain: true, sky: [ash1], props: [{type: slab, rect: [0, 92, 60, 36], color: ink0}, {type: hand, pos: [96, 112], size: 1.4, cake: true}]}
+    - shot: insert · eye · static
+      duration: 1.6
+      backdrop: {plain: true, sky: [ash1], props: [{type: slab, rect: [0, 92, 60, 36], color: ink0}]}
+      sfx: [{at: 0.5, fx: bar_drop}]
+
+# ---------------------------------------------------------------- SC05 the towpath
+- id: sc05_the_towpath
+  title: The towpath
+  backdrop:
+    region: river
+    time: day
+    seed: 3
+    angle: high
+    props:
+      - {type: water, y: [60, 150], color: cold1, shine: cold2, flow: 3, deep: cold0}
+      - {type: slab, rect: [190, 104, 54, 8], color: ink2, rim: rust0}
+      - {type: slab, rect: [196, 98, 10, 6], color: ash4}
+      - {type: slab, rect: [210, 98, 10, 6], color: ash4}
+      - {type: slab, rect: [224, 98, 10, 6], color: ash4}
+      - {type: line, points: [[192, 106], [40, 158]], color: ash3, thick: 1, creep: 8}
+      - {type: slab, rect: [0, 150, 320, 30], color: rust0}
+  weather: {type: ash, density: 0.15, wind: 0.2}
+  sound:
+    bed: [rope, {gnats: 0.3}]
+  actors:
+    - {id: h1, sprite: hauler, med: hauler_med, state: haul, path: [[60, 168], [34, 168]], flip: true, fps: 4, steps: false}
+    - {id: h2, sprite: hauler, med: hauler_med, state: haul, path: [[84, 168], [58, 168]], flip: true, fps: 4, phase: 0.4, steps: false}
+    - {id: h3, sprite: hauler, med: hauler_med, state: haul, path: [[108, 168], [82, 168]], flip: true, fps: 4, phase: 0.9, steps: false}
+    - {id: h4, sprite: hauler, med: hauler_med, state: haul, path: [[132, 168], [106, 168]], flip: true, fps: 4, phase: 0.2, steps: false}
+    - {id: h5, sprite: hauler, med: hauler_med, state: haul, path: [[156, 168], [130, 168]], flip: true, fps: 4, phase: 0.7, steps: false}
+    - {id: h6, sprite: hauler, med: hauler_med, state: haul, path: [[180, 168], [154, 168]], flip: true, fps: 4, phase: 1.1, steps: false}
+  shots:
+    - {shot: extreme-wide · high · static, duration: 3}
+    - shot: wide · high · static
+      duration: 2.4
+      backdrop:
+        props:
+          - {type: water, y: [40, 180], color: cold1, shine: cold2, flow: 3, deep: cold0}
+          - {type: back, pos: [190, 110], at: 0.2, dur: 2.0, length: 80, height: 9}
+      set: {h1: {hidden: true}, h2: {hidden: true}, h3: {hidden: true}, h4: {hidden: true}, h5: {hidden: true}, h6: {hidden: true}}
+      sfx: [{at: 0.4, fx: surface, gain: 0.8}]
+    - shot: medium · eye · static
+      duration: 2.4
+      camera: {focus: [150, 130]}
+      backdrop:
+        angle: eye
+        props: [{type: water, y: [120, 152], color: cold1, shine: cold2, flow: 3}]
+      actors:
+        - {id: h1, sprite: hauler, med: hauler_med, state: haul, path: [[116, 152], [100, 152]], flip: true, fps: 4, steps: false}
+        - {id: h2, sprite: hauler, med: hauler_med, state: haul, path: [[142, 152], [126, 152]], flip: true, fps: 4, phase: 0.5, steps: false}
+        - {id: teal, sprite: teal, med: teal_med, state: look_up, path: [[176, 152]], breathe: 3}
+        - {id: h3, sprite: hauler, med: hauler_med, state: haul, path: [[210, 152], [194, 152]], flip: true, fps: 4, phase: 0.9, steps: false}
+    - shot: medium · over-shoulder · static
+      camera: {focus: [200, 130]}
+      backdrop:
+        angle: eye
+        props: [{type: water, y: [120, 152], color: cold1, shine: cold2, flow: 3}]
+      actors:
+        - {id: h1, sprite: hauler, med: hauler_med, state: haul, path: [[204, 152], [196, 152]], flip: true, fps: 4, steps: false}
+      cards:
+        - {speaker: teal, text: "Did you see that?"}
+        - {speaker: hauler, text: "No. And you didn't either, if you want a fucking ride downriver this year."}
+    - shot: insert · eye · static
+      duration: 2
+      camera: {focus_on: h1, focus_lift: 22, zoom: 4}
+      backdrop:
+        angle: eye
+        props:
+          - {type: water, y: [120, 152], color: cold1, shine: cold2, flow: 3}
+      actors:
+        - {id: h1, sprite: hauler, med: hauler_med, state: haul, path: [[162, 152], [156, 152]], flip: true, fps: 4, steps: false}
+      sfx: [{at: 0.2, fx: creak, dur: 1.4, base: 50, gain: 1.2}, {at: 0.3, fx: grunt, gain: 0.7}]
+
+# ---------------------------------------------------------------- SC06 the rise above hollin
+- id: sc06_the_rise_above_hollin
+  title: The rise above Hollin
+  music: {cue: 1M3 "Hollin", in: 0.0, mood: "drop the theme to one held note; the wheel is the only rhythm", hit: 3.0}
+  backdrop:
+    region: river
+    time: day
+    seed: 21
+    props:
+      - {type: town, pos: [160, 132], width: 64, pennant: true, layer: 1}
+      - {type: stubble, y: 134, color: rust1}
+  weather: none
+  sound:
+    bed: [{wheel: 0.7}, {gnats: 0.4}, {wind: 0.3}]
+    events:
+      - {at: 3.0, fx: wheel_near, dur: 1.0, gain: 1.4}
+  shots:
+    - {shot: extreme-wide · pov · static, duration: 3}
+    - shot: close · eye · static
+      duration: 1.0
+      backdrop:
+        plain: true
+        sky: [sky2]
+        props:
+          - {type: wheel, pos: [170, 112], r: 64, speed: 0.6}
+          - {type: water, y: [160, 180], color: cold1, shine: cold2, flow: 20}
+    - shot: extreme-wide · pov · push-in
+      camera: {focus: [160, 124]}
+      cards:
+        - {narration: "A town of a hundred makes noise. Hollin made the noise of its wheel and nothing else."}
+
+# ---------------------------------------------------------------- SC07 the orchard under the wall
+- id: sc07_the_orchard_under_the_wall
+  title: The orchard under the wall
+  backdrop:
+    region: river
+    time: day
+    seed: 31
+    props:
+      - {type: wall, x: [0, 320], top: 88, base: 140, kind: stone, layer: 2}
+      - {type: tree, pos: [40, 150], height: 64, seed: 4, color: ash0, thick: 3}
+      - {type: tree, pos: [130, 148], height: 58, seed: 9, color: ash0, thick: 3}
+      - {type: tree, pos: [228, 150], height: 66, seed: 13, color: ash0, thick: 3}
+      - {type: tree, pos: [300, 147], height: 52, seed: 2, color: ash0, thick: 2}
+      - {type: line, points: [[20, 158], [300, 156]], color: ash3}
+      - {type: pegs, xs: [60, 140, 220], y: 158}
+      - {type: frost, y: 146, count: 40}
+  weather: none
+  sound:
+    bed: [gnats, {wind: 0.3}, {wheel: 0.3}]
+    events:
+      - {at: 1.0, fx: peg}
+      - {at: 4.5, fx: peg}
+  actors:
+    - {id: c1, sprite: chainman, med: chainman_med, state: walk, path: [[150, 156], [230, 156]], fps: 4}
+    - {id: c2, sprite: chainman, med: chainman_med, state: walk, path: [[80, 157], [160, 157]], fps: 4, phase: 0.5}
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: walk, path: [[300, 156], [250, 156]], flip: true, fps: 4, hidden: true}
+  shots:
+    - shot: wide · eye · static
+      duration: 3.4
+      backdrop:
+        props:
+          - {type: wall, x: [0, 320], top: 88, base: 140, kind: stone, layer: 2}
+          - {type: tree, pos: [40, 150], height: 64, seed: 4, color: ash0, thick: 3}
+          - {type: tree, pos: [228, 150], height: 66, seed: 13, color: ash0, thick: 3}
+          - {type: line, points: [[20, 158], [300, 156]], color: ash3}
+          - {type: chain, y: 166, links: 10, size: 36, sag: 14, x: -10, layer: front, color: ink0}
+      cards:
+        - {speaker: chainmen, note: singing the count, text: "One link, two link, three link, four."}
+    - shot: medium · high · static
+      duration: 3.2
+      camera: {focus: [200, 110]}
+      set:
+        auk: {hidden: false, state: idle, path: [[206, 118]], flip: true}
+        c1: {path: [[150, 120], [184, 108], [226, 108], [258, 120]]}
+        c2: {path: [[120, 121], [154, 110], [196, 108], [232, 121]]}
+    - shot: insert · eye · pan-left
+      duration: 2.2
+      backdrop:
+        plain: true
+        sky: [ash3]
+        props:
+          - {type: trunk, pos: [100, 180], width: 46, color: ash0, rim: ash1, seed: 2}
+          - {type: slab, rect: [102, 70, 42, 48], color: ash4, rim: ash5}
+          - {type: trunk, pos: [230, 180], width: 40, color: ash0, rim: ash1, seed: 3}
+          - {type: slab, rect: [232, 74, 36, 44], color: ash4, rim: ash5}
+          - {type: stripes, rect: [102, 70, 168, 48], period: 5, width: 1, slant: 0.0, color: ash2, amount: 0.7}
+
+# ---------------------------------------------------------------- SC08 the dry stone
+- id: sc08_the_dry_stone
+  title: The dry stone
+  backdrop:
+    region: river
+    time: day
+    seed: 41
+    props:
+      - {type: wall, x: [0, 320], top: 70, base: 152, kind: stone, gate: {x: 150, w: 40, h: 58, kind: arch, inside: ash5}}
+      - {type: waterstone, pos: [122, 152], bowl: dry, cracked: true}
+  weather: none
+  sound:
+    bed: [{wheel: 0.6}, {gnats: 0.35}]
+    surface: grit
+  actors:
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: idle, path: [[110, 152]], breathe: 4}
+    - {id: teal, sprite: teal, med: teal_med, state: idle, path: [[84, 152]], breathe: 3}
+  shots:
+    - shot: insert · high · static
+      duration: 2
+      backdrop: {plain: true, sky: [ash2], props: [{type: bowl, pos: [150, 110], r: 46, dry: true}, {type: slab, rect: [230, 40, 60, 120], color: ink1}]}
+      sfx: [{at: 0.2, fx: step, surface: grit, gain: 0.8}, {at: 0.6, fx: step, surface: grit, gain: 0.8}]
+    - shot: wide · eye · static
+      duration: 4
+    - shot: close · low · static
+      backdrop: {plain: true, sky: [ash1, ash2], props: []}
+      actors: [{id: ac, sprite: auk_close, state: grim, path: [[160, 180]], breathe: 4}]
+      cards:
+        - {speaker: auk, text: "No water."}
+    - shot: wide · framed · static
+      duration: 2
+      backdrop:
+        plain: false
+        props:
+          - {type: facades, x: [-20, 360], top: 70, base: 152, color: ash4, alt: ash3, doors: 4}
+          - {type: cobbles, y: 152, line: ash3}
+          - {type: doorway, rect: [100, 46, 120, 134], layer: front, color: ash1, rim: ash3}
+      set: {auk: {hidden: true}, teal: {hidden: true}}
+    - shot: wide · framed · static
+      duration: 3
+      backdrop:
+        plain: false
+        props:
+          - {type: facades, x: [-20, 360], top: 70, base: 152, color: ash4, alt: ash3, doors: 4}
+          - {type: cobbles, y: 152, line: ash3}
+          - {type: doorway, rect: [100, 46, 120, 134], layer: front, color: ash1, rim: ash3}
+      actors:
+        - {id: hask, sprite: hask, med: hask_med, state: walk, path: [[214, 152], [160, 152]], flip: true, fps: 4}
+        - {id: g1, sprite: guard, med: guard_med, state: walk, path: [[236, 150], [184, 150]], flip: true, fps: 4, phase: 0.4}
+        - {id: g2, sprite: guard, med: guard_med, state: walk, path: [[194, 154], [140, 154]], flip: true, fps: 4, phase: 0.9}
+    - shot: medium · eye · hask · static
+      camera: {focus_on: hask}
+      actors:
+        - {id: hask, sprite: hask, med: hask_med, state: talk, path: [[200, 152]], flip: true, breathe: 3}
+        - {id: g1, sprite: guard, med: guard_med, state: idle, path: [[230, 150]], flip: true}
+      cards:
+        - {speaker: hask, text: "Fuck's sake. Ida's shaman. He waits out here."}
+    - shot: medium · over-shoulder · teal · static
+      actors:
+        - {id: teal, sprite: teal, med: teal_med, state: talk, path: [[130, 152]], breathe: 3}
+      cards:
+        - {speaker: teal, text: "He'll wait at the stone when somebody puts water on it."}
+        - {speaker: hask, text: "It's not my wall to water."}
+    - shot: wide · eye · static
+      duration: 3
+      set: {auk: {state: walk, path: [[110, 152], [178, 152]], tint: ink0, fps: 4}, teal: {state: idle}}
+    - shot: insert · eye · static
+      duration: 0.5
+      camera: {focus_on: hask, focus_lift: 10, zoom: 4}
+      actors: [{id: hask, sprite: hask, med: hask_med, state: point, path: [[200, 152]], flip: true}]
+      sfx: [{at: 0.0, fx: knock, freq: 400, dur: 0.05, gain: 0.5}]
+    - shot: medium · eye · teal · static
+      set: {auk: {hidden: true}, teal: {state: walk, path: [[100, 152], [150, 152]], fps: 4}}
+      cards:
+        - {speaker: teal, text: "In, then. Apparently."}
+
+# ---------------------------------------------------------------- SC09 the swept street
+- id: sc09_the_swept_street
+  title: The swept street
+  backdrop:
+    region: river
+    time: day
+    seed: 51
+    props:
+      - {type: facades, x: [-60, 420], top: 66, base: 150, color: ash3, alt: ash2, dish: true, seed: 5}
+      - {type: cobbles, y: 150, line: ash1}
+      - {type: bench, pos: [70, 152], width: 30, tools: 6}
+      - {type: flies, pos: [118, 102], spread: [8, 6], count: 3}
+  weather: none
+  sound:
+    bed: [{flies: 0.6}, {wheel: 0.4}, {room: 0.6}]
+    surface: cobbles
+  actors:
+    - {id: b1, sprite: host_broom, med: host_broom_med, state: sweep, path: [[150, 152]], fps: 3}
+    - {id: b2, sprite: host_broom, med: host_broom_med, state: sweep, path: [[186, 152]], fps: 3}
+    - {id: b3, sprite: host_broom, med: host_broom_med, state: sweep, path: [[222, 152]], fps: 3}
+  shots:
+    - shot: close · low · static
+      duration: 2.2
+      backdrop: {plain: true, sky: [ash2], props: [{type: cobbles, y: 120, line: ash1}, {type: broomheads, y: 172, period: 1.4}]}
+      sfx: [{at: 0.15, fx: sweep, dur: 0.6}, {at: 1.55, fx: sweep, dur: 0.6}]
+    - shot: medium · low · static
+      duration: 1.4
+      camera: {focus: [190, 150]}
+      backdrop: {angle: low}
+      set: {b1: {path: [[150, 174]]}, b2: {path: [[186, 174]]}, b3: {path: [[222, 174]]}}
+      actors:
+        - {id: b1, sprite: host_broom, med: host_broom_med, state: sweep, path: [[150, 174]], fps: 3}
+        - {id: b2, sprite: host_broom, med: host_broom_med, state: sweep, path: [[186, 174]], fps: 3}
+        - {id: b3, sprite: host_broom, med: host_broom_med, state: sweep, path: [[222, 174]], fps: 3}
+        - {id: auk, sprite: auk_rig, med: auk_rig_med, state: walk, path: [[300, 176], [240, 176]], flip: true, fps: 4, surface: cobbles}
+      sfx: [{at: 0.1, fx: sweep, dur: 0.6}]
+    - shot: medium · low · static
+      duration: 2.2
+      camera: {focus: [190, 150]}
+      backdrop: {angle: low}
+      actors:
+        - {id: b1, sprite: host_broom, med: host_broom_med, state: sweep, path: [[150, 174]], freeze: 0.0}
+        - {id: b2, sprite: host_broom, med: host_broom_med, state: sweep, path: [[186, 174]], freeze: 0.0}
+        - {id: b3, sprite: host_broom, med: host_broom_med, state: sweep, path: [[222, 174]], freeze: 0.0}
+        - {id: auk, sprite: auk_rig, med: auk_rig_med, state: walk, path: [[240, 176], [140, 176]], flip: true, fps: 4, surface: cobbles}
+      sfx: [{at: 0.4, fx: creak, dur: 1.4, base: 30, gain: 0.5}]
+    - shot: medium · eye · teal · track
+      sfx: [{at: 0.3, fx: sweep, dur: 0.6}, {at: 1.7, fx: sweep, dur: 0.6}, {at: 3.1, fx: sweep, dur: 0.6}, {at: 4.5, fx: sweep, dur: 0.6}, {at: 5.9, fx: sweep, dur: 0.6}, {at: 7.3, fx: sweep, dur: 0.6}]
+      actors:
+        - {id: b1, sprite: host_broom, med: host_broom_med, state: sweep, path: [[150, 152]], fps: 3}
+        - {id: b2, sprite: host_broom, med: host_broom_med, state: sweep, path: [[186, 152]], fps: 3}
+        - {id: hask, sprite: hask, med: hask_med, state: walk, path: [[150, 153], [300, 153]], fps: 4, phase: 0.3, t: [0, 14]}
+        - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[128, 152], [278, 152]], fps: 4, t: [0, 14]}
+      cards:
+        - {speaker: hask, text: "Keep him off my listers. And off that millrace."}
+        - {speaker: teal, text: "He's right here. He can hear you."}
+        - {speaker: hask, text: "Good."}
+    - shot: insert · eye · static
+      duration: 2
+      camera: {focus: [90, 132], zoom: 4}
+      actors: []
+
+# ---------------------------------------------------------------- SC10 the laid table
+- id: sc10_the_laid_table
+  title: The laid table
+  backdrop:
+    plain: true
+    sky: [ash1]
+    props:
+      - {type: slab, rect: [0, 140, 320, 40], color: rust0, rim: rust1}
+      - {type: slab, rect: [236, 70, 40, 34], color: sky2}
+      - {type: line, points: [[256, 70], [256, 104]], color: ink2}
+      - {type: slab, rect: [246, 102, 14, 2], color: rust1}
+      - {type: flies, pos: [262, 84], spread: [16, 18], count: 2}
+      - {type: coats, pos: [30, 72], n: 6, gap: 32, color: ash3}
+      - {type: table, pos: [140, 128], width: 170, n: 6}
+      - {type: stripes, rect: [150, 100, 170, 80], period: 40, width: 14, slant: -0.6, color: ash2, amount: 0.3, dust: 14}
+  weather: none
+  sound:
+    bed: [{room: 1.0}, {flies: 0.5}]
+  shots:
+    - shot: medium · framed · static
+      duration: 3.2
+      backdrop:
+        props:
+          - {type: slab, rect: [0, 140, 320, 40], color: rust0, rim: rust1}
+          - {type: slab, rect: [236, 70, 40, 34], color: sky2}
+          - {type: coats, pos: [30, 72], n: 6, gap: 32, color: ash3}
+          - {type: table, pos: [140, 128], width: 170, n: 6}
+          - {type: doorway, rect: [40, 44, 220, 136], arch: false, layer: front, color: ink0, rim: ash0}
+          - {type: shoulder, side: right, x: 300, y: 120, radius: 30, layer: screen, rim: ash0}
+    - shot: insert · eye · pan-right
+      duration: 2.4
+      camera: {zoom: 2, focus: [110, 96]}
+    - shot: insert · eye · static
+      camera: {zoom: 3, focus: [254, 98]}
+      cards:
+        - {narration: "Every house had a candle dish. Not one had a candle in it."}
+
+# ---------------------------------------------------------------- SC11 the bond-board
+- id: sc11_the_bond_board
+  title: The bond-board
+  backdrop:
+    region: river
+    time: day
+    seed: 61
+    props:
+      - {type: wall, x: [100, 320], top: 66, base: 152, kind: stone, color: ash2}
+      - {type: slab, rect: [130, 104, 22, 48], color: ink0}
+      - {type: slab, rect: [124, 108, 6, 40], color: rust0}
+      - {type: slate, rect: [176, 96, 44, 28], row: 6}
+      - {type: ring, pos: [236, 116], size: 1}
+  weather: none
+  sound:
+    bed: [{wheel: 0.4}, {wind: 0.3}]
+    events:
+      - {at: 2.4, fx: drip}
+      - {at: 4.1, fx: drip}
+      - {at: 5.7, fx: drip}
+      - {at: 7.4, fx: drip}
+      - {at: 9.0, fx: drip}
+      - {at: 10.4, fx: drip}
+  actors:
+    - {id: teal, sprite: teal, med: teal_med, state: idle, path: [[200, 152]], breathe: 3, hidden: true}
+  shots:
+    - {shot: wide · eye · static, duration: 2.2}
+    - shot: close · eye · push-in
+      backdrop:
+        plain: true
+        sky: [ash2]
+        props:
+          - {type: slate, rect: [30, 52, 260, 116], row: 11, wet: true}
+          - {type: haze, rect: [120, 70, 34, 90], color: ash0, amount: 0.25}
+      camera: {zoom: [1, 1.5], focus: [160, 110]}
+      cards:
+        - {narration: "I'd been a line of chalk on a board like that once. Somebody had washed this one clean."}
+    - shot: insert · high · static
+      duration: 2.2
+      backdrop: {plain: true, sky: [ash2], props: [{type: ring, pos: [160, 70], size: 4, drip: true}]}
+
+# ---------------------------------------------------------------- SC12 the count
+- id: sc12_the_count
+  title: The count
+  music: {cue: 1M4 "The ledger", in: 0.0, mood: "dry, procedural; a pulse under the bargaining that stops for 'He keeps smells'", out: end}
+  backdrop:
+    region: river
+    time: day
+    seed: 71
+    props:
+      - {type: facades, x: [-60, 420], top: 64, base: 148, color: ash3, alt: ash2, seed: 9, layer: 2}
+      - {type: cobbles, y: 152, line: ash1}
+      - {type: fountain, pos: [150, 152], width: 36}
+      - {type: tripod, pos: [40, 156], height: 34}
+      - {type: awning, pos: [236, 154], width: 64, height: 46}
+  weather: {type: ash, density: 0.15, wind: 0.2}
+  sound:
+    bed: [{wheel: 0.6}, {gnats: 0.3}, {wind: 0.2}]
+    surface: cobbles
+    events:
+      - {at: 9.0, fx: peg}
+      - {at: 22.0, fx: peg}
+      - {at: 31.5, fx: peg}
+  actors: &count_cast
+    - {id: q1, sprite: fold_host, med: fold_host_med, state: idle, path: [[60, 158]], breathe: 3}
+    - {id: q2, sprite: fold_host, med: fold_host_med, state: idle, path: [[76, 158]], breathe: 3}
+    - {id: q3, sprite: fold_host, med: fold_host_med, state: idle, path: [[92, 158]], breathe: 3}
+    - {id: q4, sprite: fold_host, med: fold_host_med, state: idle, path: [[108, 158]], breathe: 3}
+    - {id: q5, sprite: fold_host, med: fold_host_med, state: idle, path: [[124, 158]], breathe: 3}
+    - {id: q6, sprite: fold_host, med: fold_host_med, state: idle, path: [[176, 158]], breathe: 3}
+    - {id: q7, sprite: fold_host, med: fold_host_med, state: idle, path: [[192, 158]], breathe: 3}
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: idle, path: [[118, 150]], breathe: 4}
+    - {id: teal, sprite: teal, med: teal_med, state: idle, path: [[208, 152]], breathe: 3, phase: 0.6}
+    - {id: ida, sprite: ida, med: ida_med, state: idle, path: [[246, 152]], flip: true, breathe: 3.3}
+    - {id: pim, sprite: pim, med: pim_med, state: idle, path: [[270, 152]], flip: true, breathe: 2.8}
+    - {id: hask, sprite: hask, med: hask_med, state: idle, path: [[296, 150]], flip: true, breathe: 3.6}
+  shots:
+    - shot: extreme-wide · high · static
+      duration: 3
+      backdrop:
+        props:
+          - {type: cobbles, y: 0, line: ash1}
+          - {type: fountain, pos: [150, 120], width: 36}
+          - {type: awning, pos: [236, 120], width: 64, height: 40}
+      actors:
+        - {id: q1, sprite: fold_host, state: idle, path: [[40, 128]]}
+        - {id: q2, sprite: fold_host, state: idle, path: [[56, 128]]}
+        - {id: q3, sprite: fold_host, state: idle, path: [[72, 128]]}
+        - {id: q4, sprite: fold_host, state: idle, path: [[88, 128]]}
+        - {id: q5, sprite: fold_host, state: idle, path: [[104, 128]]}
+        - {id: q6, sprite: fold_host, state: idle, path: [[120, 128]]}
+        - {id: q7, sprite: fold_host, state: idle, path: [[136, 128]]}
+        - {id: q8, sprite: fold_host, state: idle, path: [[184, 128]]}
+        - {id: q9, sprite: fold_host, state: idle, path: [[200, 128]]}
+        - {id: auk, sprite: auk_rig, state: walk, path: [[0, 150], [60, 150]], fps: 4, surface: cobbles}
+        - {id: teal, sprite: teal, state: walk, path: [[-20, 152], [40, 152]], fps: 4, surface: cobbles}
+    - shot: wide · eye · static
+      duration: 1.0
+      set: {auk: {state: walk, path: [[30, 150], [60, 150]], fps: 4}, teal: {hidden: true}}
+    - shot: wide · eye · static
+      duration: 1.4
+      set: {auk: {path: [[60, 150]]}, teal: {hidden: true}, q1: {state: look_back}, q2: {state: look_back}, q3: {state: look_back}, q4: {state: look_back}, q5: {state: look_back}, q6: {state: look_back}, q7: {state: look_back}}
+      sfx: [{at: 0.0, fx: feet_many, count: 14, gain: 0.5}]
+    - shot: medium · eye · ida · static
+      cards:
+        - {speaker: ida, text: "You came in. They don't think of the stone here. They don't think of anything they don't need."}
+    - shot: insert · eye · push-in
+      duration: 2.2
+      camera: {zoom: [1, 1.25], focus: [160, 120]}
+      backdrop: {plain: true, sky: [ink1], props: [{type: forearm, pos: [150, 118], scars: 12}]}
+    - shot: close · eye · pim · static
+      cards:
+        - {speaker: pim, text: "Twelve. Do I list him?"}
+    - shot: medium · over-shoulder · teal · static
+      set: {teal: {state: talk}}
+      cards:
+        - {speaker: ida, text: "He's not ours to list. Write the boy. Teal."}
+        - {speaker: ida, text: "Last year's roll has a hundred and twelve. Ninety-one are here. I want the other twenty-one."}
+        - {speaker: teal, text: "Found, or brought back?"}
+        - {speaker: ida, text: "Counted. Where they went, and whether they're breathing. That's all the ledger asks."}
+    - shot: medium · eye · static
+      camera: {focus: [228, 128]}
+      set: {teal: {state: talk}, ida: {state: talk}}
+      cards:
+        - {speaker: teal, text: "Two cakes of wax a day, and a full charge for the rig at the Varrow lodge after."}
+        - {speaker: ida, text: "The office pays the lodge. It's paying more than I asked this season, so don't haggle."}
+        - {speaker: teal, text: "I always haggle. It's the only fun he lets me have."}
+    - shot: close · eye · pim · static
+      set: {pim: {state: point}}
+      cards:
+        - {speaker: ida, text: "Pim wants to write \"one\" under households. The ledger hasn't got a column for whatever this is."}
+    - shot: insert · eye · static
+      duration: 2
+      backdrop: {plain: true, sky: [ash1], props: [{type: cord, pos: [160, 112], knots: 6, tie: true}]}
+      sfx: [{at: 0.4, fx: knot}, {at: 1.6, fx: knot}]
+    - shot: extreme-wide · high · static
+      backdrop:
+        props:
+          - {type: cobbles, y: 0, line: ash1}
+          - {type: fountain, pos: [150, 120], width: 36}
+          - {type: awning, pos: [236, 120], width: 64, height: 40}
+      actors:
+        - {id: q1, sprite: fold_host, state: idle, path: [[40, 128], [46, 128]], t: [1.0, 1.6], ease: smooth}
+        - {id: q2, sprite: fold_host, state: idle, path: [[56, 128], [62, 128]], t: [1.0, 1.6], ease: smooth}
+        - {id: q3, sprite: fold_host, state: idle, path: [[72, 128], [78, 128]], t: [1.0, 1.6], ease: smooth}
+        - {id: q4, sprite: fold_host, state: idle, path: [[88, 128], [94, 128]], t: [1.0, 1.6], ease: smooth}
+        - {id: q5, sprite: fold_host, state: idle, path: [[104, 128], [110, 128]], t: [1.0, 1.6], ease: smooth}
+        - {id: q6, sprite: fold_host, state: idle, path: [[120, 128], [126, 128]], t: [1.0, 1.6], ease: smooth}
+        - {id: q7, sprite: fold_host, state: idle, path: [[136, 128], [142, 128]], t: [1.0, 1.6], ease: smooth}
+        - {id: ida, sprite: ida, state: talk, path: [[246, 124]], flip: true}
+        - {id: teal, sprite: teal, state: idle, path: [[220, 126]]}
+      sfx: [{at: 1.0, fx: feet_many, count: 14, gain: 0.6}]
+      cards:
+        - {speaker: ida, text: "Wenna Cole. Abel Cole. Pryde, the overseer. Both Pryde boys. The Ashe woman, old Sarah."}
+    - shot: medium · eye · static
+      camera: {focus: [238, 128]}
+      set: {pim: {state: talk}, teal: {state: talk}}
+      cards:
+        - {speaker: pim, text: "I could write them down for you."}
+        - {speaker: teal, text: "I'd lose the paper. I don't lose knots."}
+    - shot: close · eye · ida · static
+      set: {ida: {flip: true}}
+      cards:
+        - {speaker: ida, text: "Will he remember them?"}
+    - shot: close · eye · push-in
+      camera: {zoom: [1, 1]}
+      backdrop: {plain: true, sky: [ash2, ash3], props: []}
+      actors: [{id: tc, sprite: teal_close, state: speak, path: [[170, 180]], breathe: 3}]
+      cards:
+        - {speaker: teal, text: "He doesn't keep names now. Not even mine. He keeps smells. I'll keep the names."}
+
+# ---------------------------------------------------------------- SC13 the cricket barn
+- id: sc13_the_cricket_barn
+  title: The cricket barn
+  backdrop:
+    plain: true
+    sky: [ink0]
+    props: []
+  weather: none
+  sound:
+    bed: [barn, {querns: 0.9}]
+    events:
+      - {at: 3.0, fx: creak, dur: 1.2, base: 45, gain: 0.9}
+  shots:
+    - {shot: wide · eye · static, duration: 3}
+    - shot: wide · framed · static
+      duration: 3.2
+      backdrop:
+        props:
+          - {type: crates, x: [0, 320], top: 40, base: 132, size: 14, color: rust0, dark: ink1}
+          - {type: haze, rect: [0, 40, 320, 92], color: ink0, amount: 0.7}
+          - {type: slab, rect: [0, 150, 320, 30], color: ink2}
+          - {type: stripes, rect: [0, 112, 320, 68], period: 400, width: 120, slant: -1.0, offset: 60, color: ash4, amount: 0.75}
+          - {type: quern, pos: [42, 156]}
+          - {type: quern, pos: [92, 156], phase: 0.1}
+          - {type: quern, pos: [142, 156], phase: 0.2}
+          - {type: quern, pos: [192, 156]}
+          - {type: quern, pos: [242, 156], phase: 0.1}
+          - {type: quern, pos: [292, 156]}
+      actors: &grinders
+        - {id: g1, sprite: fold_host, med: fold_host_med, state: grind, path: [[34, 158]], fps: 2.5}
+        - {id: g2, sprite: fold_host, med: fold_host_med, state: grind, path: [[84, 158]], fps: 2.5}
+        - {id: g3, sprite: fold_host, med: fold_host_med, state: grind, path: [[134, 158]], fps: 2.5}
+        - {id: g4, sprite: fold_host, med: fold_host_med, state: grind, path: [[184, 158]], fps: 2.5}
+        - {id: g5, sprite: fold_host, med: fold_host_med, state: grind, path: [[234, 158]], fps: 2.5}
+        - {id: g6, sprite: fold_host, med: fold_host_med, state: grind, path: [[284, 158]], fps: 2.5}
+    - shot: insert · eye · pan-right
+      duration: 2.2
+      camera: {zoom: 3, focus: [100, 140]}
+      backdrop:
+        props:
+          - {type: slab, rect: [0, 150, 320, 30], color: ink2}
+          - {type: stripes, rect: [0, 100, 320, 80], period: 400, width: 160, slant: -1.0, offset: 60, color: ash4, amount: 0.75}
+          - {type: quern, pos: [42, 156]}
+          - {type: quern, pos: [92, 156]}
+          - {type: quern, pos: [142, 156]}
+          - {type: quern, pos: [192, 156]}
+      actors: *grinders
+
+# ---------------------------------------------------------------- SC14 bett's wheel
+- id: sc14_bett_s_wheel
+  title: Bett's wheel
+  music: {cue: 1M5 "We were his wife", in: 0.0, mood: "under Bett's humming only; let her tune be the music, a drone at most", out: end}
+  backdrop:
+    plain: true
+    sky: [ink2, ash0]
+    props:
+      - {type: slab, rect: [0, 150, 320, 30], color: ash0}
+      - {type: stripes, rect: [0, 40, 320, 140], period: 30, width: 6, slant: 0.0, color: ash2, amount: 0.35, dust: 30}
+      - {type: slab, rect: [250, 120, 50, 30], color: ash1, rim: ash2}
+  weather: none
+  sound:
+    bed: [gear, hum]
+  actors:
+    - {id: bett, sprite: bett_med, state: sit, path: [[160, 160]], breathe: 4, fps: 2}
+  shots:
+    - shot: medium · framed · static
+      duration: 3.4
+      backdrop:
+        props:
+          - {type: slab, rect: [0, 150, 320, 30], color: ash0}
+          - {type: stripes, rect: [0, 40, 320, 140], period: 30, width: 6, slant: 0.0, color: ash2, amount: 0.35, dust: 30}
+          - {type: gear, pos: [160, 300], r: 130, teeth: 14, speed: 0.35, layer: front, color: ink0, rim_light: ash1}
+    - shot: medium · over-shoulder · static
+      actors:
+        - {id: bett, sprite: bett_med, state: sit, path: [[200, 160]], breathe: 4, fps: 2}
+      cards:
+        - {speaker: teal, text: "Are you the miller?"}
+        - {speaker: bett, text: "We were his wife. He's in the beans now."}
+        - {speaker: teal, text: "People left. Twenty-one of them. Do you know where?"}
+    - shot: close · eye · static
+      camera: {zoom: 2, focus: [176, 110]}
+      actors:
+        - {id: bett, sprite: bett_med, state: talk, path: [[180, 170]], breathe: 4, fps: 3}
+      cards:
+        - {speaker: bett, text: "Nobody left. Some went on ahead. Some went back."}
+        - {speaker: teal, text: "Back to what?"}
+        - {speaker: bett, text: "To being owed."}
+    - shot: insert · eye · push-in
+      duration: 2.2
+      camera: {zoom: [1, 1.25], focus: [160, 100]}
+      backdrop: {plain: true, sky: [ash1], props: [{type: stripes, rect: [0, 40, 320, 140], period: 30, width: 6, color: ash2, amount: 0.3}, {type: clamp, pos: [150, 62], size: 2.6}]}
+    - shot: insert · eye · static
+      duration: 2
+      backdrop: {plain: true, sky: [ink2], props: [{type: leads, pos: [170, 62], size: 2.0}]}
+    - shot: close · eye · static
+      duration: 2.2
+      backdrop: {plain: true, sky: [ink2, ash0], props: []}
+      actors: [{id: ac, sprite: auk_close, state: glare, path: [[150, 180]], flip: true, breathe: 4}]
+
+# ---------------------------------------------------------------- SC15 the millrace
+- id: sc15_the_millrace
+  title: The millrace
+  music: {cue: 1M6 "It knows them", in: 18.0, mood: "first real dread: low strings or a bowed metal under 'It knows them', then out on the stairs", hit: 26.0}
+  backdrop:
+    region: river
+    time: day
+    seed: 81
+    angle: low
+    props:
+      - {type: wall, x: [0, 320], top: 60, base: 174, kind: stone, color: ash1, dark: ink2, light: ash2}
+      - {type: steps, pos: [180, 120], n: 8, tread: 9, rise: 7, width: 140, color: ash2}
+      - {type: water, y: [160, 180], color: cold0, shine: cold1, flow: 40, deep: ink1}
+      - {type: grate, rect: [20, 128, 80, 46], gap: 7, color: ink1}
+      - {type: body, pos: [62, 166], size: 1.6}
+      - {type: flies, pos: [40, 160], spread: [16, 8], count: 4}
+      - {type: reeds, x: [0, 320], y: 160, height: 14, color: ash1, density: 0.3, layer: front, parallax: 1.0}
+  weather: none
+  sound:
+    bed: [race, {flies: 0.4}]
+    surface: grit
+  actors:
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: crouch, path: [[200, 120]], flip: true, breathe: 5}
+  shots:
+    - {shot: wide · low · static, duration: 3}
+    - shot: medium · low · static
+      duration: 2.4
+      camera: {focus: [220, 140]}
+      actors:
+        - {id: k1, sprite: host_bucket, med: host_bucket_med, state: kneel, path: [[196, 160]], flip: true}
+        - {id: k2, sprite: host_bucket, med: host_bucket_med, state: kneel, path: [[214, 160]], flip: true}
+        - {id: k3, sprite: host_bucket, med: host_bucket_med, state: kneel, path: [[232, 160]], flip: true}
+        - {id: k4, sprite: host_bucket, med: host_bucket_med, state: kneel, path: [[250, 160]], flip: true}
+      sfx: [{at: 0.8, fx: splash, dur: 0.6, size: 2, gain: 1.0}, {at: 0.82, fx: splash, dur: 0.5, size: 2, gain: 0.8}]
+    - shot: wide · eye · static
+      duration: 2.4
+      backdrop:
+        angle: eye
+        props:
+          - {type: water, y: [130, 180], color: cold0, shine: cold1, flow: 40}
+          - {type: reeds, x: [0, 320], y: 132, height: 30, color: ash1, lean_cycle: 0.9, period: 4.8, density: 1.2}
+      actors: []
+    - shot: medium · eye · hask · static
+      actors:
+        - {id: hask, sprite: hask, med: hask_med, state: talk, path: [[220, 140]], flip: true, breathe: 3}
+        - {id: teal, sprite: teal, med: teal_med, state: idle, path: [[250, 132]], flip: true, breathe: 3}
+      cards:
+        - {speaker: hask, text: "Our lister. Six days in, up this morning. Ankle's bruised black, like a little hand with too many fingers."}
+        - {speaker: teal, text: "And them?"}
+        - {speaker: hask, text: "Every morning, right beside him. Nothing touches them."}
+    - shot: close · high · static
+      duration: 2.4
+      backdrop:
+        plain: true
+        sky: [cold0]
+        props:
+          - {type: water, y: [40, 180], color: cold0, shine: cold1, flow: 12}
+          - {type: poly, points: [[110, 70], [200, 62], [232, 110], [206, 162], [124, 166], [96, 120]], color: ash2}
+          - {type: slab, rect: [130, 98, 20, 14], color: ink0}
+          - {type: slab, rect: [178, 96, 20, 14], color: ink0}
+          - {type: slab, rect: [148, 138, 34, 6], color: ash0}
+          - {type: haze, rect: [0, 40, 320, 140], color: cold0, amount: 0.3}
+          - {type: flies, pos: [164, 140], spread: [30, 10], count: 7}
+      sfx: [{at: 0.0, fx: flies, dur: 2.4, gain: 1.4}]
+    - shot: medium · low · auk · static
+      duration: 3
+    - shot: medium · low · auk · push-in
+      cards:
+        - {speaker: auk, text: "It knows them."}
+    - shot: medium · eye · static
+      duration: 2.2
+      camera: {focus: [220, 128]}
+      backdrop: {angle: eye}
+      actors:
+        - {id: k1, sprite: host_bucket, med: host_bucket_med, state: walk, path: [[150, 156], [270, 108]], fps: 4}
+        - {id: k2, sprite: host_bucket, med: host_bucket_med, state: walk, path: [[134, 162], [254, 114]], fps: 4}
+        - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[170, 150], [250, 118]], fps: 4}
+    - shot: insert · eye · static
+      duration: 2.4
+      backdrop: {plain: true, sky: [ink1], props: [{type: boots, pos: [0, 140], climb: 3, period: 0.5}]}
+      sfx: [{at: 0.05, fx: step, surface: grit}, {at: 0.55, fx: step, surface: grit}, {at: 1.05, fx: step, surface: grit}, {at: 1.5, fx: step, bare: true, gain: 1.4}, {at: 1.52, fx: step, bare: true, gain: 1.2}]
+    - shot: close · eye · static
+      backdrop: {plain: true, sky: [ash0, ash1], props: [{type: water, y: [150, 180], color: cold0, shine: cold1, flow: 40}]}
+      actors: [{id: tc, sprite: teal_close, state: look_away, path: [[160, 180]], breathe: 2.6}]
+      cards:
+        - {narration: "I told myself it was the stairs."}
+
+# ---------------------------------------------------------------- SC16 what we saw
+- id: sc16_what_we_saw
+  title: What we saw
+  music: {cue: 1M7 "We", in: 0.0, mood: "the Fold's colour: one sustained chord sung or bowed, every voice on the same note; no pulse", out: end}
+  backdrop:
+    region: river
+    time: day
+    seed: 91
+    props:
+      - {type: facades, x: [-60, 420], top: 66, base: 150, color: ash3, alt: ash2, seed: 5}
+      - {type: cobbles, y: 150, line: ash1}
+  weather: none
+  sound:
+    bed: [{hum: 0.35}, {wheel: 0.5}, {room: 0.5}]
+    surface: cobbles
+  shots:
+    - shot: close · pov · static
+      duration: 3
+      camera: {zoom: 3, focus: [160, 150]}
+      backdrop: {angle: low}
+      actors:
+        - {id: auk, sprite: auk_rig, med: auk_rig_med, state: walk, path: [[220, 176], [100, 176]], flip: true, fps: 4}
+      sfx: [{at: 0.2, fx: sweep}, {at: 1.6, fx: creak, dur: 1.2, base: 30, gain: 0.6}]
+    - shot: close · pov · static
+      duration: 3
+      backdrop: {plain: true, sky: [ink1], props: [{type: bowl, pos: [160, 112], r: 60, water: cold2, sky: ash4, ring_color: cold1}]}
+      sfx: [{at: 0.0, fx: pour, dur: 2.8}]
+    - shot: wide · pov · static
+      duration: 3
+      backdrop:
+        angle: high
+        props:
+          - {type: cobbles, y: 0, line: ash1}
+          - {type: fountain, pos: [150, 120], width: 36}
+          - {type: awning, pos: [236, 120], width: 64, height: 40}
+          - {type: doorway, rect: [30, 44, 260, 136], arch: false, layer: front, color: ink1, rim: ash0}
+      actors:
+        - {id: q1, sprite: fold_host, state: idle, path: [[60, 128]]}
+        - {id: q2, sprite: fold_host, state: idle, path: [[76, 128]]}
+        - {id: q3, sprite: fold_host, state: idle, path: [[92, 128]]}
+        - {id: q4, sprite: fold_host, state: idle, path: [[108, 128]]}
+        - {id: auk, sprite: auk_rig, state: look_up, path: [[188, 126]]}
+    - shot: extreme-wide · pov · static
+      backdrop:
+        region: river
+        time: dusk
+        props:
+          - {type: fields, y: [132, 180], furrow: ink2, shine: rust1}
+          - {type: levee, y: 126, height: 7, color: ink2, top: rust1}
+          - {type: doorway, rect: [20, 44, 280, 136], arch: false, layer: front, color: ink1, rim: ash0}
+      actors:
+        - {id: auk, sprite: auk_rig, state: walk, path: [[110, 126], [150, 126]], fps: 5, steps: false}
+        - {id: teal, sprite: teal, state: walk, path: [[90, 126], [130, 126]], fps: 5, steps: false}
+      cards:
+        - {speaker: the fold, text: "We saw two on the levee road at first light."}
+    - shot: medium · pov · static
+      camera: {zoom: 2, focus: [110, 128]}
+      backdrop:
+        props:
+          - {type: wall, x: [0, 320], top: 70, base: 152, kind: stone, gate: {x: 150, w: 40, h: 58, kind: arch, inside: ash5}}
+          - {type: waterstone, pos: [122, 152], bowl: dry, cracked: true}
+      actors:
+        - {id: auk, sprite: auk_rig, med: auk_rig_med, state: idle, path: [[110, 152]], breathe: 4}
+        - {id: teal, sprite: teal, med: teal_med, state: talk, path: [[84, 152]], breathe: 3}
+      cards:
+        - {speaker: the fold, text: "The tall one stopped at the stone. Then he came in. The boy talks for him."}
+    - shot: close · pov · push-in
+      camera: {zoom: [1, 1.25], focus: [160, 110]}
+      backdrop: {plain: true, sky: [ash2, ash3], props: []}
+      actors: [{id: ac, sprite: auk_close, state: glare, path: [[160, 184]], breathe: 4}]
+      cards:
+        - {speaker: the fold, text: "He looked up at the window. None of us had moved."}
+
+# ---------------------------------------------------------------- SC17 the laundry lane
+- id: sc17_the_laundry_lane
+  title: The laundry lane
+  backdrop:
+    region: river
+    time: day
+    seed: 101
+    props:
+      - {type: wall, x: [0, 320], top: 70, base: 150, kind: mud, color: ash2}
+      - {type: sheets, x: [10, 320], y: 74, w: 34, h: 52, gap: 10, color: ash4, amount: 0.8, layer: front}
+  weather: none
+  sound:
+    bed: [silk, {wheel: 0.3}]
+  actors:
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: walk, path: [[20, 152], [300, 152]], fps: 4, t: [0, 12]}
+    - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[-10, 152], [270, 152]], fps: 4, t: [0, 12]}
+  shots:
+    - {shot: wide · eye · static, duration: 3.4}
+    - shot: medium · eye · static
+      camera: {focus: [170, 128]}
+      backdrop:
+        props:
+          - {type: wall, x: [0, 320], top: 70, base: 150, kind: mud, color: ash2}
+          - {type: sheets, x: [10, 320], y: 74, w: 34, h: 52, gap: 10, color: ash4, amount: 0.8}
+      actors:
+        - {id: pim, sprite: pim, med: pim_med, state: walk, path: [[220, 152], [180, 152]], flip: true, fps: 4, t: [0, 1.6]}
+        - {id: pim2, sprite: pim, med: pim_med, state: talk, path: [[180, 152]], flip: true, t: [1.6, 30]}
+      sfx: [{at: 0.3, fx: snap}, {at: 0.5, fx: snap, gain: 0.6}]
+      cards:
+        - {speaker: pim, text: "She says I'm to come and write it all down. What he smells, and that."}
+    - shot: medium · eye · static
+      camera: {focus: [160, 128]}
+      backdrop:
+        props:
+          - {type: wall, x: [0, 320], top: 70, base: 150, kind: mud, color: ash2}
+          - {type: sheets, x: [10, 320], y: 74, w: 34, h: 52, gap: 10, color: ash4, amount: 0.8}
+          - {type: haze, rect: [100, 74, 30, 52], color: ash1, amount: 0.5}
+      actors:
+        - {id: teal, sprite: teal, med: teal_med, state: talk, path: [[150, 152]], breathe: 3}
+        - {id: pim, sprite: pim, med: pim_med, state: idle, path: [[184, 152]], flip: true, breathe: 2.8}
+      cards:
+        - {speaker: teal, text: "Write what I say he smells. That's how it works."}
+
+# ---------------------------------------------------------------- SC18 the stubble
+- id: sc18_the_stubble
+  title: The stubble
+  backdrop:
+    region: river
+    time: day
+    seed: 111
+    angle: high
+    props:
+      - {type: stubble, y: 112, color: rust1}
+      - {type: line, points: [[0, 150], [320, 140]], color: cold1, thick: 2}
+      - {type: gnats, pos: [70, 150], columns: 4, spread: 60, height: 40, count: 40, color: ink0}
+      - {type: gnats, pos: [250, 140], columns: 4, spread: 60, height: 40, count: 40, color: ink0, seed: 4}
+  weather: {type: ash, density: 0.2, wind: 0.2}
+  sound:
+    bed: [wind, gnats]
+  actors:
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: walk, path: [[150, 140], [190, 139]], fps: 3}
+    - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[120, 144], [160, 143]], fps: 3, phase: 0.4}
+    - {id: pim, sprite: pim, med: pim_med, state: walk, path: [[100, 146], [140, 145]], fps: 3, phase: 0.8}
+  shots:
+    - {shot: extreme-wide · high · static, duration: 3}
+    - shot: medium · eye · auk · track
+      duration: 3.4
+      backdrop:
+        angle: eye
+        props:
+          - {type: stubble, y: 132, color: rust1}
+          - {type: water, y: [154, 160], color: cold1, shine: cold2, flow: 1}
+          - {type: reeds, x: [0, 600], y: 158, height: 16, color: ash2, density: 0.6}
+      actors:
+        - {id: auk, sprite: auk_rig, med: auk_rig_med, state: crouch, path: [[120, 152], [190, 152]], fps: 2}
+    - shot: insert · eye · static
+      duration: 3.2
+      backdrop:
+        plain: true
+        sky: [cold0]
+        props:
+          - {type: reeds, x: [0, 320], y: 180, height: 120, color: ash2, density: 0.5, seed: 9}
+          - {type: poly, points: [[120, 120], [200, 116], [214, 132], [206, 150], [126, 150]], color: ash4}
+          - {type: stripes, rect: [120, 116, 94, 34], period: 6, width: 2, slant: 0.0, color: rust1, amount: 0.6}
+          - {type: slab, rect: [200, 114, 14, 6], color: ink2}
+          - {type: reeds, x: [0, 320], y: 180, height: 80, color: ash1, density: 0.4, seed: 3, layer: front}
+      sfx: [{at: 0.6, fx: breath, dur: 1.6, rate: 1.2, gain: 1.6}]
+    - shot: extreme-wide · high · pull-out
+      camera: {zoom: [1.5, 1], focus: [160, 140]}
+      cards:
+        - {narration: "He never took anything off a trail. He told me once it was rude."}
+
+# ---------------------------------------------------------------- SC19 the handcart
+- id: sc19_the_handcart
+  title: The handcart
+  backdrop:
+    region: river
+    time: day
+    seed: 121
+    props:
+      - {type: tree, pos: [20, 152], height: 70, seed: 1, color: ash0, thick: 2}
+      - {type: tree, pos: [70, 150], height: 60, seed: 2, color: ash1, thick: 2, layer: 1}
+      - {type: tree, pos: [250, 150], height: 76, seed: 3, color: ash0, thick: 2}
+      - {type: tree, pos: [300, 152], height: 66, seed: 5, color: ash1, thick: 2, layer: 1}
+      - {type: line, points: [[0, 160], [320, 158]], color: ash0}
+      - {type: line, points: [[0, 168], [320, 166]], color: ash0}
+      - {type: cart, pos: [170, 156]}
+      - {type: flies, pos: [130, 140], spread: [10, 40], count: 8}
+  weather: none
+  sound:
+    bed: [{flies: 0.8}, {beetles: 0.7}, {wind: 0.3}]
+  actors:
+    - {id: body, sprite: fold_host, med: fold_host_med, state: down, path: [[128, 160]], tint: ash1}
+    - {id: teal, sprite: teal, med: teal_med, state: idle, path: [[96, 158]], breathe: 3}
+    - {id: pim, sprite: pim, med: pim_med, state: idle, path: [[150, 158]], flip: true, breathe: 2.6}
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: idle, path: [[70, 156]], breathe: 4}
+  shots:
+    - shot: wide · eye · static
+      duration: 3
+      backdrop:
+        props:
+          - {type: tree, pos: [20, 152], height: 70, seed: 1, color: ash0, thick: 2}
+          - {type: tree, pos: [250, 150], height: 76, seed: 3, color: ash0, thick: 2}
+          - {type: cart, pos: [170, 156]}
+          - {type: spokes, pos: [160, 110], r: 150, n: 9, thick: 4, layer: front}
+    - shot: insert · eye · static
+      duration: 2
+      camera: {zoom: 4, focus: [200, 150]}
+      actors: []
+    - shot: close · high · static
+      duration: 2.4
+      camera: {zoom: 2, focus: [140, 150]}
+      set: {pim: {state: crouch, path: [[160, 158]]}, teal: {hidden: true}, auk: {hidden: true}}
+      sfx: [{at: 0.2, fx: snap, gain: 0.5}]
+    - shot: medium · eye · static
+      camera: {focus: [150, 136]}
+      set: {pim: {state: crouch, path: [[176, 158]]}}
+      backdrop:
+        props:
+          - {type: cart, pos: [170, 156]}
+          - {type: spokes, pos: [150, 100], r: 160, n: 9, thick: 3, layer: front, angle: 0.5}
+      sfx: [{at: 0.2, fx: retch, gain: 0.8}]
+      cards:
+        - {speaker: pim, text: "Wax and ash. Oh, wax and ash. They just left her."}
+    - shot: medium · eye · teal · static
+      set: {teal: {state: crouch, path: [[108, 158]]}}
+      cards:
+        - {speaker: teal, text: "She couldn't walk and they could. That's old Sarah Ashe, I'd say. That's one counted."}
+    - shot: insert · eye · static
+      duration: 2.2
+      backdrop: {plain: true, sky: [ash1], props: [{type: cord, pos: [160, 112], knots: 6}]}
+      sfx: [{at: 0.4, fx: knot, gain: 0.6}]
+    - shot: close · low · auk · static
+      duration: 3
+      sfx: [{at: 0.3, fx: breath, dur: 2.6, rate: 0.35, gain: 1.6}]
+
+# ---------------------------------------------------------------- SC20 the ford
+- id: sc20_the_ford
+  title: The ford
+  music: {cue: 1M8 "Two ways", in: 0.0, mood: "dusk colour; low and patient, something watching; the theme inverted, held under 'Two ways'", out: end}
+  backdrop:
+    region: river
+    time: dusk
+    seed: 131
+    props:
+      - {type: tree, pos: [200, 134], height: 60, seed: 11, color: ink0, thick: 3, layer: 1}
+      - {type: tree, pos: [250, 134], height: 70, seed: 12, color: ink0, thick: 3, layer: 1}
+      - {type: tree, pos: [290, 134], height: 56, seed: 13, color: ink0, thick: 3, layer: 1}
+      - {type: tree, pos: [150, 134], height: 50, seed: 14, color: ink0, thick: 2, layer: 1}
+      - {type: slab, rect: [0, 126, 320, 10], color: ink0}
+      - {type: water, y: [136, 156], color: rust1, shine: ember1, flow: 6, edge: ember0}
+      - {type: eyes, pos: [252, 112], pairs: 1, spread: [2, 2], color: ember2, seed: 7}
+      - {type: line, points: [[0, 164], [140, 158]], color: ink2}
+      - {type: line, points: [[0, 170], [150, 162]], color: ink2}
+  weather: none
+  sound:
+    bed: [ford, {gnats: 0.8}, {crickets: 0.3}]
+    events:
+      - {at: 26.0, fx: settle, gain: 1.0}
+  actors:
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: idle, path: [[110, 158]], tint: ink0, breathe: 4}
+    - {id: teal, sprite: teal, med: teal_med, state: idle, path: [[140, 159]], tint: ink0, breathe: 3}
+    - {id: pim, sprite: pim, med: pim_med, state: idle, path: [[164, 160]], tint: ink0, breathe: 2.6}
+  shots:
+    - {shot: wide · eye · static, duration: 3}
+    - shot: insert · eye · static
+      duration: 1.0
+      camera: {zoom: 3, focus: [252, 112]}
+      backdrop:
+        props:
+          - {type: slab, rect: [0, 40, 320, 140], color: ink0}
+          - {type: tree, pos: [250, 134], height: 70, seed: 12, color: ink1, thick: 3}
+          - {type: slab, rect: [251, 112, 1, 1], color: ember2}
+          - {type: slab, rect: [254, 112, 1, 1], color: ember2}
+      actors: []
+    - shot: close · low · auk · static
+      duration: 2.2
+      set: {auk: {state: crouch, tint: null}}
+      sfx: [{at: 0.2, fx: breath, dur: 1.8, rate: 2.0, gain: 1.4}]
+    - shot: wide · pov · push-in
+      backdrop:
+        props:
+          - {type: slab, rect: [0, 126, 320, 10], color: ink0}
+          - {type: water, y: [136, 156], color: rust0, shine: rust1, flow: 6}
+          - {type: haze, rect: [0, 40, 320, 140], color: ink1, amount: 0.35}
+          - {type: scent, pos: [160, 176], a: rust1, b: moss1, reach: 150, rise: 46, grow: 1.4}
+      actors: []
+      cards:
+        - {speaker: auk, text: "Two ways."}
+    - shot: medium · eye · teal · static
+      set: {teal: {state: point, tint: null}, pim: {tint: null}, auk: {tint: null}}
+      cards:
+        - {speaker: teal, text: "The cart went south, to Varrow. Bare feet went across, into the reeds."}
+    - shot: medium · over-shoulder · teal · static
+      set: {teal: {state: talk, tint: null}, pim: {hidden: true}, auk: {tint: null}}
+      cards:
+        - {speaker: pim, text: "Which do I write?"}
+        - {speaker: teal, text: "Both. Some ran from them. Some ran on ahead."}
+    - shot: wide · eye · static
+      duration: 3.4
+      set: {teal: {flip: true}, pim: {flip: true}}
+
+# ---------------------------------------------------------------- SC21 the bean trench
+- id: sc21_the_bean_trench
+  title: The bean trench
+  backdrop:
+    region: river
+    time: dusk
+    seed: 141
+    props:
+      - {type: sun, pos: [180, 128], r: 12, halo: 40, layer: -1}
+      - {type: stubble, y: 152, color: ink2}
+      - {type: trench, pos: [120, 160], width: 140, feet: false}
+  weather: {type: ash, density: 0.2, wind: 0.2}
+  sound:
+    bed: [{fire: 0.8}, gnats, {wind: 0.3}]
+    events:
+      - {at: 0.4, fx: hoes, n: 5, period: 0.8, gain: 0.9}
+  actors:
+    - {id: f1, sprite: host_hoe, state: carry, path: [[20, 152], [200, 152]], fps: 3, tint: ink0}
+    - {id: f2, sprite: host_hoe, state: carry, path: [[-2, 152], [178, 152]], fps: 3, tint: ink0}
+    - {id: f3, sprite: host_hoe, state: carry, path: [[-24, 152], [156, 152]], fps: 3, tint: ink0}
+    - {id: f4, sprite: host_hoe, state: carry, path: [[-46, 152], [134, 152]], fps: 3, tint: ink0}
+    - {id: f5, sprite: host_hoe, state: carry, path: [[-68, 152], [112, 152]], fps: 3, tint: ink0}
+  shots:
+    - {shot: extreme-wide · eye · static, duration: 4.4, set: {f1: {t: [0, 14]}, f2: {t: [0, 14]}, f3: {t: [0, 14]}, f4: {t: [0, 14]}, f5: {t: [0, 14]}}}
+    - shot: insert · eye · static
+      duration: 2.2
+      backdrop: {plain: true, sky: [rust0, rust1], props: [{type: slab, rect: [0, 130, 320, 50], color: ink1}, {type: trench, pos: [160, 140], width: 320, feet_x: -40, size: 8}]}
+    - shot: wide · high · static
+      backdrop:
+        props:
+          - {type: stubble, y: 80, color: ink2}
+          - {type: smokeline, y: 124, x: [0, 320], color: ash3}
+          - {type: gnats, pos: [100, 120], columns: 6, spread: 160, height: 50, count: 50, color: ink0}
+          - {type: gnats, pos: [230, 120], columns: 5, spread: 120, height: 60, count: 50, color: ink0, seed: 5}
+      actors:
+        - {id: tender, sprite: fold_host, state: walk, path: [[290, 110], [270, 110]], flip: true, fps: 2, tint: ink1, steps: false}
+      cards:
+        - {narration: "I think that was the miller. Buried the way any use town buries. Only nobody had marked him."}
+
+# ---------------------------------------------------------------- SC22 the marsh path
+- id: sc22_the_marsh_path
+  title: The marsh path
+  music: {cue: 1M9 "Lights", in: 0.0, mood: "night; a high thin texture for the pale lights, uneasy, nearly comic in the dialogue, never a sting", out: end}
+  backdrop:
+    region: river
+    time: night
+    seed: 151
+    props:
+      - {type: stars, count: 40, y: 110, layer: -1}
+      - {type: wall, x: [190, 320], top: 112, base: 132, kind: stone, color: ink1, dark: ink0, light: ink2, layer: 1}
+      - {type: slab, rect: [0, 150, 320, 6], color: ink2}
+      - {type: reeds, x: [0, 320], y: 150, height: 30, color: night2, density: 1.0}
+      - {type: wanderlight, pos: [160, 128], count: 5, spread: [240, 20], color: ash5, halo: ash1, radius: 4, seed: 3}
+      - {type: reeds, x: [0, 320], y: 182, height: 34, color: ink0, density: 0.8, layer: front, seed: 7}
+  weather: none
+  sound:
+    bed: [marsh]
+    surface: planks
+    events:
+      - {at: 1.0, fx: breath, dur: 18.0, rate: 1.4, gain: 1.0}
+  actors:
+    - {id: pim, sprite: pim_lantern, med: pim_lantern_med, state: walk, path: [[200, 152], [150, 152]], flip: true, fps: 4,
+       light: {radius: 26, color: ember0, intensity: 0.55, flicker: true, offset: [-6, -12]}}
+    - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[230, 152], [180, 152]], flip: true, fps: 4}
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: walk, path: [[262, 152], [212, 152]], flip: true, fps: 4}
+  shots:
+    - shot: wide · eye · static
+      cards:
+        - {speaker: pim, text: "Those lights are keeping up with us."}
+        - {speaker: teal, text: "Don't wave at them."}
+    - shot: close · eye · static
+      camera: {zoom: 3, focus_on: pim}
+      set: {pim: {state: idle, path: [[160, 152]]}}
+      cards:
+        - {speaker: pim, text: "I wasn't going to."}
+    - shot: close · eye · static
+      backdrop: {plain: true, sky: [night0, night1], props: [{type: wanderlight, pos: [60, 90], count: 2, spread: [60, 20], color: ash5, halo: ash1, radius: 4}]}
+      actors: [{id: tc, sprite: teal_close, state: look_away, path: [[180, 180]], breathe: 2.4}]
+      cards:
+        - {speaker: teal, text: "You were."}
+    - shot: extreme-wide · high · static
+      duration: 3.2
+      backdrop:
+        angle: high
+        props:
+          - {type: reeds, x: [0, 320], y: 180, height: 50, color: night1, density: 1.4}
+          - {type: slab, rect: [0, 116, 320, 3], color: ink2}
+          - {type: wanderlight, pos: [160, 112], count: 5, spread: [120, 14], color: ash5, halo: ash1, radius: 3, seed: 3}
+      actors:
+        - {id: pim, sprite: pim_lantern, state: walk, path: [[200, 118], [170, 118]], flip: true, fps: 4,
+           light: {radius: 20, color: ember0, intensity: 0.5, flicker: true, offset: [-6, -12]}}
+
+# ---------------------------------------------------------------- SC23 the bowl
+- id: sc23_the_bowl
+  title: The bowl
+  backdrop:
+    region: river
+    time: night
+    seed: 161
+    props:
+      - {type: wall, x: [0, 320], top: 70, base: 152, kind: stone, color: night1, dark: ink1, light: night2, gate: {x: 150, w: 40, h: 58, kind: arch, inside: ink0}}
+      - {type: waterstone, pos: [122, 152], bowl: dry, cracked: true}
+      - {type: lantern, pos: [196, 104]}
+      - {type: moths, pos: [196, 102], count: 6, radius: 10}
+  weather: none
+  lights:
+    - {pos: [196, 104], radius: 60, color: ember0, intensity: 0.65, flicker: true}
+  sound:
+    bed: [moths, {crickets: 0.4}]
+  actors:
+    - {id: teal, sprite: teal, med: teal_med, state: idle, path: [[136, 152]], breathe: 3}
+    - {id: pim, sprite: pim, med: pim_med, state: idle, path: [[170, 152]], flip: true, breathe: 2.6}
+    - {id: auk, sprite: auk_rig, med: auk_rig_med, state: idle, path: [[96, 152]], breathe: 4, hidden: true}
+  shots:
+    - {shot: medium · eye · static, duration: 2.2, camera: {focus: [190, 110]}}
+    - shot: insert · high · static
+      duration: 1.4
+      backdrop: {plain: true, sky: [ink1], props: [{type: bowl, pos: [160, 112], r: 52, dry: true}]}
+      lights: [{pos: [220, 70], radius: 120, color: ember0, intensity: 0.4}]
+      sfx: [{at: 0.4, fx: tick, freq: 1200, gain: 0.3}, {at: 0.5, fx: tick, freq: 900, gain: 0.3}]
+    - shot: insert · high · static
+      duration: 2
+      backdrop: {plain: true, sky: [ink1], props: [{type: bowl, pos: [160, 112], r: 52, face: false, water: cold1}]}
+      lights: [{pos: [220, 70], radius: 120, color: ember0, intensity: 0.4}]
+      sfx: [{at: 0.0, fx: pour, dur: 1.8}]
+    - shot: medium · eye · static
+      camera: {focus: [150, 126]}
+      set: {pim: {state: talk}}
+      cards:
+        - {speaker: pim, text: "Is that allowed?"}
+        - {speaker: teal, text: "It's water. Tonight I'm the town."}
+    - shot: wide · eye · static
+      duration: 3.4
+      set: {auk: {hidden: false, state: drink, path: [[116, 152]]}, teal: {path: [[86, 152]]}, pim: {path: [[66, 152]], flip: false}}
+      sfx: [{at: 0.6, fx: splash, dur: 0.3, size: 0.3, gain: 0.3}, {at: 2.6, fx: knock, freq: 300, gain: 0.4}]
+    - shot: wide · eye · static
+      duration: 3.2
+      set: {auk: {hidden: false, state: walk, path: [[130, 152], [176, 152]], fps: 4}, teal: {path: [[86, 152]]}, pim: {path: [[66, 152]], flip: false}}
+    - shot: insert · eye · static
+      camera: {zoom: 4, focus: [130, 144]}
+      actors: []
+      cards:
+        - {narration: "Then he went back in. I didn't ask him why. I'm still sorry I didn't."}
+
+# ---------------------------------------------------------------- SC24 the tent
+- id: sc24_the_tent
+  title: The tent
+  backdrop:
+    region: river
+    time: night
+    seed: 171
+    props:
+      - {type: stars, count: 30, y: 100, layer: -1}
+      - {type: facades, x: [-60, 420], top: 70, base: 150, color: night2, alt: night1, roof: ink1, inside: ink0, window: ink0, seed: 9, layer: 2}
+      - {type: tent, rect: [80, 76, 160, 76], shadows: [[110, 1], [146, 1], [178, 1], [214, 2]], glow_amount: 0.3}
+  weather: none
+  lights:
+    - {pos: [160, 120], radius: 90, color: ember0, intensity: 0.35}
+  sound:
+    bed: [{room: 0.8}, {moths: 0.5}, {wheel: 0.3}, {fire: 0.15}]
+  shots:
+    - {shot: wide · eye · static, duration: 3.2}
+    - shot: medium · eye · static
+      backdrop:
+        plain: true
+        sky: [ash2, ash3]
+        props:
+          - {type: slab, rect: [0, 136, 320, 44], color: ash1}
+          - {type: table, pos: [160, 134], width: 150, n: 0}
+          - {type: slab, rect: [146, 130, 28, 3], color: bone}
+          - {type: candles, xs: [104, 132, 190, 218], y: 133}
+      lights: [{pos: [160, 124], radius: 110, color: ember1, intensity: 0.45, flicker: true}]
+      actors:
+        - {id: teal, sprite: teal_med, state: talk, path: [[60, 180]], breathe: 3}
+        - {id: ida, sprite: ida_med, state: sit, path: [[270, 180]], flip: true, breathe: 3.3}
+      cards:
+        - {speaker: teal, text: "A cart went south toward Varrow. The rest walked into the reeds barefoot. And old Sarah's dead by the road."}
+        - {speaker: ida, text: "And nobody saw a rig come. No shaman, no wright. A month ago they were a mill town. Then they weren't."}
+    - shot: close · eye · static
+      backdrop: {plain: true, sky: [ash1, ash2], props: [{type: candles, xs: [250], y: 150}]}
+      lights: [{pos: [250, 140], radius: 120, color: ember1, intensity: 0.5, flicker: true}]
+      actors: [{id: pim, sprite: pim_big, state: talk, path: [[150, 178]], breathe: 2.6}]
+      cards:
+        - {speaker: pim, text: "One of them said \"you came back\" to me today. I've never been here in my life."}
+        - {speaker: ida, text: "They say it to half of us. Don't write it down."}
+        - {speaker: pim, text: "I already did."}
+    - shot: medium · over-shoulder · static
+      backdrop:
+        plain: true
+        sky: [ash2, ash3]
+        props:
+          - {type: slab, rect: [0, 136, 320, 44], color: ash1}
+          - {type: candles, xs: [150, 176], y: 140}
+      lights: [{pos: [170, 130], radius: 110, color: ember1, intensity: 0.45, flicker: true}]
+      actors: [{id: ida, sprite: ida_med, state: talk, path: [[210, 180]], flip: true, breathe: 3.3}]
+      cards:
+        - {speaker: ida, text: "No overseer, no debt, no thefts. Honestly, Hask, it's the best-run town I've counted."}
+    - shot: close · low · static
+      backdrop: {plain: true, sky: [ash1, ash2], props: []}
+      lights: [{pos: [200, 170], radius: 120, color: ember0, intensity: 0.5, flicker: true}]
+      actors: [{id: hask, sprite: hask_big, state: talk, path: [[150, 178]], flip: true, breathe: 3.6}]
+      cards:
+        - {speaker: hask, text: "Something scared them enough to leave an old woman for the beetles. Quiet's not the same as good."}
+    - shot: wide · eye · static
+      duration: 2.4
+      backdrop:
+        props:
+          - {type: stars, count: 30, y: 100, layer: -1}
+          - {type: facades, x: [-60, 420], top: 70, base: 150, color: night2, alt: night1, roof: ink1, inside: ink0, window: ink0, seed: 9, layer: 2}
+          - {type: tent, rect: [80, 76, 160, 76], shadows: [[110, 1], [146, 1], [178, 1], [214, 2]], glow_amount: 0.3, still: true}
+
+# ---------------------------------------------------------------- SC25 the dark street
+- id: sc25_the_dark_street
+  title: The dark street
+  music: {cue: 1M10 "Every door", in: 2.0, mood: "slow build toward the square; one pulse that Teal's steps never match", out: end}
+  backdrop:
+    region: river
+    time: night
+    seed: 181
+    props:
+      - {type: facades, x: [-60, 900], top: 66, base: 150, color: night1, alt: ink2, roof: ink1, inside: ink0, window: ink0, sitters: true, sitter: ink2, seed: 5}
+      - {type: cobbles, y: 150, line: ink2}
+  weather: none
+  sound:
+    bed: [{wheel: 0.4}, {crickets: 0.5}]
+    surface: cobbles
+  actors:
+    - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[40, 152], [400, 152]], fps: 3.5, t: [0, 20]}
+  shots:
+    - shot: wide · eye · static
+      duration: 2
+      backdrop:
+        props:
+          - {type: slab, rect: [0, 40, 320, 140], color: ink0}
+          - {type: slab, rect: [60, 120, 12, 26], color: ink1}
+          - {type: slab, rect: [160, 120, 12, 26], color: ink1}
+          - {type: slab, rect: [250, 120, 12, 26], color: ink1}
+      actors: []
+    - {shot: medium · eye · teal · track, duration: 4}
+    - shot: close · eye · static
+      duration: 3
+      backdrop: {plain: true, sky: [night0], props: []}
+      actors: [{id: tc, sprite: teal_close, state: look_away, path: [[160, 180]], breathe: 2.2}]
+    - shot: medium · framed · static
+      duration: 2.4
+      backdrop:
+        plain: true
+        sky: [ink0]
+        props:
+          - {type: slab, rect: [0, 150, 320, 30], color: ink1}
+          - {type: doorway, rect: [90, 50, 140, 130], arch: false, layer: front, color: night1, rim: night2}
+      actors:
+        - {id: s1, sprite: fold_host_med, state: sit, path: [[120, 168]], tint: ink2}
+        - {id: s2, sprite: fold_host_med, state: sit, path: [[180, 168]], tint: ink2}
+    - shot: medium · framed · static
+      duration: 2.4
+      backdrop:
+        plain: true
+        sky: [ink0]
+        props:
+          - {type: slab, rect: [0, 150, 320, 30], color: ink1}
+          - {type: doorway, rect: [100, 50, 120, 130], arch: false, layer: front, color: night1, rim: night2}
+      actors:
+        - {id: s1, sprite: fold_host_med, state: sit, path: [[110, 168]], tint: ink2}
+        - {id: s2, sprite: fold_host_med, state: sit, path: [[150, 168]], tint: ink2}
+        - {id: s3, sprite: fold_host_med, state: sit, path: [[190, 168]], tint: ink2}
+
+# ---------------------------------------------------------------- SC26 you're late
+- id: sc26_you_re_late
+  title: You're late
+  music: {cue: 1M11 "You're late" + end title, in: 8.0, hit: 31.0, mood: "the ember light rises with the score; total silence when the feet stop; one struck note on the boy's line, then the theme over black", out: end}
+  transition_out: {duration: 2.5}
+  backdrop:
+    region: river
+    time: night
+    seed: 191
+    props:
+      - {type: stars, count: 40, y: 100, layer: -1}
+      - {type: facades, x: [-60, 420], top: 70, base: 148, color: night1, alt: ink2, roof: ink1, inside: ink0, window: ink0, seed: 9, layer: 2}
+      - {type: tent, rect: [230, 100, 70, 48], shadows: [], glow_amount: 0.12, color: night3, glow: ember0}
+      - {type: cobbles, y: 152, line: ink2}
+      - {type: fountain, pos: [80, 152], width: 30, color: night2}
+  weather: none
+  lights:
+    - {pos: [160, 128], radius: 64, color: ember0, intensity: 0.6, pulse: 3}
+  sound:
+    bed: [{crickets: 0.8}, {wheel: 0.3}, {rig: 0.8}]
+    surface: cobbles
+    events:
+      - {at: 2.0, fx: ratchet, n: 3}
+      - {at: 3.5, fx: valve, dur: 2.5}
+      - {at: 15.6, fx: feet_many, count: 40, gain: 1.2}
+      - {at: 18.6, fx: feet_many, count: 40, gain: 1.4}
+      - {at: 19.0, fx: silence, fade: 0.2}
+  actors:
+    - {id: rig, sprite: rig, state: hum, path: [[160, 154]]}
+    - {id: auk, sprite: auk, med: auk_med, state: idle, path: [[178, 154]], flip: true, breathe: 4}
+  shots:
+    - {shot: wide · eye · static, duration: 2}
+    - shot: insert · eye · static
+      duration: 2
+      backdrop: {plain: true, sky: [ink0], props: []}
+      actors: [{id: hands, sprite: hands_crank, state: crank, path: [[160, 150]]}]
+      lights: [{pos: [160, 120], radius: 50, color: ember0, intensity: 0.5}]
+    - shot: medium · low · static
+      duration: 3.2
+      backdrop:
+        plain: true
+        sky: [night0, night1]
+        props:
+          - {type: faces, pos: [160, 172], n: 5, size: 0.8, light: [0.2, 2.6]}
+      lights: [{pos: [160, 150], radius: 90, color: ember0, intensity: 0.45, pulse: 3}]
+    - shot: medium · eye · static
+      camera: {focus: [168, 128]}
+      actors:
+        - {id: rig, sprite: rig, state: hum, path: [[160, 154]]}
+        - {id: auk, sprite: auk, med: auk_med, state: idle, path: [[178, 154]], flip: true, breathe: 4}
+        - {id: teal, sprite: teal, med: teal_med, state: walk, path: [[230, 154], [196, 154]], flip: true, fps: 4, t: [0, 1.4]}
+        - {id: teal2, sprite: teal, med: teal_med, state: idle, path: [[196, 154]], flip: true, t: [1.4, 30], breathe: 3}
+      cards:
+        - {narration: "He knew me by my feet, and by how I breathe, before he ever turned round."}
+    - shot: extreme-wide · high · static
+      duration: 4.4
+      backdrop:
+        angle: high
+        props:
+          - {type: cobbles, y: 0, line: ink2}
+          - {type: facades, x: [-60, 420], top: 36, base: 100, color: night1, alt: ink2, roof: ink1, inside: ink0, window: ink0, seed: 9}
+      lights: [{pos: [160, 124], radius: 56, color: ember0, intensity: 0.6, pulse: 3}]
+      actors:
+        - {id: rig, sprite: rig, state: hum, path: [[160, 128]]}
+        - {id: auk, sprite: auk, state: idle, path: [[174, 128]], flip: true}
+        - {id: teal, sprite: teal, state: idle, path: [[190, 128]], flip: true}
+        - {id: r1, sprite: fold_host, state: walk, path: [[40, 104], [96, 122]], fps: 4, t: [0.6, 3.4], steps: false}
+        - {id: r1b, sprite: fold_host, state: idle, path: [[96, 122]], t: [3.4, 9]}
+        - {id: r2, sprite: fold_host, state: walk, path: [[120, 102], [134, 118]], fps: 4, t: [0.6, 3.4], steps: false}
+        - {id: r2b, sprite: fold_host, state: idle, path: [[134, 118]], t: [3.4, 9]}
+        - {id: r3, sprite: fold_host, state: walk, path: [[290, 104], [232, 122]], flip: true, fps: 4, t: [0.6, 3.4], steps: false}
+        - {id: r3b, sprite: fold_host, state: idle, path: [[232, 122]], flip: true, t: [3.4, 9]}
+        - {id: r4, sprite: fold_host, state: walk, path: [[210, 102], [200, 118]], flip: true, fps: 4, t: [0.6, 3.4], steps: false}
+        - {id: r4b, sprite: fold_host, state: idle, path: [[200, 118]], flip: true, t: [3.4, 9]}
+        - {id: r5, sprite: fold_host, state: walk, path: [[60, 170], [110, 150]], fps: 4, t: [0.6, 3.4], steps: false}
+        - {id: r5b, sprite: fold_host, state: idle, path: [[110, 150]], t: [3.4, 9]}
+        - {id: r6, sprite: fold_host, state: walk, path: [[270, 172], [216, 150]], flip: true, fps: 4, t: [0.6, 3.4], steps: false}
+        - {id: r6b, sprite: fold_host, state: idle, path: [[216, 150]], flip: true, t: [3.4, 9]}
+        - {id: r7, sprite: fold_host, state: walk, path: [[170, 180], [164, 156]], fps: 4, t: [0.6, 3.4], steps: false}
+        - {id: r7b, sprite: fold_host, state: idle, path: [[164, 156]], t: [3.4, 9]}
+    - shot: wide · low · static
+      duration: 2.6
+      backdrop: {plain: true, sky: [ink0], props: [{type: slab, rect: [0, 150, 320, 30], color: ink1}, {type: feet, xs: [14, 74, 134, 194, 254], y: 176, size: 3, edge: true}]}
+      lights: [{pos: [160, 200], radius: 120, color: ember0, intensity: 0.5}]
+    - shot: medium · eye · static
+      duration: 3.4
+      camera: {focus: [180, 128]}
+      actors:
+        - {id: rig, sprite: rig, state: hum, path: [[150, 154]]}
+        - {id: auk, sprite: auk, med: auk_med, state: idle, path: [[200, 154]], flip: true, breathe: 4}
+        - {id: boy, sprite: host_boy, med: host_boy_med, state: walk, path: [[130, 154], [176, 154]], fps: 3, t: [0, 2.2], steps: false}
+        - {id: boy2, sprite: host_boy, med: host_boy_med, state: look_up, path: [[176, 154]], t: [2.2, 9], breathe: 2}
+      sfx: [{at: 0.1, fx: step, bare: true, gain: 0.8}, {at: 0.8, fx: step, bare: true, gain: 0.8}, {at: 1.5, fx: step, bare: true, gain: 0.8}, {at: 2.1, fx: step, bare: true, gain: 0.6}]
+    - shot: close · low · static
+      duration: 2.4
+      backdrop: {plain: true, sky: [night0, ink0], props: []}
+      lights: [{pos: [160, 200], radius: 110, color: ember0, intensity: 0.6, pulse: 3}]
+      actors: [{id: ac, sprite: auk_close, state: look_down, path: [[160, 182]], breathe: 4}]
+    - shot: close · high · static
+      backdrop: {plain: true, sky: [ink0, night0], props: []}
+      lights: [{pos: [160, 110], radius: 100, color: ember0, intensity: 0.55, pulse: 3}]
+      actors: [{id: boy, sprite: host_boy_big, state: look_up, path: [[150, 236]], scale: 2, breathe: 2}]
+      cards:
+        - {speaker: host, text: "You're late.", hold: 3.0}
+      tail: 3.0

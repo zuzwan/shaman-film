@@ -65,6 +65,18 @@ here inherits these rules. Change them only when drew says so.
   colours live in `assets/show.yaml`; the card's time (dusk/day/night) follows the first scene. The sting window goes to `out/<ep>/cues.yaml`; `episodes/ep00_intro`
   shows it. `rig_big` (`tools/art/rig_big.py`) is the rig at zoom-3 size, faces per continuity.
 
+- Sound (pilot, 2026-11-06): effects are synthesised in `engine/audio.py` (no samples, no voice).
+  A scene's `sound: {bed: [...], events: [{at, fx}]}` and a shot's `sfx` cue them; footsteps are
+  automatic for walking actors. Music is scored after picture lock against `out/<ep>/cues.yaml`
+  (scene times, the intro sting, each scene's `music` note). Keep `music` notes on scenes.
+- Sets: river-country set pieces and inserts live in `engine/sets.py` (registered as props).
+  Inserts go on a `plain` backdrop: they draw at their own size and show no scene actors.
+  Shots can carry their own `cards`; a shot without a duration lasts as long as its cards.
+- Delivery: `python render.py episodes/<ep> --youtube` writes `<ep>.mp4` (1080p) and
+  `<ep>_youtube_1440p.mp4` (x8, 24 fps, H.264 high + AAC). Pushing a tag `epNN-cutN` runs
+  `.github/workflows/release-episode.yml`, which renders and attaches both to a GitHub Release.
+  Never commit video. `episodes/ep01` is the pilot and the template for the loop.
+
 ## Layout
 - `engine/` the reusable engine. Most review effort goes here.
 - `assets/sprites/*.yaml` ASCII sprites (format documented in `engine/sprites.py`).
@@ -84,6 +96,6 @@ here inherits these rules. Change them only when drew says so.
 4. Tag each approved cut in git (`ep01-cut1`, ...).
 
 ## Not built yet
-Audio (score, effects, narration mux), scene-to-scene cross transitions, more
+The score (effects are built), scene-to-scene cross transitions, more
 creatures (only the gaunt so far), a medium-size rig, close portraits for the
 rest of the cast, hands and feet inserts beyond the crank.

@@ -1,0 +1,55 @@
+# Render an episode and attach the finished files to a GitHub Release.
+#
+# Tag an approved cut and push the tag (or run it by hand from the Actions tab):
+#     git tag ep01-cut1 && git push origin ep01-cut1
+# The release "ep01-cut1" then carries:
+#     ep01_youtube_1440p.mp4   the upload copy (x8 nearest-neighbour, 24 fps, H.264 high + AAC stereo)
+#     ep01.mp4                 the 1080p cut
+#     cues.yaml                the cue sheet for the score
+# Videos live on the release, never in git history (GitHub's 100 MB file limit
+# applies to the repo, not to release assets, which can be up to 2 GB each).
+name: Release episode
+
+on:
+  push:
+    tags: ["ep*-cut*"]
+  workflow_dispatch:
+    inputs:
+      episode: {description: "Episode folder, e.g. ep01", required: true}
+      tag: {description: "Release tag, e.g. ep01-cut1", required: true}
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          pip install numpy pillow pyyaml
+      - name: Which episode
+        id: ep
+        run: |
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          EP="${{ github.event.inputs.episode }}"
+          [ -z "$EP" ] && EP="${TAG%%-cut*}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "ep=$EP" >> "$GITHUB_OUTPUT"
+      - name: Render
+        run: python render.py episodes/${{ steps.ep.outputs.ep }} --youtube
+      - name: Attach to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          EP=${{ steps.ep.outputs.ep }}; TAG=${{ steps.ep.outputs.tag }}
+          FILES="out/$EP/${EP}_youtube_1440p.mp4 out/$EP/$EP.mp4 out/$EP/cues.yaml"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" $FILES --clobber
+          else
+            gh release create "$TAG" $FILES --title "$TAG" \
+              --notes "Rendered from ${{ github.sha }}. Upload ${EP}_youtube_1440p.mp4 to YouTube."
+          fi
