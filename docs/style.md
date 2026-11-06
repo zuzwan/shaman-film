@@ -53,3 +53,11 @@ Night is blue everywhere, tinted by the region's darkest ramp.
   chainmen, clerks, guards.
 - **The Fold** looks like a devout farming community. Its hosts share one sprite
   and one gait, so put them in step with no phase offsets. The sameness is the tell.
+
+## Shots and cutting (2026-11-06)
+
+A scene is a shot list, never one wide shot with a figure crossing it. Size
+and angle change every few seconds; something sits between the camera and the
+figures; fights are a handful of frames between two long holds. The catalogue
+is `docs/shots.md`. The first creature is the gaunt: a starved, antlered walker
+in the Appalachian-horror register, never named as a myth.

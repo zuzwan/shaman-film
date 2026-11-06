@@ -1,0 +1,152 @@
+# Shot catalogue test. Not story content: one scene per shot type in docs/shots.md,
+# so a script's SHOT lines have a known look before an episode is cut.
+episode: ep00_shots
+resolution: [320, 180]
+scale: 6
+fps: 12
+band: 40
+
+scenes:
+  # 1. extreme-wide: figures tiny against the land, letterboxed
+  - id: s01_extreme_wide
+    duration: 4
+    shot: "extreme-wide · eye · static"
+    transition_in: {duration: 0.8}
+    backdrop: {region: uplands, time: day, seed: 3}
+    actors:
+      - {id: auk,  sprite: shaman,     state: walk, path: [[60, 154], [120, 154]]}
+      - {id: teal, sprite: apprentice, state: walk, path: [[44, 154], [104, 154]]}
+    captions: [{text: "EXTREME WIDE", t: [0.3, 3.5], y: 30}]
+
+  # 2. low angle: the horizon drops, the figures tower (feet at 152 + 22)
+  - id: s02_low
+    duration: 4
+    shot: "medium · low · auk · static"
+    backdrop: {region: river, time: dusk, seed: 5,
+               props: [{type: grass, y: 180, height: 14, layer: front, parallax: 1.4, seed: 2}]}
+    actors:
+      - {id: auk,  sprite: shaman,     state: idle, path: [[150, 174]], scale: 2, breathe: 3}
+      - {id: teal, sprite: apprentice, state: idle, path: [[200, 174]], scale: 2, flip: true, breathe: 2.6, phase: 1.1}
+    captions: [{text: "LOW ANGLE", t: [0.3, 3.5], y: 30}]
+
+  # 3. high angle: looking down the slope, more ground than sky (feet at 152 - 34)
+  - id: s03_high
+    duration: 4
+    shot: "wide · high · static"
+    backdrop: {region: coast, time: day, seed: 2}
+    weather: {type: rain, density: 0.3, wind: 0.6}
+    actors:
+      - {id: auk,  sprite: shaman,     state: walk, path: [[90, 128], [140, 142]]}
+      - {id: teal, sprite: apprentice, state: walk, path: [[74, 124], [124, 138]]}
+    captions: [{text: "HIGH ANGLE", t: [0.3, 3.5], y: 30}]
+
+  # 4. framed: through a ruin doorway, the lantern coming
+  - id: s04_framed
+    duration: 5
+    shot: "wide · framed · auk · static"
+    backdrop: {region: glass, time: night, seed: 7,
+               props: [{type: ruin, pos: [150, 152], width: 120, height: 70, arches: 3, seed: 4, color: ink1, layer: 1, parallax: 0.5}]}
+    weather: none
+    actors:
+      - {id: auk, sprite: shaman, state: walk, path: [[300, 158], [160, 158]], flip: true,
+         light: {radius: 22, color: ember0, intensity: 0.5, flicker: true, offset: [-6, -14]}}
+    captions: [{text: "FRAMED", t: [0.3, 3.5], y: 30}]
+
+  # 5. over the shoulder: Teal's back, Auk talking
+  - id: s05_over_shoulder
+    shot: "medium · over-shoulder · auk · static"
+    backdrop: {region: interior, time: dusk, seed: 9}
+    actors:
+      - {id: auk, sprite: shaman, state: idle, path: [[190, 162]], flip: true, scale: 2}
+    cards:
+      - {speaker: shaman, text: "Count the eyes before you count the fires. The fires lie."}
+    captions: [{text: "OVER-SHOULDER", t: [0.3, 2.5], y: 30}]
+
+  # 6. pov: branches in the face, eyes in the dark, the raider coming at us
+  - id: s06_pov
+    duration: 4
+    shot: "wide · pov · static"
+    backdrop: {region: interior, time: night, seed: 4,
+               props: [{type: eyes, pos: [120, 138], pairs: 3, spread: [70, 10], color: ember2, seed: 3},
+                       {type: branches, x: 0, width: 160, depth: 50, layer: front, parallax: 1.2, seed: 5}]}
+    weather: none
+    actors:
+      - {id: raider, sprite: raider, state: run, path: [[170, 150], [162, 170]], flip: true, scale: 2}
+    camera: {shake: {amp: 1, decay: 0}}
+    captions: [{text: "POV", t: [0.3, 3.5], y: 30}]
+
+  # 7. track: the camera follows Teal through near trunks that slide past faster
+  - id: s07_track
+    duration: 6
+    shot: "wide · eye · teal · track"
+    backdrop: {region: interior, time: day, seed: 12,
+               props: [{type: tree, pos: [120, 152], height: 90, seed: 3, color: fern0, thick: 4, depth: 7, parallax: 0.9},
+                       {type: tree, pos: [330, 152], height: 100, seed: 5, color: fern0, thick: 4, depth: 7, parallax: 0.9},
+                       {type: trunk, pos: [40, 0], width: 24, layer: front, parallax: 1.7, seed: 1},
+                       {type: trunk, pos: [380, 0], width: 30, layer: front, parallax: 1.7, seed: 2},
+                       {type: trunk, pos: [700, 0], width: 20, layer: front, parallax: 1.7, seed: 3}]}
+    actors:
+      - {id: teal, sprite: apprentice, state: walk, path: [[160, 160], [420, 160]], bob: 1}
+      - {id: auk,  sprite: shaman,     state: walk, path: [[130, 160], [390, 160]]}
+    captions: [{text: "TRACK", t: [0.3, 3.5], y: 30}]
+
+  # 8. depth walk: the figure comes to camera in three cuts, not a slide
+  - id: s08_depth
+    backdrop: {region: uplands, time: dusk, seed: 6}
+    weather: {type: snow, density: 0.3, wind: 0.5}
+    actors:
+      - {id: teal, sprite: apprentice, state: walk, path: [[150, 150]], flip: true}
+    shots:
+      - {duration: 1.4, set: {teal: {path: [[160, 152]]}}}
+      - {duration: 1.2, set: {teal: {scale: 2, path: [[164, 170]]}}, backdrop: {angle: low}}
+      - {duration: 1.4, set: {teal: {scale: 3, path: [[170, 200]]}}, backdrop: {angle: low}}
+    captions: [{text: "DEPTH WALK", t: [0.3, 3.5], y: 30}]
+
+  # 9. panels: a manga page; three sub-shots land one after another
+  - id: s09_panels
+    duration: 5
+    backdrop: {region: glass, time: dusk, seed: 8}
+    weather: none
+    actors:
+      - {id: auk,    sprite: shaman, state: windup, path: [[150, 162]]}
+      - {id: raider, sprite: raider, state: lunge,  path: [[186, 162]], flip: true}
+      - {id: rig,    sprite: rig,    state: hum,    path: [[110, 164]]}
+    panels:
+      - {rect: [8, 6, 180, 62],   at: 0.0, shot: "wide · eye · static"}
+      - {rect: [196, 6, 116, 62], at: 0.6, shot: "close · eye · raider · static", fx: [{type: speedlines, kind: horizontal, color: ash3, density: 20}]}
+      - {rect: [8, 74, 304, 60],  at: 1.2, shot: "close · eye · rig · static", window: [100, 60]}
+    captions: [{text: "PANELS", t: [2.0, 4.5], y: 42, color: ash4}]
+
+  # 10. the Survey's map: an insert on paper, the route inking itself
+  - id: s10_map
+    duration: 6
+    backdrop:
+      plain: true
+      sky: [ash5, ash4, ash5]
+      horizon: 180
+      props:
+        - {type: contours, pos: [90, 60], rings: 5, step: 9, color: ash3, seed: 1}
+        - {type: contours, pos: [230, 110], rings: 4, step: 11, color: ash3, seed: 2}
+        - {type: route, points: [[20, 160], [70, 130], [120, 120], [180, 98], [250, 60]], color: blood2, progress: [0.8, 4.5], dash: 3}
+        - {type: marker, pos: [20, 160], label: MILLS, color: ink1}
+        - {type: marker, pos: [120, 120], label: CISTERN, color: ink1}
+        - {type: marker, pos: [250, 60], label: SALT, color: ink1}
+    weather: none
+    cards:
+      - {narration: "The Survey drew the road before anyone walked it."}
+
+  # 11. push in on the rig, then pull out from Auk's face
+  - id: s11_push_pull
+    backdrop: {region: glass, time: night, seed: 2}
+    weather: none
+    actors:
+      - {id: rig, sprite: rig,    state: hum,  path: [[150, 164]]}
+      - {id: auk, sprite: shaman, state: idle, path: [[182, 162]], flip: true}
+    lights:
+      - {pos: [150, 146], radius: 20, color: ember0, intensity: 0.5, flicker: true}
+    shots:
+      - {duration: 2.5, shot: "medium · eye · rig · push-in"}
+      - {duration: 2.5, shot: "close · eye · auk · pull-out"}
+      - {duration: 0.6, shot: "medium · eye · auk · shake", fx: [{type: flash, color: bone, amount: 0.4}]}
+    transition_out: {duration: 1.2}
+    captions: [{text: "PUSH IN / PULL OUT", t: [0.3, 2.3], y: 30}]
