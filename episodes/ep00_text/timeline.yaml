@@ -1,0 +1,52 @@
+# Draft generated from script-sample.md by tools/script2timeline.py.
+# Hand pass still to do: camera, actor paths, props, lights. `notes` is ignored by the renderer.
+episode: ep00_text
+resolution: [320, 180]
+scale: 6
+fps: 12
+band: 40
+scenes:
+- id: sc01_the_road_in
+  title: 'EP00 / SC01: The road in'
+  duration: auto
+  backdrop: {region: river, time: dusk}
+  actors:
+  - {sprite: shaman, state: idle, path: [[138, 162]]}
+  - {sprite: apprentice, state: idle, path: [[160, 162]]}
+  - {sprite: rig, state: hum, path: [[182, 162]], flip: true}
+  cards:
+  - narration: The mill town had been listed for forty years. This season the Survey had struck it from the route.
+  - speaker: apprentice
+    text: There's no smoke from the chimneys.
+  - speaker: shaman
+    text: There's no one to light them.
+  notes:
+    where: the mill road, a dead tree, fields gone to stubble
+    shot: wide
+    action: they stop at the edge of the town's fields.
+    sound:
+    - wind, a cart wheel
+  weather: {type: ash, density: 0.25, wind: 0.2}
+  transition_in: {duration: 1.0}
+- id: sc02_the_square
+  title: 'EP00 / SC02: The square'
+  duration: auto
+  backdrop: {region: river, time: night}
+  actors:
+  - {sprite: apprentice, state: idle, path: [[127, 162]]}
+  - {sprite: fold_host, state: idle, path: [[149, 162]]}
+  - {sprite: fold_host, state: idle, path: [[171, 162]], flip: true}
+  - {sprite: fold_host, state: idle, path: [[193, 162]], flip: true}
+  cards:
+  - speaker: apprentice
+    text: Where is everyone?
+  - speaker: host
+    text: Here.
+    note: all three at once
+  - narration: They spoke the word together, the way a congregation says amen, and went back to work in step.
+  notes:
+    where: the square, every door unlocked
+    shot: wide
+    action: the hosts stop work together and turn.
+  weather: {type: motes, density: 0.5, wind: 0.1}
+  transition_out: {duration: 1.5}

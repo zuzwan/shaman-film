@@ -6,7 +6,7 @@ upscaling happens only in FFmpeg, with nearest-neighbour.
 """
 import numpy as np
 
-from . import regions, sprites
+from . import regions, sprites, subtitles
 from .backdrops import Backdrop
 from .dither import mask, threshold
 from .font import CH, text_mask, wrap
@@ -49,7 +49,13 @@ class Scene:
         self.spec, self.cfg = spec, cfg
         self.W, self.H = cfg["resolution"]
         self.fps = cfg["fps"]
-        self.duration = spec["duration"]
+        self.band = spec.get("band", cfg.get("band", 0))
+        self.cards = subtitles.schedule(spec.get("cards", []), spec.get("cards_start", 0.6), self.W, self.band)
+        dur = spec.get("duration", "auto")
+        if dur == "auto":  # long enough to read every card
+            dur = max(spec.get("min_duration", 3.0), subtitles.total_time(spec.get("cards", []),
+                      spec.get("cards_start", 0.6), spec.get("tail", 1.2), self.W, self.band))
+        self.duration = float(dur)
         self.n_frames = int(round(self.duration * self.fps))
         cam = spec.get("camera", {})
         self.pan = cam.get("pan", [0, 0])
@@ -183,8 +189,12 @@ class Scene:
             self.weather.draw(c, t, cam_x)
         if z != 1:
             c = self._zoom(c, z)
-        self._draw_captions(c, t)
+        if self.band:  # lift the picture, cropping empty sky, and open a black text band below
+            c = np.concatenate([c[self.band:], np.zeros((self.band, self.W, 3), np.uint8)])
+            c[self.H - self.band:] = RGB["ink0"]
         self._transition(c, t)
+        self._draw_captions(c, t)
+        subtitles.draw(c, self.cards, t, self.band)
         return c
 
     def _zoom(self, c, z):

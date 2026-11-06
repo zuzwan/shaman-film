@@ -37,6 +37,9 @@ def render_scene(spec, cfg, out, keys_only=False):
     scene = Scene(spec, cfg)
     W, H = cfg["resolution"]
     key_idx = set(np.linspace(0, scene.n_frames - 1, KEYS_PER_SCENE).astype(int))
+    # with subtitles, also key the moment each card is fully typed: that's what gets reviewed
+    for card in scene.cards:
+        key_idx.add(min(scene.n_frames - 1, int((card["t_typed"] + 0.3) * cfg["fps"])))
     proc = None if keys_only else ffmpeg_writer(out / "scenes" / f"{spec['id']}.mp4", W, H, cfg["fps"], cfg["scale"])
     keys = []
     for i, frame in scene.frames():
@@ -80,7 +83,8 @@ def main():
 
     ep = Path(args.episode)
     tl = yaml.safe_load(open(ep / "timeline.yaml"))
-    cfg = {"resolution": tl.get("resolution", [320, 180]), "fps": tl.get("fps", 12), "scale": tl.get("scale", 6)}
+    cfg = {"resolution": tl.get("resolution", [320, 180]), "fps": tl.get("fps", 12), "scale": tl.get("scale", 6),
+           "band": tl.get("band", 0)}
     out = Path("out") / ep.name
     for sub in ("scenes", "keys"):
         (out / sub).mkdir(parents=True, exist_ok=True)
@@ -88,7 +92,7 @@ def main():
     scenes = [s for s in tl["scenes"] if not args.scene or s["id"].startswith(args.scene)]
     rows = []
     for spec in scenes:
-        print(f"rendering {spec['id']} ({spec['duration']}s)")
+        print(f"rendering {spec['id']}")
         rows.append((spec["id"], render_scene(spec, cfg, out, args.keys)))
     contact_sheet(rows, cfg, out / "contact.png")
     print(f"contact sheet: {out / 'contact.png'}")
